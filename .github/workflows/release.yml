@@ -1,0 +1,113 @@
+# Release: build, attest, and publish.
+#
+# Three properties this workflow is designed to have, each answering a row
+# of the threat model in SECURITY.md:
+#
+#   * nothing is built on a maintainer's laptop, so a compromised laptop
+#     cannot publish;
+#   * every artifact carries build provenance, so a downstream reader can
+#     check that this workflow produced it;
+#   * publishing uses a trusted publisher rather than a long-lived API
+#     token, so there is no token to steal.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build every package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build
+        run: |
+          pip install build twine
+          for pkg in packages/*/; do
+            python -m build --outdir dist "$pkg"
+          done
+          twine check dist/*
+
+      - name: Software bill of materials
+        run: |
+          pip install cyclonedx-bom
+          for pkg in packages/*/; do
+            name=$(basename "$pkg")
+            cyclonedx-py environment --output-format json \
+              --outfile "dist/${name}-sbom.json" || true
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  provenance:
+    name: Attest build provenance
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: "dist/*.whl,dist/*.tar.gz"
+
+  publish:
+    name: Publish to PyPI
+    needs: [build, provenance]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/parapet
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Drop the SBOMs before upload
+        run: rm -f dist/*-sbom.json
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    name: GitHub release
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" dist/* \
+            --title "${{ github.ref_name }}" \
+            --notes-file CHANGELOG.md \
+            --verify-tag

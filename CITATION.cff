@@ -1,0 +1,89 @@
+cff-version: 1.2.0
+title: PARAPET
+message: >-
+  If you use PARAPET, please cite the software and the papers its
+  components implement.
+type: software
+authors:
+  - family-names: Zhao
+    given-names: Yutong
+    orcid: "https://orcid.org/0000-0002-9307-5532"
+    affiliation: California State University, Long Beach
+  - name: The PARAPET Authors
+repository-code: "https://github.com/Yutong0711/PARAPET"
+license: Apache-2.0
+abstract: >-
+  PARAPET turns a security or performance exposure into a reviewable
+  decision: it classifies the exposure, measures what a candidate fix
+  costs at run time, reports where in the architecture that cost lands,
+  and checks the result against a service budget the maintainer declared
+  in advance. The output is a hardening record.
+keywords:
+  - software performance
+  - software architecture
+  - supply chain security
+  - issue triage
+references:
+  - type: article
+    title: >-
+      A Platform-Agnostic Framework for Automatically Identifying
+      Performance Issue Reports With Heuristic Linguistic Patterns
+    authors:
+      - family-names: Zhao
+        given-names: Yutong
+      - family-names: Xiao
+        given-names: Lu
+      - family-names: Wong
+        given-names: Sunny
+    journal: IEEE Transactions on Software Engineering
+    volume: 50
+    issue: 7
+    start: 1704
+    end: 1725
+    year: 2024
+    doi: 10.1109/TSE.2024.3390623
+  - type: article
+    title: >-
+      A Large-Scale Empirical Study of Real-Life Performance Issues in
+      Open Source Projects
+    authors:
+      - family-names: Zhao
+        given-names: Yutong
+      - family-names: Xiao
+        given-names: Lu
+      - family-names: Bondi
+        given-names: Andre B.
+      - family-names: Chen
+        given-names: Bihuan
+      - family-names: Liu
+        given-names: Yang
+    journal: IEEE Transactions on Software Engineering
+    volume: 49
+    issue: 2
+    start: 924
+    end: 946
+    year: 2023
+    doi: 10.1109/TSE.2022.3167628
+  - type: conference-paper
+    title: >-
+      Butterfly Space: An Architectural Approach for Investigating
+      Performance Issues
+    authors:
+      - family-names: Zhao
+        given-names: Yutong
+      - family-names: Xiao
+        given-names: Lu
+      - family-names: Wang
+        given-names: Xiao
+      - family-names: Chen
+        given-names: Zhifei
+      - family-names: Chen
+        given-names: Bihuan
+      - family-names: Liu
+        given-names: Yang
+    collection-title: >-
+      IEEE International Conference on Software Architecture (ICSA)
+    start: 202
+    end: 213
+    year: 2020
+    doi: 10.1109/ICSA47634.2020.00027

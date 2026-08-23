@@ -1,0 +1,94 @@
+set_id: security-v1
+description: >-
+  A starter set of heuristic linguistic patterns for security hardening
+  work, written in the same language as the performance set. It is not a
+  vulnerability detector: it separates reports and advisories that describe
+  a hardening opportunity from those that do not, so a maintainer's queue
+  can be routed. Extend it for your own project; see docs/pattern-sets.md.
+source:
+  basis: >-
+    Pattern names follow common weakness vocabulary (CWE) and the wording
+    of published advisories. Unlike the performance set, this one has not
+    been validated against a labelled corpus, and its accuracy is unknown.
+  license: Apache-2.0
+patterns:
+  - id: SEC001
+    name: memory_safety
+    category: LEX
+    definition: '{"buffer overflow" | "buffer over-read" | "out of bounds" | "out-of-bounds" | "heap overflow" | "stack overflow" | "use after free" | "use-after-free" | "double free" | "null dereference" | "null pointer dereference"}'
+  - id: SEC002
+    name: memory_unsafe_api
+    category: STR
+    definition: '{"strcpy" | "strcat" | "sprintf" | "gets" | "memcpy" | "alloca"} + {"unsafe" | "replace" | "unchecked" | "bounds" | "overflow"}'
+  - id: SEC003
+    name: injection
+    category: LEX
+    definition: '1. {"sql injection" | "command injection" | "code injection" | "xss" | "cross-site scripting" | "xxe" | "xml external entity"}; 2. {"injection"} + {"prevent" | "sanitize" | "escape" | "parameterize"}'
+  - id: SEC004
+    name: unvalidated_input
+    category: STR
+    definition: '{"input" | "parameter" | "argument" | "payload"} + {"unvalidated" | "unchecked" | "untrusted" | "not validated" | "no validation" | "sanitize" | "sanitized" | "validate"}'
+  - id: SEC005
+    name: deserialization
+    category: LEX
+    definition: 'word_contains{"deserial"} + {"untrusted" | "unsafe" | "gadget" | "arbitrary"}'
+  - id: SEC006
+    name: path_traversal
+    category: LEX
+    definition: '{"path traversal" | "directory traversal" | "zip slip"} | text_contains{"../"}'
+  - id: SEC007
+    name: crypto_weakness
+    category: STR
+    definition: '1. {"md5" | "sha1" | "sha-1" | "rc4" | "des" | "3des" | "ecb"} + {"weak" | "deprecated" | "replace" | "insecure" | "broken"}; 2. {"hardcoded" | "hard-coded"} + {"key" | "secret" | "password" | "credential" | "token"}'
+  - id: SEC008
+    name: weak_randomness
+    category: STR
+    definition: '{"random" | "rand" | "prng" | "seed"} + {"predictable" | "insecure" | "not cryptographically" | "weak" | "secure random"}'
+  - id: SEC009
+    name: authentication
+    category: STR
+    definition: '{"authentication" | "authorization" | "access control" | "permission" | "privilege"} + {"bypass" | "missing" | "escalation" | "escalate" | "incorrect" | "improper"}'
+  - id: SEC010
+    name: transport_security
+    category: STR
+    definition: '1. {"certificate" | "hostname" | "tls" | "ssl"} + {"verification" | "verify" | "validation" | "disabled" | "not checked"}; 2. {"plaintext" | "cleartext"} + {"transmit" | "transmitted" | "sent" | "stored"}'
+  - id: SEC011
+    name: secret_exposure
+    category: SEM
+    definition: '{"leak" | "leaks" | "leaked" | "expose" | "exposes" | "exposed" | "disclosure"} + {"secret" | "token" | "credential" | "password" | "private key" | "api key"}'
+  - id: SEC012
+    name: resource_exhaustion
+    category: STR
+    definition: '1. {"denial of service" | "dos" | "resource exhaustion" | "algorithmic complexity attack" | "zip bomb" | "billion laughs"}; 2. {"unbounded" | "no limit" | "without limit"} + {"allocation" | "recursion" | "loop" | "read" | "buffer"}'
+  - id: SEC013
+    name: race_condition
+    category: STR
+    definition: '{"race condition" | "toctou" | "time of check" | "time-of-check"} | {"race"} + {"exploit" | "window" | "concurrent"}'
+  - id: SEC014
+    name: sandbox_isolation
+    category: STR
+    definition: '{"sandbox" | "isolate" | "isolation" | "confine" | "seccomp" | "capability"} + {"add" | "adds" | "escape" | "harden" | "restrict" | "enforce"}'
+  - id: SEC015
+    name: memory_safe_migration
+    category: STR
+    definition: '{"memory-safe" | "memory safe" | "rust" | "safe wrapper"} + {"rewrite" | "port" | "migrate" | "replace" | "bindings"}'
+  - id: SEC016
+    name: dependency_supply_chain
+    category: STR
+    definition: '1. {"supply chain" | "dependency confusion" | "typosquat" | "typosquatting"}; 2. {"dependency" | "transitive dependency" | "vendored"} + {"vulnerable" | "outdated" | "pin" | "pinned" | "upgrade" | "cve"}'
+  - id: SEC017
+    name: advisory_reference
+    category: PRF
+    definition: 'text_contains{"cve-" | "ghsa-" | "cwe-" | "osv-"}'
+  - id: SEC018
+    name: reproducer_present
+    category: PRF
+    definition: '{"proof of concept" | "poc" | "reproducer" | "crash input" | "test case"} | {"asan" | "ubsan" | "msan" | "valgrind" | "sanitizer" | "fuzzer" | "oss-fuzz"}'
+  - id: SEC019
+    name: hardening_intent
+    category: SEM
+    definition: '{"harden" | "hardens" | "hardening" | "mitigate" | "mitigation" | "defense in depth" | "defence in depth"}'
+  - id: SEC020
+    name: cost_of_hardening
+    category: SEM
+    definition: '{"mitigation" | "hardening" | "sandbox" | "bounds check" | "check" | "validation"} + {"overhead" | "slowdown" | "regression" | "cost" | "expensive" | "performance impact"}'

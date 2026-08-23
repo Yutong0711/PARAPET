@@ -1,0 +1,6 @@
+key,summary,description
+DEMO-1,Reads are slow after the bounds check landed,"Since the bounds check was added to Store.read the read benchmark takes about 12 percent more time. Profiling shows the extra time is spent inside checkBounds, which is called on every read. The per-call cost is tiny but the call count is 50000."
+DEMO-2,Add a --verbose flag to the exporter,"It would be useful to see what the exporter is doing. Add a --verbose flag that prints each record as it is written."
+DEMO-3,Out-of-bounds read in the record decoder,"A crafted record makes Decoder.decode read past the end of the buffer. CVE-2026-0001. A crash input from oss-fuzz is attached as a reproducer."
+DEMO-4,Typo in the README,"The README says 'recieve'. It should say 'receive'."
+DEMO-5,Cache misses cause repeated fetches from the store,"When the cache misses we go to the store every single time, so a cold start does the same expensive fetch again and again. Memory usage also climbs because nothing is evicted."

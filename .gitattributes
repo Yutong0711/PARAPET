@@ -1,0 +1,27 @@
+# The repository is authored on Windows and runs on Linux in CI, so line
+# endings are normalised in the repository rather than left to whoever
+# cloned it. Without this, a shell script committed with CRLF fails on
+# Linux with "bad interpreter", which is a confusing way to learn about
+# line endings.
+
+* text=auto eol=lf
+
+*.sh    text eol=lf
+*.py    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.toml  text eol=lf
+*.md    text eol=lf
+*.cff   text eol=lf
+*.java  text eol=lf
+*.csv   text eol=lf
+Makefile text eol=lf
+
+*.xlsx  binary
+*.png   binary
+*.pdf   binary
+*.jfr   binary
+
+# Keep the vendored pattern set out of language statistics; it is data,
+# and counting it as code misrepresents what is in the repository.
+packages/parapet-triage/src/parapet_triage/data/*.yaml linguist-generated=false linguist-language=YAML

@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (py${{ matrix.python }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install the packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e packages/parapet-record
+          pip install -e packages/parapet-triage
+          pip install -e packages/parapet-scope
+          pip install -e packages/parapet-attrib
+          pip install -e packages/parapet-cli
+          pip install pytest pytest-cov
+
+      - name: Test
+        run: pytest packages -q --cov --cov-report=term-missing
+
+      # A user who installs one package must not be handed an ImportError
+      # from an optional dependency. This is the check that keeps the
+      # "installs in minutes" claim true.
+      - name: Each package works alone
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.12'
+        run: |
+          for pkg in parapet-record parapet-triage parapet-scope parapet-attrib; do
+            python -m venv "/tmp/solo-$pkg"
+            "/tmp/solo-$pkg/bin/pip" install -q "packages/$pkg"
+            "/tmp/solo-$pkg/bin/python" -c "import ${pkg//-/_}; print('$pkg ok', ${pkg//-/_}.__version__)"
+          done
+          /tmp/solo-parapet-triage/bin/parapet-triage doctor
+          /tmp/solo-parapet-scope/bin/parapet-scope --version
+          /tmp/solo-parapet-attrib/bin/parapet-attrib --version
+
+  quickstart:
+    name: the quickstart still works
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          python -m pip install --upgrade pip
+          pip install -e packages/parapet-record -e packages/parapet-triage \
+                      -e packages/parapet-scope -e packages/parapet-attrib \
+                      -e packages/parapet-cli
+      - name: Run the bundled example end to end
+        run: bash examples/java-demo/run.sh
+
+  build:
+    name: packages build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build twine
+      - name: Build and check every package
+        run: |
+          for pkg in packages/*/; do
+            python -m build --outdir dist "$pkg"
+          done
+          twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/

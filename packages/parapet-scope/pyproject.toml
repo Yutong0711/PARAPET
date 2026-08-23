@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "parapet-scope"
+version = "0.1.0"
+description = "Classify how wide a code change is, and how it should be reviewed"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "The PARAPET Authors" }]
+keywords = ["software architecture", "design structure matrix", "code review", "java"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Version Control :: Git",
+]
+dependencies = []
+
+[project.optional-dependencies]
+record = ["parapet-record>=0.1.0"]
+dev = ["pytest>=7.4", "pytest-cov>=4.1"]
+
+[project.scripts]
+parapet-scope = "parapet_scope.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Yutong0711/PARAPET"
+Source = "https://github.com/Yutong0711/PARAPET"
+Issues = "https://github.com/Yutong0711/PARAPET/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]

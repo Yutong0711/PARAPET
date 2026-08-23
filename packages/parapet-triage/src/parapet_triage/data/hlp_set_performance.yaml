@@ -1,0 +1,356 @@
+set_id: performance-v1
+description: The 80 heuristic linguistic patterns of Zhao, Xiao and Wong (TSE 2024), transcribed from
+  the published data package.
+source:
+  doi: 10.5281/zenodo.10944186
+  paper_doi: 10.1109/TSE.2024.3390623
+  license: CC-BY-4.0
+patterns:
+- id: HLP001
+  name: efficiency
+  category: LEX
+  definition: '{"efficient" | "efficiently" | "efficiency" | "inefficient" | "inefficiently" | "inefficiency"}'
+- id: HLP002
+  name: complexity
+  category: LEX
+  definition: '{"complex" | "complexity" | "complicated" | "uncomplex"}'
+- id: HLP003
+  name: reduce
+  category: LEX
+  definition: '{"reduce" | "reduces" | "reducing" | "reduction"}'
+- id: HLP004
+  name: performance
+  category: LEX
+  definition: '{"performance"}'
+- id: HLP005
+  name: latency
+  category: LEX
+  definition: '{"latency" | "latencies"}'
+- id: HLP006
+  name: expensive
+  category: LEX
+  definition: '{"expensive"}'
+- id: HLP007
+  name: speed
+  category: LEX
+  definition: 1. {"speedup" | "speed up" | "sped by" | "speeds up" | "speedups" | "great speed" | "speed
+    increase/descrease" };2. word_contains{"accelerat"}; 3. {"faster"}; 4. {"quick" | "quickly"} 5. word_contains_"slow"
+    6. "average" + "speed"; 6. "longer than usual" | "for a long moment"}
+- id: HLP008
+  name: spilling
+  category: LEX
+  definition: '{"spilling"}'
+- id: HLP009
+  name: throughput
+  category: LEX
+  definition: '{"throughput"}'
+- id: HLP010
+  name: negative_necessary
+  category: SEM
+  definition: 1. {"only when necessary" | "unnecessary" | "unneeded" | " only the needed" | "not needed"
+    | "redundant" | "redundancy" | "wasteful"}.
+- id: HLP011
+  name: block
+  category: LEX
+  definition: 1. {"block" | "blocks" | "blocked" | "blocking" | "bottleneck" | "bottlenecked"}; 2. {"hang"
+    | "hangs" | "hanging" | "long running"}; 3. {"process"} + contains_"crash"
+- id: HLP012
+  name: byte
+  category: PRF
+  definition: '{"byte" | "bytes"} | word_contains{"-byte"}'
+- id: HLP013
+  name: prefetch
+  category: LEX
+  definition: word_contains{"prefetch"}
+- id: HLP014
+  name: hotspot
+  category: LEX
+  definition: '{"hot spot" | "hotspot"}'
+- id: HLP015
+  name: space
+  category: LEX
+  definition: '{"space"} + {"enough"}'
+- id: HLP016
+  name: buffer
+  category: STR
+  definition: word_contains{"buffer"} + {"additional" | "size" | "connection" | "optimize" | "fit" | "filled-up"
+    | "on heap" | "off heap"}
+- id: HLP017
+  name: timeout
+  category: STR
+  definition: 1. word_contains_"timeout"; 2. {"expire" | "expires" | "expiration"};
+- id: HLP018
+  name: frequent
+  category: LEX
+  definition: '{"frequent" | "frequently" | "frequency"}'
+- id: HLP019
+  name: skip
+  category: LEX
+  definition: '{"skip" | "skips" | "skipped" | "skipping"}'
+- id: HLP020
+  name: infinity
+  category: LEX
+  definition: '{"infinite" | "forever" | "infinity"}'
+- id: HLP021
+  name: over_again
+  category: SEM
+  definition: '{"over again" | "again and again"}'
+- id: HLP022
+  name: regress
+  category: LEX
+  definition: contains_"regress"
+- id: HLP023
+  name: overhead
+  category: LEX
+  definition: '{"overhead"}'
+- id: HLP024
+  name: network
+  category: LEX
+  definition: '{"network"} + {"traffic" | "hop" | "hops"}'
+- id: HLP025
+  name: garbage
+  category: LEX
+  definition: '{"produce" | "generate"} +{"garbage"}'
+- id: HLP026
+  name: dynamic_allocation
+  category: LEX
+  definition: '{"dynamic allocation"}'
+- id: HLP027
+  name: throttle
+  category: LEX
+  definition: '{"throttling" | "throttles" | "throttle"}'
+- id: HLP028
+  name: processing_time
+  category: LEX
+  definition: '{"throttling" | "throttles" | "throttle"}'
+  note: identical definition to throttle in the published set
+- id: HLP029
+  name: contended_lock
+  category: LEX
+  definition: '{"contended" | "contention"} + {"lock" | "locks"}'
+- id: HLP030
+  name: bound
+  category: LEX
+  definition: '{"bound" | "inbound"}'
+- id: HLP031
+  name: memory_unit
+  category: PRF
+  definition: word_contains_"kb" | "mb" | "gb" | "tb"}
+- id: HLP032
+  name: cpi
+  category: LEX
+  definition: '{"CPI"}'
+- id: HLP033
+  name: execution
+  category: STR
+  definition: '{"when" | "while"}+{"run" | "execute" | "perform"} + NUMBER+DURATION'
+- id: HLP034
+  name: iteration
+  category: STR
+  definition: word_contains_"loop" | "iterat" | "recurs"
+- id: HLP035
+  name: concurrent
+  category: LEX
+  definition: word_contains_"concurren"
+- id: HLP036
+  name: probe_filter
+  category: LEX
+  definition: text_contains{"probe filter"}
+- id: HLP037
+  name: thread
+  category: STR
+  definition: 1. {"thread" | "GC"} + {"pause" |"count low" | "deltification"}; {"thread pool"} + {"jump"
+    | "removed"}
+- id: HLP038
+  name: binary_search
+  category: LEX
+  definition: '{"binary search"}'
+- id: HLP039
+  name: power_consumption
+  category: LEX
+  definition: 1. {"power"} + {"consumption"}; 2.{"drain"} + {"battery"}
+- id: HLP040
+  name: stress_testing
+  category: LEX
+  definition: '{"stress"} + {"testing"}'
+- id: HLP041
+  name: huge_data_chunk
+  category: LEX
+  definition: '{"huge page" | "huge backlog" | "huge file"}'
+- id: HLP042
+  name: data_rate
+  category: STR
+  definition: '{"calculate"} + {"data rate"}'
+- id: HLP043
+  name: GC_pressure
+  category: LEX
+  definition: '{"GC"} + {"pressure" | "count increase" | "thrashing" }'
+- id: HLP044
+  name: big_O
+  category: PRF
+  definition: text_contains{"O(n^2)", "O(N)", "O(1)", "O(NlogN)"…}
+- id: HLP045
+  name: disk_spill
+  category: LEX
+  definition: text_contains("disk spill")
+- id: HLP046
+  name: brute_force
+  category: LEX
+  definition: '"brute force"'
+- id: HLP047
+  name: percentage
+  category: PRF
+  definition: ner_contains_"PERCENT"
+- id: HLP048
+  name: duration
+  category: PRF
+  definition: ner_contains_"DURATION" | {"duration"}
+- id: HLP049
+  name: profiling
+  category: PRF
+  definition: '{"<profiling>"} | contains_"profil" | {"ms"} | {"ops/sec"} | {"megabytes/sec" | "mb/s"
+    | "mb/sec"}'
+- id: HLP050
+  name: benchmark
+  category: LEX
+  definition: '{"benchmark"}'
+- id: HLP051
+  name: one … per …
+  category: STR
+  definition: '"one" is before "per"'
+- id: HLP052
+  name: all_to_one
+  category: SEM
+  definition: 1. "each" + "in its own"; 2. {"all" | "overall"} + {"to one"}; 3.{"add them all into your
+    compaction"}
+- id: HLP053
+  name: in_one_go
+  category: SEM
+  definition: 1. {"in one time" | "in one go" | "at the same time" | "only once" | "just one time" | "in
+    a single" | "in one operation" | "at once"}; 2.{"no more than"} + {"at a time"}
+- id: HLP054
+  name: memory
+  category: STR
+  definition: '{"memory"} + {"usage" | "lot of" | "too much"|"overflow" | "hold" | "remove" | "bloat"
+    | "limit" | "limitation" | "plenty of" | "consume" | "consuming" | "consumes" | consumption" | "excessive"
+    | "usage" | "pack" | "heavy" | "leak"} | {"OOM"} | contains_{"fit" | "sorting"} + {"in memory" | "into
+    memory"} | "memory" + "only" + "through"'
+- id: HLP055
+  name: cpu
+  category: SEM
+  definition: '{"cpu"} + {"a lot of" | "higher" | "lower" | "limit" | "limitation" | "usage" | "utilization"
+    | "waiting" | "low level"}'
+- id: HLP056
+  name: per
+  category: SEM
+  definition: per_NN_per_NN
+- id: HLP057
+  name: nn_by_nn
+  category: SEM
+  definition: two nouns are the same
+- id: HLP058
+  name: load_NN
+  category: STR
+  definition: '"load" | "loads" is noun'
+- id: HLP059
+  name: respond_until
+  category: STR
+  definition: '{"respond until | "responds until" | "stop responding"}'
+- id: HLP060
+  name: calls
+  category: STR
+  definition: 1. {"called" | "invoked" | "callstack"} + {"frequently" | "very often" | "a lot" | "many
+    times" | "multiple time" | "repeated" | "repeatedly" | "nearly every" | "on every"}; 2. {"extra" |
+    "additional"} +{"call" | calls"}; 3. {"call"} + {"at least"} + {"every" | "each"}; 3. too many requests
+- id: HLP061
+  name: re
+  category: STR
+  definition: '{"redo" | "rework" | "recalculate" | "re-" | "resurrect" | "reindex" | "rewrite" | "reload"
+    | "resize"}'
+- id: HLP062
+  name: spend_time
+  category: STR
+  definition: '{"take" | "takes" | "took" | "taken" | "spend" | "spends" | "spent" | "waste" | "wastes"
+    | "wasted" | "wasting" | "loose" | "looses" | "go" | "goes"} + {"most" | "more" | "lot of" | "lots
+    of" | "long" | "part" | "half" | "quite a bit of" | "significant" | "majority" | "minority" | "dominating"}
+    + {"time" | "resource"} | "operation too long:'
+- id: HLP063
+  name: cache
+  category: STR
+  definition: 1. {"cache" | "caching" | "caches" | cached} + {"cold" | "warm" | "buffer" | "metadata"
+    |"execution" | "duplicate" | "replace" | "update" | "improve" | "miss" | "hit" | "entry" | "lock"
+    | "document" | "add" | "additional" | "atomic" | "heavy" | "optimize" | "benefit" | "extra" | "all
+    over" | "speed" | "parallel" | "on-heap" | "off heap" | "configurable" | "minimize" | "maximize" |
+    "drop" | "capacity" | "mess" | "preload"}; 2."cache" + "save" + "disk"
+- id: HLP064
+  name: perform
+  category: STR
+  definition: '{"perform" | "performs"} +{"rounds" | "poor" | "poorly"}'
+- id: HLP065
+  name: each_one
+  category: STR
+  definition: '{"each"} + {"one" | "own" | "individual"}'
+- id: HLP066
+  name: close+immediately
+  category: STR
+  definition: word_contains{"immediate"} + word_contains{"close" | "flush"}
+- id: HLP067
+  name: cardinality
+  category: LEX
+  definition: '{"cardinality"} + {"cost" | "high" | "improve"}'
+- id: HLP068
+  name: fast
+  category: STR
+  definition: text_contains{"fast to"} + VB | "enough" | "fail fast" | "fast way" | "fast pace"
+- id: HLP069
+  name: lot_of_reading
+  category: STR
+  definition: 1. {"reading" | "read" | "reads"} + {"a lot of" | "too many" |"unusual high" | "the same"
+    | "on every"}
+- id: HLP070
+  name: roundtrip
+  category: STR
+  definition: '{"roundtrip" | "round trip"} + {"more" | "less" | "lot"}'
+- id: HLP071
+  name: traverse
+  category: STR
+  definition: '{"traverse" | "traversal" | "traversing" | "go through"} + {"in time" | "entire" | "broad"
+    | "lot" | "full" | "recursively"}'
+- id: HLP072
+  name: cd_files
+  category: STR
+  definition: '{"file" | "files"} + {"creat" | "delet"} + {"lot" | "few" | "more" | "less"}'
+- id: HLP073
+  name: avoid
+  category: STR
+  definition: '{"avoid"} + {"for" | "when" | "if" | "extra work" | "wasted" | "again" | "duplicat" | "double"
+    | "overrid" | "lookup" | "lookups"}'
+- id: HLP074
+  name: cost
+  category: STR
+  definition: '{"cost" | "costs} + {"high" | "low" | "minimum" | "significant"|"higher" | "nothing" |
+    "increasing" | "significant"}'
+- id: HLP075
+  name: session
+  category: STR
+  definition: '{"session" | "sessions"} + {"short-lived" | "lot of"}'
+- id: HLP076
+  name: negative_do_everything
+  category: STR
+  definition: '{"shouldn''t" | "not" | "n''t" } +{"read" | "create"} + {"everything" | "each" | "everything"}'
+- id: HLP077
+  name: algorithm
+  category: STR
+  definition: '{"algorithm"}+{"one-pass"}'
+- id: HLP078
+  name: waste
+  category: STR
+  definition: 1. {"waste"} +{"time" | "work"}; 2. {"extra work"} + {"lot of"}
+- id: HLP079
+  name: save_time
+  category: STR
+  definition: '{"save"} + {"time"}'
+- id: HLP080
+  name: decrease_operations
+  category: STR
+  definition: '{"calls" | "operations"} + {"increase" | "decrease"}'

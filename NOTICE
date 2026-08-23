@@ -1,0 +1,42 @@
+PARAPET
+Copyright 2026 The PARAPET Authors
+
+This product includes software developed at
+California State University, Long Beach; the University of Arizona; and the
+Rochester Institute of Technology.
+
+--------------------------------------------------------------------------
+Bundled data
+--------------------------------------------------------------------------
+
+packages/parapet-triage/src/parapet_triage/data/hlp_set_performance.yaml
+
+  The 80 heuristic linguistic patterns in this file are transcribed from the
+  data package for:
+
+    Y. Zhao, L. Xiao and S. Wong, "A Platform-Agnostic Framework for
+    Automatically Identifying Performance Issue Reports With Heuristic
+    Linguistic Patterns," IEEE Transactions on Software Engineering,
+    50(7):1704-1725, 2024. doi:10.1109/TSE.2024.3390623
+
+  Data package: doi:10.5281/zenodo.10944186
+  Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).
+  https://creativecommons.org/licenses/by/4.0/
+
+  The pattern names, categories and definitions are reproduced from that
+  package. The compiled matcher implementations are original work licensed
+  under Apache-2.0 with the rest of PARAPET.
+
+packages/parapet-scope/src/parapet_scope/data/change_scope_codebook.yaml
+
+  The root-cause, optimization-level, design-level pattern and
+  test/production co-change code books are transcribed from the data
+  package for:
+
+    Y. Zhao, L. Xiao, A. B. Bondi, B. Chen and Y. Liu, "A Large-Scale
+    Empirical Study of Real-Life Performance Issues in Open Source
+    Projects," IEEE Transactions on Software Engineering, 49(2):924-946,
+    2023. doi:10.1109/TSE.2022.3167628
+
+  Data package: doi:10.5281/zenodo.6383167
+  Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).

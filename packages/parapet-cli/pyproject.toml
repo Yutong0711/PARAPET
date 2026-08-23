@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "parapet"
+version = "0.1.0"
+description = "Turn a security or performance exposure into a reviewable decision"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "The PARAPET Authors" }]
+keywords = ["software performance", "supply chain security", "code review", "hardening"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = [
+  "parapet-record>=0.1.0",
+  "parapet-triage>=0.1.0",
+  "parapet-scope>=0.1.0",
+  "parapet-attrib>=0.1.0",
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "pytest-cov>=4.1"]
+
+[project.scripts]
+parapet = "parapet_cli.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Yutong0711/PARAPET"
+Source = "https://github.com/Yutong0711/PARAPET"
+Issues = "https://github.com/Yutong0711/PARAPET/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
