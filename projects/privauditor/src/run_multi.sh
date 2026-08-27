@@ -1,0 +1,11 @@
+WORLD_SIZE=2 CUDA_VISIBLE_DEVICES=0,1,2,3 torchrun --nproc_per_node=2 --master_port=3192 finetune.py \
+  --base_model 'yahma/llama-7b-hf' \
+  --data_path 'math_10k.json' \
+  --output_dir './trained_models/llama-lora' \
+  --batch_size 16 \
+  --micro_batch_size 4 \
+  --num_epochs 3 \
+  --learning_rate 3e-4 \
+  --cutoff_len 256 \
+  --val_set_size 120 \
+  --adapter_name lora

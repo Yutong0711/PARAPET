@@ -1,9 +1,0 @@
-method,time,own_time,count
-acme.Loader#load,1000.0,40.0,50000
-acme.Loader#loadAll,1010.0,10.0,50000
-acme.Cache#get,900.0,60.0,50000
-acme.Cache#lookup,20.0,20.0,50000
-acme.Store#read,820.0,30.0,50000
-acme.Store#checkBounds,0.0,0.0,0
-acme.Store#fetch,790.0,790.0,50000
-acme.Decoder#decode,60.0,60.0,50000

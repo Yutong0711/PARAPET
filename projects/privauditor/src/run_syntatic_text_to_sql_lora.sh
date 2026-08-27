@@ -1,0 +1,14 @@
+CUDA_VISIBLE_DEVICES=6 python finetune.py \
+  --base_model 'yahma/llama-7b-hf' \
+  --data_path 'dataset/syntatic_text_to_sql/train.json' \
+  --output_dir './trained_models/llama7b-text2sql' \
+  --batch_size 32 \
+  --micro_batch_size 16 \
+  --num_epochs 3 \
+  --learning_rate 3e-4 \
+  --cutoff_len 256 \
+  --eval_step 320 \
+  --save_step 320 \
+  --val_set_size 120 \
+  --use_gradient_checkpointing \
+  --adapter_name lora

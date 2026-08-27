@@ -1,0 +1,10 @@
+__pycache__
+.idea/*
+/peft/src/peft/__pycache__
+dataset/*
+trained_models/*
+ft-training_set/*
+experiment/*
+*.out
+results_new
+.vscode

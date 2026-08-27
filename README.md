@@ -1,133 +1,104 @@
 # PARAPET
 
-Turn a security or performance exposure into a reviewable decision.
+**PARAPET** turns a security exposure into a reviewable decision. Almost all
+commercial software now depends on open-source components, and most of those
+components carry a known vulnerability. Fixing one has a price — added latency,
+memory, or CPU — and a project with paid engineers and a benchmarking harness
+can measure that price and decide. A library with two volunteers and a thousand
+dependents cannot, so the fix that matters most waits at a contributor who has
+no way to weigh it.
 
-Hardening running code costs something, and almost no volunteer-run
-project can say how much. Mozilla measured the cost of sandboxing a font
-library, found the effect on real page loads acceptable, and shipped. The
-Linux kernel measured its CPU mitigations, found the cost uneven across
-workloads, and now ships a documented switch that turns them off. Both had
-paid engineers, representative workloads and a benchmarking harness. A
-library with two maintainers and a thousand dependent packages has none of
-that, so hardening there waits, or merges with its cost unknown.
+PARAPET is a language-model pipeline that closes that gap. For one exposure at a
+time it identifies the weakness and its reproducer, drafts more than one way to
+remove it, measures each candidate on the project's own workloads, and checks
+the result against a **service budget** the maintainer declared in advance — a
+written limit on how much runtime cost security may add. What reaches the
+maintainer is a **hardening record**: what was removed, the check that proves
+it, what it cost, and how to reproduce both. This repository is the PESOSE
+Track 1 planning platform: it scopes whether and how PARAPET should become a
+governed open-source ecosystem.
 
-PARAPET answers the question that stalls it: **what does this change cost,
-and does that fit what the project already said it would pay?**
+## The unified story
 
-What comes out is a *hardening record*: what the change is about, how wide
-it is and how to review it, what it cost, where in the architecture that
-cost landed, and whether it fits the budget the project declared in
-advance.
+The hardening loop has three jobs, and each founding artifact owns part of one:
 
-```bash
-pip install parapet
-parapet init                       # write a service budget, then edit it
-parapet run --repo . --commit HEAD \
-    --issues issues.csv \
-    --before before.csv --after after.csv --source src/main/java \
-    --changed-methods acme.Loader#load \
-    --budget parapet-budget.yaml --out records/
-parapet show records/HEAD.json
+1. **Draft** a fix that closes the weakness — **CoQuIR** retrieves the secure
+   coding pattern (its `SaferCode` and `CVEFixes` preference-retrieval tasks are
+   the security subset), and **More Than Just Functional** contributes the
+   multi-candidate generate-and-critique workflow.
+2. **Measure** what each candidate costs — **PerfOrch** generates the
+   candidates, compiles and runs them across languages, and records execution
+   time and memory on real benchmarks; **Metior** supplies the statistics that
+   make those numbers trustworthy under noise: dependent-data bootstrapping, a
+   stopping rule fixed before the run, tail-aware reporting.
+3. **Guard** the pipeline itself — **LUNA** compares the agent's observed
+   behavior against a pinned reference profile to catch a degraded or
+   compromised model, and **PrivAuditor** is the data-protection review that
+   must clear any model adaptation before it is used.
+
+PerfOrch is the seed tool that already runs the middle job. CoQuIR is the core
+security artifact; LUNA and PrivAuditor are supporting security controls; Metior
+supplies the measurement statistics; More Than Just Functional is background
+evidence for the drafting workflow. **PARAPET itself — the exposure-to-decision
+framework, the threat model, the security policy, repository ingestion and
+pull-request integration — is built under the award and released separately.**
+
+## Repository layout
+
+```
+projects/
+  perforch/                   README.md + src/   seed: LLM candidate generation + runtime measurement
+  coquir/                     README.md + src/   core: security-aware code retrieval (SaferCode, CVEFixes)
+  metior/                     README.md + src/   measurement statistics under noise (dependent-data bootstrapping)
+  luna/                       README.md + src/   reference-profile monitoring of agent/model behavior
+  privauditor/                README.md + src/   data-protection review for model adaptation
+  more-than-just-functional/  README.md + src/   background: multi-candidate generation + critique
+index.html, styles.css, script.js   the PARAPET website (GitHub Pages)
 ```
 
-## The pieces
+Each project folder is a **vendored snapshot**: source under `src/`, the
+project's own `README.md` (with a provenance banner) and any upstream `LICENSE`
+at the folder root. Derived results, evaluation dumps, datasets, virtualenvs,
+and duplicate document formats were removed to keep this repository lightweight —
+each folder README points back to the full upstream material.
 
-Four packages. Each installs and runs on its own; `parapet` chains them.
+| Project | Origin | Paper | Role |
+| --- | --- | --- | --- |
+| PerfOrch | [qzydustin/perforch](https://github.com/qzydustin/perforch) `e873cd9` | — | Seed pipeline |
+| CoQuIR | Derui Zhu artifact bundle v1.0 | ACL 2026 | Core |
+| Metior | ASE 2021 research artifact (He et al.) | ASE 2021 | Supporting |
+| LUNA | Derui Zhu artifact bundle v1.0 | IEEE TSE 2024 | Supporting |
+| PrivAuditor | Derui Zhu artifact bundle v1.0 | NeurIPS 2024 D&B | Supporting |
+| More Than Just Functional | Derui Zhu artifact bundle v1.0 | NeurIPS 2025 | Background |
 
-| Package | Question it answers | Needs |
-| --- | --- | --- |
-| [`parapet-triage`](packages/parapet-triage) | Is this report about the kind of problem I am looking for, and why? | an issue export, a CSV, or an OSV advisory |
-| [`parapet-scope`](packages/parapet-scope) | How wide is this change, and where should a reviewer start? | a git checkout with Java sources |
-| [`parapet-attrib`](packages/parapet-attrib) | The benchmark says 4% slower. Where did the 4% go? | two profiles and a call graph |
-| [`parapet-record`](packages/parapet-record) | The shared schema, and the budget check | nothing |
+## What Track 1 scopes
 
-Install only what you need:
+- **Ecosystem discovery (PA1):** quota-sampled maintainer interviews, repository
+  mining of how often hardening is reverted or reopened citing runtime cost, and
+  three pilot integrations scored by an independent evaluator.
+- **Organization and governance (PA2):** who holds authority over a declared
+  service budget, who owns the non-code assets (benchmark workloads, pattern
+  catalog, tuned weights), and what pays for the ecosystem. Apache-2.0 core
+  weighed against MPL-2.0, paired with a contributor agreement or DCO.
+- **Risk analysis and security plan (PA3):** a threat model for the six risk
+  classes in the initial register — gamed measurement, one fix opening another,
+  a quietly changed budget, a compromised agent model, capture of budget or
+  evaluation authority, and standing supply-chain risks — each mapped to a
+  control. The measurement is the newest thing to trust and the cheapest to
+  attack.
+- **Community building (PA4):** user and contributor funnels on CHAOSS metrics,
+  a workshop and a mentored sprint, and course modules across three campuses,
+  two of them Hispanic-Serving Institutions.
 
-```bash
-pip install parapet-triage      # triage alone, no other dependency but PyYAML
-pip install parapet-scope       # scope alone, zero dependencies
-pip install parapet-attrib      # attribution alone, zero dependencies
-```
+## Team
 
-## Three things worth knowing before you try it
+Led by California State University, Long Beach (PI Yutong Zhao), with the
+Rochester Institute of Technology (Co-PI Derui Zhu) and the University of Arizona
+(Co-PIs Sen He and Bo Liu).
 
-**It explains itself.** Every triage verdict names the patterns that
-produced it. Every scope verdict names the structural evidence. Every
-attribution says which methods carry the added cost. A tool whose output
-feeds a security review has to be checkable in a few seconds, and an
-opaque score is not.
+## License
 
-**It refuses to decide when it cannot.** A cost measured once has no
-confidence interval, so the record comes back `unscored` rather than
-`admitted`. A budget that declares no limit for a dimension does not pass
-that dimension, it declines to judge it. This is deliberate: a record that
-silently omits a check looks exactly like one that passed it.
-
-**It installs in minutes, not hours.** No compiler, no commercial
-analyser, no model download. `parapet-scope` reads Java structure from
-source text, `parapet-attrib` builds a call graph the same way, and
-`parapet-triage` classifies with pattern matching that needs no training
-corpus. Each of those choices costs accuracy in a documented way, and each
-package says where.
-
-## The service budget
-
-The budget is the piece that makes the rest useful. It is a small file a
-maintainer writes once:
-
-```yaml
-project: acme
-authority: >-
-  Changes require review by two maintainers and a note explaining what
-  workload evidence justified the new limit.
-limits:
-  latency: "5%"
-  memory: "10%"
-binding: [latency]
-workloads:
-  - "bench/read-throughput"
-```
-
-Whoever can edit that file decides how much security the project buys.
-Lowering a limit quietly is the attack: hardening the project would
-otherwise accept starts failing its own check, the defences weaken, and no
-security code changed for a reviewer to see. Review changes to it the way
-you review a change to a signing key.
-
-## Documentation
-
-- [Quickstart](docs/quickstart.md), the under-an-hour path
-- [Installing](docs/install.md)
-- [The record schema](docs/record-schema.md)
-- [Java setup](docs/java-setup.md): call graphs and profiles
-- [Writing your own pattern set](docs/pattern-sets.md)
-- [Troubleshooting](docs/troubleshooting.md)
-
-## Provenance
-
-The three analysis components implement methods from peer-reviewed work,
-and each package keeps the validation under `paper/`:
-
-- Triage implements the heuristic linguistic pattern framework of Zhao,
-  Xiao and Wong, *IEEE TSE* 50(7), 2024
-  ([10.1109/TSE.2024.3390623](https://doi.org/10.1109/TSE.2024.3390623)).
-  The 80 published patterns ship with the package.
-- Scope implements the change-scope and design-level pattern taxonomy of
-  Zhao, Xiao, Bondi, Chen and Liu, *IEEE TSE* 49(2), 2023
-  ([10.1109/TSE.2022.3167628](https://doi.org/10.1109/TSE.2022.3167628)),
-  derived from 570 hand-coded issues.
-- Attribution implements the architectural cost attribution of Zhao, Xiao,
-  Wang, Chen, Chen and Liu, *IEEE ICSA* 2020
-  ([10.1109/ICSA47634.2020.00027](https://doi.org/10.1109/ICSA47634.2020.00027)).
-
-`CITATION.cff` has the full entries. The bundled pattern sets and code
-books carry CC BY 4.0 attribution in [`NOTICE`](NOTICE).
-
-## Contributing
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md) first, and
-[SECURITY.md](SECURITY.md) before reporting anything that looks like a
-vulnerability. Governance is at an early stage and is written down in
-[GOVERNANCE.md](GOVERNANCE.md), including who may change what.
-
-Apache-2.0. See [LICENSE](LICENSE).
+The PARAPET platform (website, documentation, and the integration glue in this
+repository) is released under the [MIT License](LICENSE). Each vendored project
+under `projects/` retains its own upstream license; see the `LICENSE` file inside
+that folder where present.

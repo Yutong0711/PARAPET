@@ -1,0 +1,40 @@
+{
+    "experiment_name": "experiment_prefix-tuning_text2sql",
+    "load_8bit": false,
+    "base_model": "yahma/llama-7b-hf",
+    "lora_weights": "/home/stud/bcui/bhome/Documents/projects/llm_finetuning_privacy_benchmark/trained_models/llama7b_prefix-tuning_text2sql",
+    "dataset_member": "/home/stud/bcui/bhome/Documents/projects/llm_finetuning_privacy_benchmark/dataset/syntatic_text_to_sql/train.json",
+    "dataset_nonmember": "/home/stud/bcui/bhome/Documents/projects/llm_finetuning_privacy_benchmark/dataset/syntatic_text_to_sql/val.json",
+    "dataset_key": "output",
+    "min_words": 100,
+    "max_words": 200,
+    "max_tokens": 512,
+    "max_data": 100000,
+    "output_name": "unified_mia",
+    "specific_source": "Github_ngram_13_<0.8_truncated",
+    "n_samples": 100,
+    "blackbox_attacks": ["zlib"],
+    "ref_config": {
+        "models": [
+            "stabilityai/stablelm-base-alpha-3b-v2"
+        ]
+    },
+    "neighborhood_config": {
+        "model": "bert",
+        "n_perturbation_list": [
+            25
+        ],
+        "pct_words_masked": 0.3,
+        "span_length": 2,
+        "dump_cache": false,
+        "load_from_cache": true,
+        "neighbor_strategy": "random"
+    },
+    "env_config": {
+        "results": "results_new",
+        "device": "cuda",
+        "device_aux": "cuda"
+    },
+    "dump_cache": false,
+    "load_from_hf": true
+}

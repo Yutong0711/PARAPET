@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="PARAPET turns a security exposure into a reviewable decision, measured on real workloads and checked against a service budget the maintainer declared in advance." />
+    <meta name="theme-color" content="#07111f" />
+    <meta property="og:title" content="PARAPET — Security Hardening at a Measured Cost" />
+    <meta property="og:description" content="Big projects can measure what a security fix costs and decide. Most cannot. PARAPET scopes an open-source ecosystem where the price is stated once, in public, and every hardening change arrives checked against it." />
+    <meta property="og:type" content="website" />
+    <title>PARAPET — Security Hardening at a Measured Cost</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="script.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="PARAPET home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>PARAPET</span>
+      </a>
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <nav id="site-nav" aria-label="Main navigation">
+        <a href="#projects">Projects</a>
+        <a href="#ecosystem">Ecosystem</a>
+        <a href="#roadmap">Roadmap</a>
+        <a class="nav-cta" href="https://github.com/qzydustin/perforch" target="_blank" rel="noreferrer">GitHub ↗</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> PESOSE Track 1 · Scoping an open-source ecosystem</p>
+          <h1>Security at a <em>price you set.</em></h1>
+          <p class="hero-intro">
+            Almost all software depends on open source, and most of those
+            components carry a known vulnerability. Fixing one has a runtime
+            price. PARAPET turns each exposure into a reviewable decision —
+            measured on the project's own workloads and checked against a budget
+            the maintainer declared in advance.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#projects">Explore the tools</a>
+            <a class="button secondary" href="#roadmap">See how it fits</a>
+          </div>
+          <dl class="hero-stats" aria-label="Ecosystem summary">
+            <div><dt>87%</dt><dd>Of OSS components carry a known vuln</dd></div>
+            <div><dt>06</dt><dd>Founding open-source artifacts</dd></div>
+            <div><dt>03</dt><dd>Partner institutions</dd></div>
+          </dl>
+        </div>
+        <div class="hero-visual" aria-label="Six software artifacts around a shared hardening loop">
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <div class="core"><span>PP</span><small>PARAPET</small></div>
+          <div class="node node-1"><b>⚙</b><span>PerfOrch</span></div>
+          <div class="node node-2"><b>⌕</b><span>CoQuIR</span></div>
+          <div class="node node-3"><b>σ</b><span>Metior</span></div>
+          <div class="node node-4"><b>◎</b><span>LUNA</span></div>
+          <div class="node node-5"><b>🔒</b><span>PrivAuditor</span></div>
+          <div class="node node-6"><b>±</b><span>MTJF</span></div>
+        </div>
+      </section>
+
+      <section class="mission section" id="ecosystem">
+        <p class="section-label">01 / The problem we scope</p>
+        <div class="mission-grid">
+          <h2>Big projects can price a fix. Most cannot.</h2>
+          <div>
+          <p>Mozilla measured the cost of sandboxing the libGraphite font library — about 85% added to that library's execution, but only 3% added latency on real page loads — judged it acceptable, and shipped it in Firefox. The Linux kernel measured its CPU mitigations, found the cost uneven across workloads, and ships a boot switch that turns them off. Both could decide because both had paid engineers, representative workloads, and a benchmarking harness.</p>
+          <p>A library with two volunteers and a thousand dependents has none of that, so the hardening change that matters most stalls at a contributor who cannot weigh it. PARAPET is a one-year effort to scope an ecosystem where a maintainer states the price once, in public — a <em>service budget</em> on added latency, memory, and CPU — and every proposed hardening change arrives already checked against it, carrying a record of what it removed, what proved it, and what it cost.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="projects section" id="projects">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">02 / Founding artifacts</p>
+            <h2>Six artifacts, one hardening loop</h2>
+          </div>
+          <p>Identify the exposure, draft a fix, measure what it costs, check it against the budget, record the decision. Each artifact owns part of that loop.</p>
+        </div>
+
+        <div class="project-grid">
+          <article class="project-card featured">
+            <div class="card-top"><span class="project-index">Seed · Measure</span><span class="status">Runs today</span></div>
+            <div class="project-icon">⚙</div>
+            <h3>PerfOrch</h3>
+            <p>Generates candidate implementations, compiles and runs them across C++, Go, Java, Python, and Rust, and records execution time and memory on EffiBenchX and HumanEvalPack. The engine for "draft candidates, measure on real workloads."</p>
+            <ul class="tags"><li>Candidate generation</li><li>Runtime measurement</li><li>Multi-language</li></ul>
+            <a href="https://github.com/qzydustin/perforch" target="_blank" rel="noreferrer" aria-label="View PerfOrch on GitHub">View repository <span>↗</span></a>
+          </article>
+
+          <article class="project-card">
+            <div class="card-top"><span class="project-index">Core · Draft</span><span class="status">ACL 2026</span></div>
+            <div class="project-icon">⌕</div>
+            <h3>CoQuIR</h3>
+            <p>A code quality-aware retrieval benchmark. Its <code>SaferCode</code> and <code>CVEFixes</code> preference-retrieval tasks are the security subset that surfaces the right secure pattern for a given exposure.</p>
+            <ul class="tags"><li>Security-aware retrieval</li><li>SaferCode</li><li>CVEFixes</li></ul>
+            <a href="https://github.com/qzydustin/perforch/tree/main/projects/coquir" target="_blank" rel="noreferrer" aria-label="CoQuIR source folder">projects/coquir <span>↗</span></a>
+          </article>
+
+          <article class="project-card">
+            <div class="card-top"><span class="project-index">Measure</span><span class="status">ASE 2021</span></div>
+            <div class="project-icon">σ</div>
+            <h3>Metior</h3>
+            <p>Performance testing with dependent-data bootstrapping: a stopping rule fixed before the run and tail-aware reporting, so a cost number holds up under cloud noise instead of drifting with it.</p>
+            <ul class="tags"><li>Dependent-data bootstrapping</li><li>Stopping rule</li><li>Tail latency</li></ul>
+            <a href="https://github.com/qzydustin/perforch/tree/main/projects/metior" target="_blank" rel="noreferrer" aria-label="Metior source folder">projects/metior <span>↗</span></a>
+          </article>
+
+          <article class="project-card">
+            <div class="card-top"><span class="project-index">Guard</span><span class="status">IEEE TSE 2024</span></div>
+            <div class="project-icon">◎</div>
+            <h3>LUNA</h3>
+            <p>Builds a reference profile of expected model behavior and monitors an agent against it, flagging output that has degraded or been compromised before its changes reach a queue.</p>
+            <ul class="tags"><li>Reference profile</li><li>Behavior monitoring</li><li>Model analysis</li></ul>
+            <a href="https://github.com/qzydustin/perforch/tree/main/projects/luna" target="_blank" rel="noreferrer" aria-label="LUNA source folder">projects/luna <span>↗</span></a>
+          </article>
+
+          <article class="project-card">
+            <div class="card-top"><span class="project-index">Guard</span><span class="status">NeurIPS 2024</span></div>
+            <div class="project-icon">🔒</div>
+            <h3>PrivAuditor</h3>
+            <p>Benchmarks data-protection vulnerabilities in LLM adaptation techniques — the review that must clear any model tuning before it is used, so proposal data never leaks through an adapted model.</p>
+            <ul class="tags"><li>Data protection</li><li>LLM adaptation</li><li>Membership inference</li></ul>
+            <a href="https://github.com/qzydustin/perforch/tree/main/projects/privauditor" target="_blank" rel="noreferrer" aria-label="PrivAuditor source folder">projects/privauditor <span>↗</span></a>
+          </article>
+
+          <article class="project-card">
+            <div class="card-top"><span class="project-index">Background · Draft</span><span class="status">NeurIPS 2025</span></div>
+            <div class="project-icon compact">MTJF</div>
+            <h3>More Than Just Functional</h3>
+            <p>A multi-candidate generate-and-critique workflow for efficient code. Prior experience with the drafting step — not a performance deliverable in the security-only scope.</p>
+            <ul class="tags"><li>Multi-candidate</li><li>LLM-as-critique</li><li>Efficiency</li></ul>
+            <a href="https://github.com/qzydustin/perforch/tree/main/projects/more-than-just-functional" target="_blank" rel="noreferrer" aria-label="More Than Just Functional source folder">projects/more-than-just-functional <span>↗</span></a>
+          </article>
+        </div>
+      </section>
+
+      <section class="workflow section" aria-labelledby="workflow-title">
+        <p class="section-label">03 / Building the ecosystem</p>
+        <h2 id="workflow-title">From one maintainer's script to shared infrastructure</h2>
+        <p class="workflow-intro">Track 1 funds planning, not product: the architecture, the governance, the security plan, and the community strategy an exposure-to-decision framework needs before adoption scales.</p>
+        <div class="ecosystem-grid">
+          <article class="ecosystem-card"><span>01</span><h3>Service-budget authority</h3><p>A maintainer-written, versioned limit on added latency, memory, and CPU cost, treated as access control: the charter names who may write it, who may change it, and how downstream consumers learn it moved.</p></article>
+          <article class="ecosystem-card"><span>02</span><h3>Trusted measurement</h3><p>Held-out workloads, a stopping rule and effect size fixed before the run, a recorded environment, and tail-aware reporting on a dedicated quiesced host. The measurement is the newest thing to trust and the cheapest to attack.</p></article>
+          <article class="ecosystem-card"><span>03</span><h3>Agent accountability</h3><p>Who may operate a contributing agent, how its changes are labeled, and the review they need beyond the human default — each carrying an equivalence check and a hardening record with the evidence.</p></article>
+          <article class="ecosystem-card"><span>04</span><h3>Governance &amp; funding</h3><p>An Apache-2.0 core weighed against MPL-2.0, a contributor agreement or DCO, and a funding model tested with maintainers, program offices, and public-interest funders including OpenSSF and the Linux Foundation.</p></article>
+        </div>
+      </section>
+
+      <section class="contribute section" id="roadmap">
+        <div>
+          <p class="section-label">04 / The ecosystem</p>
+          <h2>Checked against the record.</h2>
+          <p class="contribute-lede">PARAPET does not rewrite a project's security code unseen. Every hardening change arrives as a record — what was removed, the check that proves it, the cost, and how to reproduce both — measured against a budget the maintainer wrote.</p>
+        </div>
+        <div class="contribute-copy">
+          <p>The ecosystem serves the maintainers who defer hardening they cannot cost, and the operators, program offices, and distributions whose systems depend on those projects. Track 1 produces the plan; a Track 2 award would build the framework itself.</p>
+          <div class="link-list">
+            <a href="#projects"><span>PA1 · Maintainer interviews, repository mining, and three scored pilot integrations</span><b>Year 1</b></a>
+            <a href="#ecosystem"><span>PA2–PA3 · Governance charter, service-budget authority policy, threat model for six risk classes</span><b>Year 1</b></a>
+            <a href="https://github.com/qzydustin/perforch" target="_blank" rel="noreferrer"><span>PARAPET public repository, ingestion &amp; pull-request integration, disclosure workflow</span><b>Track 2</b></a>
+          </div>
+          <p class="contribute-note">Led by California State University, Long Beach with the University of Arizona and the Rochester Institute of Technology.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>PARAPET</span></a>
+      <p>State the price once. Check every change against it.</p>
+      <p>© <span id="year"></span> PARAPET contributors · CSULB · Arizona · RIT</p>
+    </footer>
+  </body>
+</html>
