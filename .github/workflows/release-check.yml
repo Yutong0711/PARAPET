@@ -1,0 +1,54 @@
+name: Release check
+
+# Runs when a version tag is pushed. It validates that the tagged tree passes
+# the same checks CI runs and that the tag agrees with VERSION.
+#
+# It deliberately does NOT create a tag, publish a GitHub Release, upload
+# artifacts, or push anything. Tagging and releasing remain manual.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-release:
+    name: Validate tagged tree
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Check the tag matches VERSION
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          version="$(cat VERSION)"
+          echo "tag=$tag version=$version"
+          if [ "$tag" != "$version" ]; then
+            echo "::error::tag '$GITHUB_REF_NAME' does not match VERSION ('$version')"
+            exit 1
+          fi
+
+      - name: Run the full supported validation suite
+        run: bash scripts/run_tests.sh

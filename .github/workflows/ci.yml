@@ -1,0 +1,103 @@
+name: CI
+
+# Validation for PARAPET v1.0. Every job runs real tests against the checked-in
+# repository; none of them use continue-on-error, secrets, GPUs, paid APIs, or
+# network access at test time.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  component-tests:
+    name: Component functional + Python runtime smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      # Functional tests of PerfOrch's deterministic core and the More Than Just
+      # Functional AST profiler transform, plus end-to-end tests that execute
+      # generated Python through PerfOrch's own runtime backend.
+      - name: Run component tests
+        run: python -m pytest tests/perforch tests/more_than_just_functional -m "not jvm"
+
+  jvm-smoke:
+    name: Java/JVM end-to-end smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      # PARAPET has no Maven or Gradle build. The only JVM path in the
+      # repository is PerfOrch's java_processor, which shells out to javac/java,
+      # so a JDK is installed and that backend is exercised directly.
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Fail if no JDK is available
+        run: |
+          javac -version
+          java -version
+
+      - name: Run JVM end-to-end tests
+        run: python -m pytest tests/perforch -m jvm
+
+  repository-sanity:
+    name: Repository and website structural checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      # Provenance banners, preserved upstream licenses, version consistency,
+      # internal documentation links, vendored source parseability, and the
+      # HTML/JavaScript/Pages-manifest contract. Structural, not functional.
+      - name: Run repository and website checks
+        run: python -m pytest tests/repository tests/website

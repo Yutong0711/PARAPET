@@ -1,7 +1,8 @@
 > **Vendored snapshot.** From the *PESOSE — Derui Zhu Prior Research Code Artifacts* bundle (v1.0, 2026-08-23),
 > `research_artifacts/luna`. Paper: LUNA, IEEE TSE 2024. Code lives in [`src/`](src/). The `eval/` derived
-> results (~42 MB) and `dataset/` (~7 MB) were removed. No root license was supplied upstream; the bundled
-> `src/luna/hmmlearn` component keeps its own license.
+> results (~42 MB) and `dataset/` (~7 MB) were removed. Project-level content here is released under the
+> [Apache License 2.0](LICENSE) by decision of the project team; the bundled `src/luna/hmmlearn` component
+> is not covered by that decision and keeps its own BSD 3-Clause license.
 
 # 🚀🦸 LUNA: A Model-based LLM-Oriented Universal Analysis Framework
 
@@ -470,6 +471,9 @@ This detailed example provides a clear guide on how to set up and run a comprehe
 
 ## License
 
-[FPA](LICENSE)
+[Apache License 2.0](LICENSE)
+
+The bundled `src/luna/hmmlearn` component is not covered by that license and
+remains under its own BSD 3-Clause license (`src/luna/hmmlearn/LICENSE.txt`).
 
 ---

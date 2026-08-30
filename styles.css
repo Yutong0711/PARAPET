@@ -115,7 +115,10 @@ h2 { font-size: clamp(2.4rem, 5vw, 5.2rem); line-height: 1.03; letter-spacing: -
 footer { background: var(--ink); color: white; min-height: 160px; padding: 2.5rem var(--gutter); display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem 2.5rem; }
 .footer-brand .brand-mark i { border-color: white; }
 footer p { font-size: .75rem; color: #9ba8b8; margin: 0; }
-footer p:last-child { margin-left: auto; }
+footer p.footer-copy { margin-left: auto; }
+footer p.footer-legal { flex-basis: 100%; margin-left: 0; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, .12); line-height: 1.6; }
+footer p.footer-legal a { color: #cbd5e1; text-decoration: underline; }
+footer p.footer-legal code { color: #cbd5e1; }
 
 @media (max-width: 900px) {
   .hero { grid-template-columns: 1fr; }

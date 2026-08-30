@@ -3,6 +3,12 @@ from . import core
 
 PYTHON_BIN = sys.executable
 
+# argv lists, not a shell string: sys.executable may contain spaces (a venv
+# under a path such as "/mnt/d/Funding/2026 PESOSE/...") and interpolating it
+# into "PYTHON_BIN main.py" made shlex.split tear the path into two arguments.
+RUN_CMD = [PYTHON_BIN, "main.py"]
+MEMORY_CMD = [PYTHON_BIN, "main.py"]
+
 def wrap_py(full_code, iterations):
     code = full_code.split("\n")
     # Prefer wrapping the test cases block if present.
@@ -43,6 +49,6 @@ correctness_test, refine_test = core.build_processor_api(
     source_relpath="main.py",
     wrap_fn=wrap_py,
     compile_fn=None,
-    run_cmd=f"{PYTHON_BIN} main.py",
-    memory_cmd=f"{PYTHON_BIN} main.py",
+    run_cmd=RUN_CMD,
+    memory_cmd=MEMORY_CMD,
 )
