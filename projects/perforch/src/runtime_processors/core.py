@@ -5,6 +5,7 @@ import signal
 import subprocess
 import sys
 import json
+from collections.abc import Sequence
 from dataclasses import dataclass
 import numpy as np
 
@@ -54,19 +55,47 @@ def _compile_once(compile_fn, temp_dir: str, timeout: int):
     raise TypeError(f"Unsupported compile_fn type: {type(compile_fn).__name__}")
 
 
+def _as_argv(command) -> list[str]:
+    """Normalise a command to an argv list without shell parsing.
+
+    A list or tuple is already argv and is passed through element by element:
+    an element may contain spaces (an interpreter path such as
+    ``/mnt/d/Funding/2026 PESOSE/.../python3``) and still be one argument.
+    Only a plain string is split, with ``shlex``, for the backends that
+    configure a fixed literal command ("java Main", "cargo build").
+
+    Interpolating a path into a command string and re-splitting it is what
+    broke the Python backend on any checkout whose path contains a space, so
+    callers that build a command from a path must pass a list.
+    """
+    if isinstance(command, (list, tuple)):
+        argv = [str(part) for part in command]
+        if not argv:
+            raise ValueError("command must not be empty")
+        return argv
+    if isinstance(command, str):
+        argv = shlex.split(command)
+        if not argv:
+            raise ValueError("command must not be empty")
+        return argv
+    raise TypeError(f"Unsupported command type: {type(command).__name__}")
+
+
 def run_with_timeout(command, timeout, cwd=None, env=None):
     """
     Run a command with a specified timeout using the Linux `timeout` command.
 
-    :param command: Command string to run.
+    :param command: Command to run: an argv list (preferred, and required when
+        any argument contains spaces) or a literal command string.
     :param timeout: Timeout in seconds.
     :param cwd: Directory to run the command in.
     :param env: Environment variables dictionary.
     :return: A tuple of (stdout, stderr).
     :raises: RuntimeError if the command fails.
     """
-    # Split the command string into a list of arguments
-    command_list = shlex.split(command)
+    # Normalise to argv. No shell is involved, so an argument may contain
+    # spaces; cwd is handed to Popen directly for the same reason.
+    command_list = _as_argv(command)
     # Enable timeout automatically when timeout is a positive number.
     if timeout is not None and timeout > 0:
         full_command = ["timeout", "--signal=SIGKILL", str(timeout)] + command_list
@@ -90,7 +119,7 @@ def run_with_timeout(command, timeout, cwd=None, env=None):
             stderr_s = (stderr or "").strip()
             stdout_s = (stdout or "").strip()
             details = stderr_s or stdout_s or f"exit code={proc.returncode}"
-            raise RuntimeError(f"Command '{command}' failed: {details}")
+            raise RuntimeError(f"Command '{shlex.join(command_list)}' failed: {details}")
         return (stdout or "") + (stderr or "")
     except KeyboardInterrupt:
         if proc is not None and proc.pid is not None:
@@ -101,15 +130,17 @@ def run_with_timeout(command, timeout, cwd=None, env=None):
         raise
 
 
-def _run_cmdbench(temp_dir: str, timeout: int, command: str, iterations_num: int = 1):
+def _run_cmdbench(temp_dir: str, timeout: int, command, iterations_num: int = 1):
     import cmdbench
 
     if command is None or not str(command).strip():
         raise ValueError("command must not be empty")
 
-    tokens = shlex.split(command)
-    if not tokens:
-        raise ValueError("command must not be empty")
+    # Same rule as run_with_timeout: an argv list is never re-split. cmdbench
+    # takes a command string, so the tokens are re-quoted with shlex.quote
+    # below -- quoting a correct argv, rather than hoping a built string
+    # survives a round trip through shlex.split.
+    tokens = _as_argv(command)
     first = tokens[0]
     if first.startswith("./") or first.startswith("target/"):
         abs_first = os.path.join(temp_dir, first)
@@ -242,7 +273,7 @@ def correctness_test(
     *,
     source_relpath: str,
     compile_fn,
-    run_cmd: str,
+    run_cmd: str | Sequence[str],
     post_write_fn=None,
 ) -> TestProcessorResult:
     file_path = os.path.join(temp_dir, source_relpath)
@@ -283,7 +314,7 @@ def refine_test(
     source_relpath: str,
     wrap_fn,
     compile_fn,
-    memory_cmd: str,
+    memory_cmd: str | Sequence[str],
 ) -> TestProcessorResult:
     try:
         source_path = os.path.join(temp_dir, source_relpath)
@@ -351,8 +382,8 @@ def build_processor_api(
     source_relpath: str,
     wrap_fn,
     compile_fn,
-    run_cmd: str,
-    memory_cmd: str,
+    run_cmd: str | Sequence[str],
+    memory_cmd: str | Sequence[str],
     post_write_fn=None,
 ):
     def _correctness_test(complete_code, temp_dir, timeout):

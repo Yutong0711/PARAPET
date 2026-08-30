@@ -1,6 +1,7 @@
 > **Vendored snapshot.** From the *PESOSE — Derui Zhu Prior Research Code Artifacts* bundle (v1.0, 2026-08-23),
 > `research_artifacts/more-than-just-functional`. Paper: "More Than Just Functional: LLM-as-a-Critique for
-> Efficient Code Generation," NeurIPS 2025. Code lives in [`src/`](src/). No upstream license was supplied.
+> Efficient Code Generation," NeurIPS 2025. Code lives in [`src/`](src/). Project-level content here is
+> released under the [Apache License 2.0](LICENSE) by decision of the project team.
 > Background evidence only — no performance deliverable is claimed for PARAPET.
 
 # Fastdecoder

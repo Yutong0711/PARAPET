@@ -1,0 +1,28 @@
+# PARAPET repository-level ignores.
+#
+# Vendored snapshots under projects/ keep their own upstream .gitignore files;
+# this file only covers artifacts produced by PARAPET's own tooling
+# (the pytest suite in tests/ and scripts/run_tests.sh).
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*.so
+
+# pytest
+.pytest_cache/
+.cache/
+
+# Local virtual environments used to run the test suite
+.venv/
+venv/
+env/
+
+# OS / editor state
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Temporary files written by local test runs
+*.tmp

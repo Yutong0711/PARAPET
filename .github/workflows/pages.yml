@@ -8,6 +8,7 @@ on:
       - "styles.css"
       - "script.js"
       - ".nojekyll"
+      - "tests/website/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -21,7 +22,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Deployment is gated on the website checks: they verify that every element
+  # script.js queries exists in index.html, that every local asset the page
+  # references is present, and that the staging step below copies all of them.
+  validate:
+    name: Validate site before deploying
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Run website checks
+        run: python -m pytest tests/website
+
   deploy:
+    needs: validate
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
