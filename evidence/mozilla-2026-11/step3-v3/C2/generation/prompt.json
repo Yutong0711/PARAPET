@@ -1,0 +1,10 @@
+{
+  "template": "parapet/prompts/harden_v1.txt",
+  "template_sha256": "d5b3c33c4650e1a53437ad477bd4031896f35b4b33193efb946968f8ed90edbc",
+  "prompt_sha256": "48823d42342e244db8b00af2bff2c0b45a45f62f67066165c71ce0824710bed9",
+  "inputs": {
+    "source_file": "parapet/cases/C2/src/example/config/ConfigLoader.java",
+    "cwe_id": "CWE-611",
+    "cwe_name": "Improper Restriction of XML External Entity Reference"
+  }
+}

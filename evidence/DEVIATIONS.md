@@ -180,3 +180,64 @@ The validation outcomes are identical in the two runs.
 **Note on Step 5.** The hosted control was not run because neither
 `OPENAI_API_KEY` nor `ANTHROPIC_API_KEY` was set (see EVIDENCE.md section E).
 This is the skip the task specifies, recorded here for completeness.
+
+## 4. Post-hoc tasks after the final evidence commit `8c8ad50` (requested 2026-11-18, started 19:05 PST)
+
+All four are **post-hoc**: designed and run after the results above were
+seen. No model was called. No case, check, budget, decision rule, claim
+level, `LOCAL-EVIDENCE.md`, or existing run directory was changed;
+`LOCAL-EVIDENCE.md` still rebuilds byte-identically from its template.
+
+**D11 (post-hoc). v3 remeasurement of C1 and C2 (19:05:32–19:13:28 PST).**
+`python -m parapet run --case <C> --candidates-from
+evidence/mozilla-2026-11/step3/<C>/generation --budget
+parapet/budgets/strict.parapet.budget.yaml --budget
+parapet/budgets/lenient.parapet.budget.yaml`, written to `step3-v3/<C>/`,
+with the current runner (D6 memory fix; D8 Linux working directories).
+Validation outcomes are identical to v1 and v2. Every v3 latency interval
+overlaps the interval of every earlier session in which that arm was
+measured. One verdict changed relative to the earlier sessions: C1 R1's
+latency upper bound is 5.77%, so in v3 it does not fit the strict budget
+(R2 still fits and is recommended). C2 R2 fits the strict budget in v3. v3
+rows are added to the cross-session tables in EVIDENCE.md (builder kind
+`cross_v3`; the `cross` kind used by LOCAL-EVIDENCE.md is unchanged).
+
+**D12 (post-hoc, designed after seeing results). C2 arm P1 (19:13:52–19:16:40 PST).**
+P1 (`posthoc/C2-P1/`) is hand-written from the original C2 source, not from
+G2's file. It applies the same four `setFeature` calls and two setters as
+generated candidate G2 to a `DocumentBuilderFactory` built once at class load
+and reused (`newDocumentBuilder` under a lock). It is not a reference fix,
+enters no decision table, and no budget was applied. It was validated with
+the registered C2 checks (L4; the same four DTD probes rejected as R1 and G2)
+and measured in its own session with baseline, baseline-AA, R1 and G2
+(`analysis/posthoc_c2_p1.py`, output `posthoc/C2-P1-session/`). Latency
+against that session's baseline: P1 -6.60% [-7.67, -5.42], G2 +34.80%
+[+33.19, +37.23], R1 +9.98% [+8.85, +11.90]. P1 against G2: -30.72%
+[-31.84, -29.96]. P1 and G2 differ only in whether the configured factory is
+built per call or once.
+
+**D13 (post-hoc). L1 external-DTD observation (19:13:38–19:13:45 PST).** A
+supplementary program (`posthoc/L1-dtd-observation/`), not a check and not part of any claim level. It
+parses a document whose DOCTYPE names a local DTD file declaring an internal
+entity that holds a marker, with the entity used in the body. It was run
+against V0, CONTROL, R1, R2 (case files) and G2, G3, G5 (saved candidates).
+Observed: V0, CONTROL and R1 load the DTD (marker present); R2, G2, G3 and
+G5 reject the document (DOCTYPE disallowed). Section H's sentence on
+external DTDs was corrected to state this observation instead of the earlier
+inference from the benign external-DTD probe.
+
+**D14 (post-hoc). Analysis and wording only, from existing summaries.**
+(a) Tables of setFeature calls per workload operation (excluding
+`FEATURE_SECURE_PROCESSING`), median allocation per operation and latency
+overhead, per case (`analysis/posthoc_tables.py`); counts are read from patch
+sources, and for L1 R1 from the upstream helper's loop (first feature URI
+succeeds on this JDK). (b) "Model-induced cost" is renamed "excess over
+matched reference" in EVIDENCE.md. The matched reference sets fewer features
+than the candidates, so the excess is not attributed to the model. Existing
+records, run summaries and LOCAL-EVIDENCE.md keep the old label, which is
+superseded; they are not rewritten. (c) L1's frozen-settings result is
+described as prompt truncation. (d) Sessions whose A/A peak-memory upper
+bound exceeds 5% are listed, and their strict memory verdicts are marked not
+resolvable (EVIDENCE.md B.4); the recorded `decision.json` files are
+unchanged. (e) EVIDENCE.md states that L4 means "passes the registered
+checks" and that L4 patches can differ in security coverage.

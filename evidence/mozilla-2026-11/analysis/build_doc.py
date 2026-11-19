@@ -72,6 +72,25 @@ def endpoints(run: str) -> str:
 def render(kind: str, arg: str) -> str:
     if kind == "cross":
         return cross(arg)
+    if kind == "cross_v3":   # EVIDENCE.md only: earlier sessions plus v3 (D11)
+        import contextlib
+        import io
+        specs = [f"{lab}={BASE / d / arg}" for lab, d in SESSIONS + [("v3 Step 3", "step3-v3")]
+                 if (BASE / d / arg).is_dir()]
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cross_session.main([arg] + specs)
+        return buf.getvalue().rstrip("\n")
+    if kind == "posthoc":    # D11-D14 tables (analysis/posthoc_tables.py)
+        import posthoc_tables
+        name, _, rest = arg.partition(" ")
+        fn = getattr(posthoc_tables, name)
+        return fn(*rest.split()) if rest else fn()
+    if kind == "excess":     # same table as model_induced, with the D14 label
+        d = tables.load(BASE / arg)
+        return "\n".join(tables.model_induced_table(d)).replace(
+            "(model-induced)", "(excess over matched reference)").replace(
+            "no model-induced cost to report", "no excess over a matched reference to report").replace(str(BASE) + "/", "")
     if kind == "cpu_only":
         return cpu_only(arg)
     if kind == "endpoints":

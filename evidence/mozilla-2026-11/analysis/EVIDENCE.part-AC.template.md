@@ -66,11 +66,11 @@ columns are invalid (D6) and shown only for completeness.
 
 C1 (CWE-502):
 
-{{cross:C1}}
+{{cross_v3:C1}}
 
 C2 (CWE-611):
 
-{{cross:C2}}
+{{cross_v3:C2}}
 
 Primary Step 2 tables (v2 session, valid memory):
 
@@ -90,18 +90,32 @@ What the hand-written patches show:
 
 - C1: R1 (serialization filter) adds a small latency cost in every session;
   R2 (data-only format) is faster than the baseline in every session. Both fit
-  both budgets in every session; the rule recommends R2 because its latency
-  upper bound is lowest. R2 rejects every token written by the original
+  both budgets in the four sessions up to LOCAL-EVIDENCE; in the post-hoc v3
+  session (D11) R1's latency interval is [+1.97, +5.77], overlapping every
+  earlier session, and its upper bound misses the strict cap, so R1 fits the
+  strict budget in four of five sessions. The rule recommends R2 in every
+  session because its latency upper bound is lowest. R2 rejects every token written by the original
   implementation (6/6 probes); R1 rejects one legacy token shape (1/6). The
   decision rule does not weigh rejected inputs; the records list them for the
   maintainer.
 - C2: R1 (reject DOCTYPE) costs about 10% latency in every session and never
   fits the strict budget; it fits the lenient one. R2 (entity resolver) is
   within the noise floor in every session, and fits the strict budget in three
-  of four sessions. In the v2 Step 2 session its latency upper bound is
+  of four sessions up to LOCAL-EVIDENCE and in the v3 session (four of five). In the v2 Step 2 session its latency upper bound is
   5.08% against a 5.0% cap, so in that session nothing fits the strict budget.
   The strict verdict for a patch whose cost sits inside the noise is therefore
   not stable from session to session.
+
+### B.4 Sessions where strict memory verdicts are not resolvable (D14, post-hoc)
+
+When a session's own A/A peak-memory interval reaches above 5%, two copies of
+the same program can differ by more than the strict memory cap. A strict
+memory verdict in that session (fits or does not fit, on memory) cannot be
+resolved by this measurement. The table covers every session in this package.
+The verdicts recorded in each `decision.json` are unchanged; this table
+qualifies them.
+
+{{posthoc:memory_resolvability}}
 
 ## C. Workflow with the default local generator
 
@@ -110,6 +124,13 @@ candidates were re-validated and re-measured once more without a model call
 (v2). Raw outputs are saved verbatim in `step3/<case>/generation/raw/`.
 
 ### C.1 Claim levels (per case; levels are not merged)
+
+**What L4 means (D14).** L4 ("admissible") means the patch passes the
+registered checks: it compiles, the reproducer and both held-out variants no
+longer fire the canary, and the functional tests pass. It does not mean
+equal security coverage. Two L4 patches can differ in what they still allow:
+which legitimate inputs they now reject (the probe columns), and whether the
+parser still reads an external DTD named by the document (section D.4).
 
 {{claims:step3-v2/C1}}
 
@@ -146,19 +167,29 @@ entity/DTD features, `setXIncludeAware(false)` and
 `setExpandEntityReferences(false)`; all are admissible (L4) and reject the
 same four DTD probes as R1.
 
-### C.3 Cost of admissible candidates (C2) and model-induced cost
+### C.3 Cost of admissible candidates (C2) and excess over matched reference
 
 The matched reference is assigned by the pre-registered rule in
 `parapet/cases/C2/case.yaml` (all five set `disallow-doctype-decl` → R1).
-Model-induced cost = candidate against R1, measured in the same session.
+Excess over matched reference = candidate against R1, measured in the same
+session. (This was labelled "model-induced cost" until D14; the label in the
+existing records and run summaries is superseded, and the records are not
+rewritten.) R1 sets one feature (`disallow-doctype-decl`) plus
+`FEATURE_SECURE_PROCESSING`. The candidates set four features plus two
+setters (see C.8), so the excess measures a different configuration. It is
+not attributed to the model.
+
+v3 (current runner, valid memory; D11):
+
+{{excess:step3-v3/C2}}
 
 v2 (valid memory):
 
-{{model_induced:step3-v2/C2}}
+{{excess:step3-v2/C2}}
 
 v1 (latency valid, memory invalid):
 
-{{model_induced:step3/C2}}
+{{excess:step3/C2}}
 
 ### C.4 Budget decisions over all admissible patches
 
@@ -213,4 +244,57 @@ C2:
 
 Whole-board power from `nvidia-smi` every 200 ms; includes anything else
 using the GPU (the Windows desktop). Not a per-request energy measurement.
+
+### C.8 setFeature calls, allocation and latency (D14, post-hoc analysis)
+
+Counts are setFeature calls executed per workload operation, excluding
+`FEATURE_SECURE_PROCESSING`, read from each patch's source. Allocation and
+latency come from the v3 session's summary. This is a description of what
+each configuration does; no causal claim is made about which setting costs
+what.
+
+C1 (no patch configures an XML parser; the column is 0 throughout):
+
+{{posthoc:feature_table C1 step3-v3/C1}}
+
+C2:
+
+{{posthoc:feature_table C2 step3-v3/C2}}
+
+### C.9 v3 remeasurement with the current runner (D11, post-hoc)
+
+`step3-v3/<case>`: the saved Step 3 candidates and the hand-written patches,
+re-validated and re-measured with the current runner. Since D8, fork and check
+working directories are on the Linux filesystem. No model call. Validation
+outcomes are identical to v1 and v2. The v3 rows are in the cross-session
+tables in B.3. Below, per arm: whether the v3 latency interval overlaps the
+interval of each earlier session.
+
+C1:
+
+{{posthoc:overlap_table C1}}
+
+C2:
+
+{{posthoc:overlap_table C2}}
+
+v3 budget decisions, C1:
+
+{{decisions:step3-v3/C1}}
+
+v3 budget decisions, C2:
+
+{{decisions:step3-v3/C2}}
+
+### C.10 Post-hoc arm P1 for C2 (D12) — post-hoc, designed after seeing results
+
+P1 is **not a reference fix** and enters no decision table. It is hand-written
+from the original C2 source (`posthoc/C2-P1/`). It uses the same four feature
+settings and the same two setters as generated candidate G2. The difference:
+the configured `DocumentBuilderFactory` is built once at class load and
+reused, and each call takes a new `DocumentBuilder` from it under a lock. It
+was validated with the registered C2 checks and measured in its own session
+with baseline, baseline-AA, R1 and G2 (`posthoc/C2-P1-session/`).
+
+{{posthoc:p1_report}}
 

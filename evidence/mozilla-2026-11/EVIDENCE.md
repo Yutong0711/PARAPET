@@ -12,8 +12,12 @@ content frozen at LOCAL-EVIDENCE (`LOCAL-EVIDENCE.md`, unchanged).
 the pre-registered runner, is invalid as a JVM measurement because it
 included the runner's own memory; **v2** is correct (DEVIATIONS D6/D7). L1
 was measured only with the corrected runner. (2) Every change after a
-pre-registration commit is in `evidence/DEVIATIONS.md` (P1–P4, D1–D10),
-reproduced in full in section G.
+pre-registration commit is in `evidence/DEVIATIONS.md` (P1–P4, D1–D14),
+reproduced in full in section G. (3) D11–D14 are **post-hoc**: designed
+and run after the results were seen (v3 remeasurement, the post-hoc arm
+P1, the L1 external-DTD observation, and analysis/wording changes; sections
+B.4, C.3, C.8–C.10, D.2, D.4, D.5 and H). They change no case, check,
+budget, decision rule, claim level, or existing run directory.
 
 Pre-registration commits: `f9f9e15` (C1, C2, budgets, protocol, prompt,
 settings; 2026-11-18 17:05:09 PST) and `083b7b8` (L1; 18:12:18 PST).
@@ -109,6 +113,8 @@ C1 (CWE-502):
 | v2 Step 2 | R2 | -63.45% [-64.02, -63.09] | -26.84% [-27.31, -25.09] | 2.27% / 1.91% | fits (recommended) | fits (recommended) |
 | v2 Step 3 | R1 | +3.26% [+2.21, +4.47] | -1.53% [-4.40, -0.06] ≈ noise | 3.03% / 2.08% | fits | fits |
 | v2 Step 3 | R2 | -63.09% [-63.60, -62.39] | -26.36% [-27.97, -25.17] | 3.03% / 2.08% | fits (recommended) | fits (recommended) |
+| v3 Step 3 | R1 | +4.37% [+1.97, +5.77] | -1.57% [-4.12, -0.14] ≈ noise | 3.99% / 1.75% | no | fits |
+| v3 Step 3 | R2 | -63.11% [-63.87, -62.54] | -25.99% [-26.62, -24.64] | 3.99% / 1.75% | fits (recommended) | fits (recommended) |
 
 C2 (CWE-611):
 
@@ -132,6 +138,13 @@ C2 (CWE-611):
 | v2 Step 3 | G3 | +35.92% [+33.58, +41.09] | -0.43% [-4.21, +2.03] ≈ noise | 2.99% / 4.83% | no | no |
 | v2 Step 3 | G4 | +35.49% [+31.89, +37.61] | +2.17% [-3.87, +4.77] ≈ noise | 2.99% / 4.83% | no | no |
 | v2 Step 3 | G5 | +34.81% [+31.29, +38.92] | -0.65% [-4.44, +2.71] ≈ noise | 2.99% / 4.83% | no | no |
+| v3 Step 3 | R1 | +9.52% [+8.43, +11.29] | -1.54% [-2.91, +1.03] ≈ noise | 3.23% / 4.56% | no | fits |
+| v3 Step 3 | R2 | +1.45% [+0.67, +3.54] ≈ noise | +0.61% [-1.10, +4.20] ≈ noise | 3.23% / 4.56% | fits (recommended) | fits (recommended) |
+| v3 Step 3 | G1 | +33.03% [+31.42, +35.07] | -3.45% [-5.85, +0.31] ≈ noise | 3.23% / 4.56% | no | no |
+| v3 Step 3 | G2 | +33.46% [+31.37, +36.25] | -1.69% [-3.79, +3.64] ≈ noise | 3.23% / 4.56% | no | no |
+| v3 Step 3 | G3 | +33.81% [+32.12, +36.39] | -2.97% [-5.21, +0.91] ≈ noise | 3.23% / 4.56% | no | no |
+| v3 Step 3 | G4 | +33.94% [+32.53, +36.10] | -2.37% [-4.01, +0.61] ≈ noise | 3.23% / 4.56% | no | no |
+| v3 Step 3 | G5 | +31.95% [+31.07, +34.23] | -2.03% [-4.00, +3.69] ≈ noise | 3.23% / 4.56% | no | no |
 
 Primary Step 2 tables (v2 session, valid memory):
 
@@ -175,18 +188,47 @@ What the hand-written patches show:
 
 - C1: R1 (serialization filter) adds a small latency cost in every session;
   R2 (data-only format) is faster than the baseline in every session. Both fit
-  both budgets in every session; the rule recommends R2 because its latency
-  upper bound is lowest. R2 rejects every token written by the original
+  both budgets in the four sessions up to LOCAL-EVIDENCE; in the post-hoc v3
+  session (D11) R1's latency interval is [+1.97, +5.77], overlapping every
+  earlier session, and its upper bound misses the strict cap, so R1 fits the
+  strict budget in four of five sessions. The rule recommends R2 in every
+  session because its latency upper bound is lowest. R2 rejects every token written by the original
   implementation (6/6 probes); R1 rejects one legacy token shape (1/6). The
   decision rule does not weigh rejected inputs; the records list them for the
   maintainer.
 - C2: R1 (reject DOCTYPE) costs about 10% latency in every session and never
   fits the strict budget; it fits the lenient one. R2 (entity resolver) is
   within the noise floor in every session, and fits the strict budget in three
-  of four sessions. In the v2 Step 2 session its latency upper bound is
+  of four sessions up to LOCAL-EVIDENCE and in the v3 session (four of five). In the v2 Step 2 session its latency upper bound is
   5.08% against a 5.0% cap, so in that session nothing fits the strict budget.
   The strict verdict for a patch whose cost sits inside the noise is therefore
   not stable from session to session.
+
+### B.4 Sessions where strict memory verdicts are not resolvable (D14, post-hoc)
+
+When a session's own A/A peak-memory interval reaches above 5%, two copies of
+the same program can differ by more than the strict memory cap. A strict
+memory verdict in that session (fits or does not fit, on memory) cannot be
+resolved by this measurement. The table covers every session in this package.
+The verdicts recorded in each `decision.json` are unchanged; this table
+qualifies them.
+
+| Session | A/A peak-memory overhead [95% CI] | Upper bound > 5%? | Strict memory verdicts in this session |
+| --- | --- | --- | --- |
+| C1 v1 Step 2 | +0.43% [-1.02, +1.81] ≈ noise | no | v1 memory invalid (D6) |
+| C1 v1 Step 3 | +0.64% [-0.56, +2.33] ≈ noise | no | v1 memory invalid (D6) |
+| C1 v2 Step 2 | -0.86% [-1.91, +0.48] ≈ noise | no | resolvable |
+| C1 v2 Step 3 | -0.59% [-2.08, +0.46] ≈ noise | no | resolvable |
+| C1 v3 Step 3 | -0.15% [-1.75, +1.29] ≈ noise | no | resolvable |
+| C2 v1 Step 2 | +0.22% [-2.76, +3.65] ≈ noise | no | v1 memory invalid (D6) |
+| C2 v1 Step 3 | +0.63% [-3.69, +2.16] ≈ noise | no | v1 memory invalid (D6) |
+| C2 v2 Step 2 | -0.66% [-3.55, +2.68] ≈ noise | no | resolvable |
+| C2 v2 Step 3 | +0.84% [-1.67, +4.83] ≈ noise | no | resolvable |
+| C2 v3 Step 3 | +0.29% [-2.04, +4.56] ≈ noise | no | resolvable |
+| L1 no generator | -1.16% [-5.86, +5.47] ≈ noise | yes | **not resolvable** for R1, R2 |
+| L1 frozen-settings run | +0.25% [-3.89, +4.40] ≈ noise | no | resolvable |
+| L1 long-context run | +2.22% [-3.50, +6.22] ≈ noise | yes | **not resolvable** for R1, R2, G2, G3, G5 |
+| C2 post-hoc P1 session | +1.07% [-1.59, +3.21] ≈ noise | no | resolvable |
 
 ## C. Workflow with the default local generator
 
@@ -195,6 +237,13 @@ candidates were re-validated and re-measured once more without a model call
 (v2). Raw outputs are saved verbatim in `step3/<case>/generation/raw/`.
 
 ### C.1 Claim levels (per case; levels are not merged)
+
+**What L4 means (D14).** L4 ("admissible") means the patch passes the
+registered checks: it compiles, the reproducer and both held-out variants no
+longer fire the canary, and the functional tests pass. It does not mean
+equal security coverage. Two L4 patches can differ in what they still allow:
+which legitimate inputs they now reject (the probe columns), and whether the
+parser still reads an external DTD named by the document (section D.4).
 
 | Case | L0 server answers | L1 parseable patch | L2 compiles | L3 reproducer no longer fires | L4 admissible | L5 fits strict | L5 fits lenient |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -247,15 +296,31 @@ entity/DTD features, `setXIncludeAware(false)` and
 `setExpandEntityReferences(false)`; all are admissible (L4) and reject the
 same four DTD probes as R1.
 
-### C.3 Cost of admissible candidates (C2) and model-induced cost
+### C.3 Cost of admissible candidates (C2) and excess over matched reference
 
 The matched reference is assigned by the pre-registered rule in
 `parapet/cases/C2/case.yaml` (all five set `disallow-doctype-decl` → R1).
-Model-induced cost = candidate against R1, measured in the same session.
+Excess over matched reference = candidate against R1, measured in the same
+session. (This was labelled "model-induced cost" until D14; the label in the
+existing records and run summaries is superseded, and the records are not
+rewritten.) R1 sets one feature (`disallow-doctype-decl`) plus
+`FEATURE_SECURE_PROCESSING`. The candidates set four features plus two
+setters (see C.8), so the excess measures a different configuration. It is
+not attributed to the model.
+
+v3 (current runner, valid memory; D11):
+
+| Candidate | Matched reference (rule) | Latency vs baseline [95% CI] | Latency vs matched reference [95% CI] (excess over matched reference) | Peak memory vs matched reference [95% CI] |
+| --- | --- | --- | --- | --- |
+| G1 | R1 | +33.03% [+31.42, +35.07] | +21.47% [+19.79, +22.84] | -1.95% [-4.34, +0.88] ≈ noise |
+| G2 | R1 | +33.46% [+31.37, +36.25] | +21.86% [+19.72, +23.85] | -0.16% [-2.25, +4.10] ≈ noise |
+| G3 | R1 | +33.81% [+32.12, +36.39] | +22.19% [+20.38, +24.17] | -1.46% [-3.66, +1.41] ≈ noise |
+| G4 | R1 | +33.94% [+32.53, +36.10] | +22.30% [+20.72, +23.80] | -0.85% [-2.44, +1.11] ≈ noise |
+| G5 | R1 | +31.95% [+31.07, +34.23] | +20.48% [+19.32, +22.27] | -0.50% [-2.56, +4.56] ≈ noise |
 
 v2 (valid memory):
 
-| Candidate | Matched reference (rule) | Latency vs baseline [95% CI] | Latency vs matched reference [95% CI] (model-induced) | Peak memory vs matched reference [95% CI] |
+| Candidate | Matched reference (rule) | Latency vs baseline [95% CI] | Latency vs matched reference [95% CI] (excess over matched reference) | Peak memory vs matched reference [95% CI] |
 | --- | --- | --- | --- | --- |
 | G1 | R1 | +35.22% [+32.67, +38.26] | +21.81% [+17.08, +25.36] | -4.44% [-6.96, -1.33] ≈ noise |
 | G2 | R1 | +36.46% [+33.07, +39.68] | +22.92% [+17.88, +26.59] | -3.82% [-6.93, +0.83] ≈ noise |
@@ -265,7 +330,7 @@ v2 (valid memory):
 
 v1 (latency valid, memory invalid):
 
-| Candidate | Matched reference (rule) | Latency vs baseline [95% CI] | Latency vs matched reference [95% CI] (model-induced) | Peak memory vs matched reference [95% CI] |
+| Candidate | Matched reference (rule) | Latency vs baseline [95% CI] | Latency vs matched reference [95% CI] (excess over matched reference) | Peak memory vs matched reference [95% CI] |
 | --- | --- | --- | --- | --- |
 | G1 | R1 | +34.36% [+31.45, +39.84] | +21.19% [+17.50, +26.25] | -2.36% [-5.51, +1.43] ≈ noise |
 | G2 | R1 | +36.86% [+32.93, +41.07] | +23.45% [+18.93, +27.34] | -0.31% [-4.35, +3.55] ≈ noise |
@@ -387,6 +452,108 @@ First samples before the first request (board idle plus desktop): 21.1, 21.7, 44
 Whole-board power from `nvidia-smi` every 200 ms; includes anything else
 using the GPU (the Windows desktop). Not a per-request energy measurement.
 
+### C.8 setFeature calls, allocation and latency (D14, post-hoc analysis)
+
+Counts are setFeature calls executed per workload operation, excluding
+`FEATURE_SECURE_PROCESSING`, read from each patch's source. Allocation and
+latency come from the v3 session's summary. This is a description of what
+each configuration does; no causal claim is made about which setting costs
+what.
+
+C1 (no patch configures an XML parser; the column is 0 throughout):
+
+| Patch | setFeature calls per workload operation (excl. FEATURE_SECURE_PROCESSING) | Median allocation per operation (bytes) | Latency overhead vs baseline [95% CI] | How the count was derived |
+| --- | --- | --- | --- | --- |
+| baseline | 0 | 39773 | — | no setFeature call |
+| R1 | 0 | 41549 | +4.37% [+1.97, +5.77] | no setFeature call |
+| R2 | 0 | 27277 | -63.11% [-63.87, -62.54] | no setFeature call |
+
+Session: `step3-v3/C1` (allocation and latency from `measurement/summary.json`).
+
+C2:
+
+| Patch | setFeature calls per workload operation (excl. FEATURE_SECURE_PROCESSING) | Median allocation per operation (bytes) | Latency overhead vs baseline [95% CI] | How the count was derived |
+| --- | --- | --- | --- | --- |
+| baseline | 0 | 169651 | — | no setFeature call |
+| R1 | 1 | 191085 | +9.52% [+8.43, +11.29] | static count in the target file; every call is on the per-call path |
+| R2 | 0 | 170058 | +1.45% [+0.67, +3.54] ≈ noise | no setFeature call |
+| G1 | 4 | 254789 | +33.03% [+31.42, +35.07] | static count in the target file; every call is on the per-call path |
+| G2 | 4 | 254804 | +33.46% [+31.37, +36.25] | static count in the target file; every call is on the per-call path |
+| G3 | 4 | 254785 | +33.81% [+32.12, +36.39] | static count in the target file; every call is on the per-call path |
+| G4 | 4 | 254803 | +33.94% [+32.53, +36.10] | static count in the target file; every call is on the per-call path |
+| G5 | 4 | 254812 | +31.95% [+31.07, +34.23] | static count in the target file; every call is on the per-call path |
+| P1 (post-hoc, T2 session) | 0 per operation (4 once, at class load) | 166227 | -6.60% [-7.67, -5.42] | factory configured once and reused; measured in its own session against that session's baseline |
+
+Session: `step3-v3/C2` (allocation and latency from `measurement/summary.json`).
+
+### C.9 v3 remeasurement with the current runner (D11, post-hoc)
+
+`step3-v3/<case>`: the saved Step 3 candidates and the hand-written patches,
+re-validated and re-measured with the current runner. Since D8, fork and check
+working directories are on the Linux filesystem. No model call. Validation
+outcomes are identical to v1 and v2. The v3 rows are in the cross-session
+tables in B.3. Below, per arm: whether the v3 latency interval overlaps the
+interval of each earlier session.
+
+C1:
+
+| Arm | v3 latency overhead [95% CI] | overlaps v1 Step 2 | overlaps v1 Step 3 | overlaps v2 Step 2 | overlaps v2 Step 3 |
+| --- | --- | --- | --- | --- | --- |
+| R1 | +4.37% [+1.97, +5.77] | yes | yes | yes | yes |
+| R2 | -63.11% [-63.87, -62.54] | yes | yes | yes | yes |
+
+C2:
+
+| Arm | v3 latency overhead [95% CI] | overlaps v1 Step 2 | overlaps v1 Step 3 | overlaps v2 Step 2 | overlaps v2 Step 3 |
+| --- | --- | --- | --- | --- | --- |
+| R1 | +9.52% [+8.43, +11.29] | yes | yes | yes | yes |
+| R2 | +1.45% [+0.67, +3.54] ≈ noise | yes | yes | yes | yes |
+| G1 | +33.03% [+31.42, +35.07] | not measured | yes | not measured | yes |
+| G2 | +33.46% [+31.37, +36.25] | not measured | yes | not measured | yes |
+| G3 | +33.81% [+32.12, +36.39] | not measured | yes | not measured | yes |
+| G4 | +33.94% [+32.53, +36.10] | not measured | yes | not measured | yes |
+| G5 | +31.95% [+31.07, +34.23] | not measured | yes | not measured | yes |
+
+v3 budget decisions, C1:
+
+| Budget | Caps (latency %, peak memory %) | Admissible patches assessed | Fit | Recommended | Why the others do not fit |
+| --- | --- | --- | --- | --- | --- |
+| strict (`208491b8306d…`) | 5.0, 5.0 | R1, R2 | R2 | R2 | R1: latency overhead upper bound 5.77% > cap 5.0% |
+| lenient (`fdada931cc93…`) | 25.0, 25.0 | R1, R2 | R2, R1 | R2 | — |
+
+v3 budget decisions, C2:
+
+| Budget | Caps (latency %, peak memory %) | Admissible patches assessed | Fit | Recommended | Why the others do not fit |
+| --- | --- | --- | --- | --- | --- |
+| strict (`208491b8306d…`) | 5.0, 5.0 | R1, R2, G1, G2, G3, G4, G5 | R2 | R2 | R1: latency overhead upper bound 11.29% > cap 5.0%; G1: latency overhead upper bound 35.07% > cap 5.0%; G2: latency overhead upper bound 36.25% > cap 5.0%; G3: latency overhead upper bound 36.39% > cap 5.0%; G4: latency overhead upper bound 36.10% > cap 5.0%; G5: latency overhead upper bound 34.23% > cap 5.0% |
+| lenient (`fdada931cc93…`) | 25.0, 25.0 | R1, R2, G1, G2, G3, G4, G5 | R2, R1 | R2 | G1: latency overhead upper bound 35.07% > cap 25.0%; G2: latency overhead upper bound 36.25% > cap 25.0%; G3: latency overhead upper bound 36.39% > cap 25.0%; G4: latency overhead upper bound 36.10% > cap 25.0%; G5: latency overhead upper bound 34.23% > cap 25.0% |
+
+### C.10 Post-hoc arm P1 for C2 (D12) — post-hoc, designed after seeing results
+
+P1 is **not a reference fix** and enters no decision table. It is hand-written
+from the original C2 source (`posthoc/C2-P1/`). It uses the same four feature
+settings and the same two setters as generated candidate G2. The difference:
+the configured `DocumentBuilderFactory` is built once at class load and
+reused, and each call takes a new `DocumentBuilder` from it under a lock. It
+was validated with the registered C2 checks and measured in its own session
+with baseline, baseline-AA, R1 and G2 (`posthoc/C2-P1-session/`).
+
+| Arm | Registered checks (claim level) | Inputs now rejected | Median latency (ns/op) | Median alloc (B/op) | Latency vs baseline [95% CI] | Peak memory vs baseline [95% CI] |
+| --- | --- | --- | --- | --- | --- | --- |
+| baseline | L2 | 0 | 61108.6 | 169653 | — | — |
+| baseline-AA | (copy of V0) | — | 61930.5 | 169649 | +1.34% [+0.08, +2.86] ≈ noise | +1.07% [-1.59, +3.21] ≈ noise |
+| R1 | L4 | 4 | 67206.8 | 191083 | +9.98% [+8.85, +11.90] | +1.29% [-3.61, +3.17] ≈ noise |
+| G2 | L4 | 4 | 82377.4 | 254824 | +34.80% [+33.19, +37.23] | -1.83% [-5.25, +0.71] ≈ noise |
+| P1 | L4 | 4 | 57074.8 | 166227 | -6.60% [-7.67, -5.42] | -3.41% [-5.54, -1.67] |
+
+A/A noise floor: latency 2.86%, peak memory 3.21%. Raw samples `posthoc/C2-P1-session/measurement/raw_samples.jsonl` sha256 `221d6c8340cd20b6b41a5e84bd1df286dabbb356f41d779c4485ff018e6fb3e2`.
+
+| Comparison (same session) | Latency [95% CI] | Peak memory [95% CI] |
+| --- | --- | --- |
+| P1 vs R1 | -15.08% [-16.45, -14.23] | -4.64% [-5.87, +0.05] |
+| P1 vs G2 | -30.72% [-31.84, -29.96] | -1.60% [-3.63, +1.76] |
+| G2 vs R1 | +22.57% [+20.60, +24.50] | -3.09% [-6.31, +1.87] |
+
 ## D. Real library case — L1, java-xmlbuilder (CWE-611, CVE-2014-125087)
 
 Library: java-xmlbuilder (https://github.com/jmurty/java-xmlbuilder),
@@ -448,7 +615,12 @@ R1 and R2 were measured again in each generator session (same protocol):
 | long-context run | G3 | +81.79% [+77.82, +84.91] | +10.50% [+5.05, +11.97] | 2.93% / 6.22% | no | no |
 | long-context run | G5 | +83.62% [+79.61, +89.75] | +11.57% [+6.27, +12.81] | 2.93% / 6.22% | no | no |
 
-### D.2 Generator part, frozen settings (primary generator result)
+### D.2 Generator part, frozen settings (primary generator result): prompt truncation
+
+Result: **prompt truncation**. The server cut every prompt to fit the frozen
+context, so no candidate could be a patch (L0 5/5, L1 0/5). This shows the
+frozen settings do not fit a 46 KB file. It says nothing about the model's
+behavior on the full prompt.
 
 Exactly the Step 3 prompt template and settings (8,192-token context, 4,096
 `max_tokens`). The full prompt is 10,075 tokens; the server log records
@@ -520,10 +692,15 @@ A/A noise floor: latency **2.93%**, peak memory **6.22%**.
 | G3 | 20/20 | 99322.9 | 107586 | 302915 | +81.79% [+77.82, +84.91] | +10.50% [+5.05, +11.97] |
 | G5 | 20/20 | 100326.6 | 108630 | 302911 | +83.62% [+79.61, +89.75] | +11.57% [+6.27, +12.81] |
 
-Model-induced cost (the pre-registered rule matches G2, G3 and G5 to R2,
-because each sets `disallow-doctype-decl`):
+Excess over matched reference (formerly "model-induced cost"; D14). The
+pre-registered rule matches G2, G3 and G5 to R2 because each sets
+`disallow-doctype-decl`. R2 sets that one feature (plus
+`FEATURE_SECURE_PROCESSING`) on the parse factory only. The candidates set
+four features and further setters on both the parse and the create factory
+(see C.8). So the excess measures a different configuration and is not
+attributed to the model:
 
-| Candidate | Matched reference (rule) | Latency vs baseline [95% CI] | Latency vs matched reference [95% CI] (model-induced) | Peak memory vs matched reference [95% CI] |
+| Candidate | Matched reference (rule) | Latency vs baseline [95% CI] | Latency vs matched reference [95% CI] (excess over matched reference) | Peak memory vs matched reference [95% CI] |
 | --- | --- | --- | --- | --- |
 | G2 | R2 | +81.44% [+77.61, +85.58] | +63.26% [+60.37, +66.96] | +2.95% [+0.66, +4.67] ≈ noise |
 | G3 | R2 | +81.79% [+77.82, +84.91] | +63.57% [+60.89, +66.13] | +2.46% [-0.10, +4.38] ≈ noise |
@@ -552,6 +729,41 @@ neither budget. In the same session the upstream fix R1 costs +40.51% and the
 OWASP fix R2 +11.13%; nothing fits the strict budget and only R2 fits the
 lenient one. Generation took about 80 to 88 s per candidate on the GPU for
 about 10,000 completion tokens each.
+
+### D.4 Supplementary observation: is an external DTD named by the document read? (D13, post-hoc)
+
+Not a check and not part of any claim level. The document's DOCTYPE names a
+local DTD file that declares an **internal** entity holding a marker string,
+and the body uses the entity (`posthoc/L1-dtd-observation/`). If the marker
+appears in the parsed document, the parser read the external DTD. One fresh
+JVM per patch, same library build layout as validation; no model call.
+
+| Patch | Observation | Detail (truncated) |
+| --- | --- | --- |
+| V0 | DTD loaded (marker present) | text content: PARAPET-DTD-LOADED-3f8a / serialized: <config><name>PARAPET-DTD-LOADED-3f8a</name></config> |
+| CONTROL | DTD loaded (marker present) | text content: PARAPET-DTD-LOADED-3f8a / serialized: <config><name>PARAPET-DTD-LOADED-3f8a</name></config> |
+| R1 | DTD loaded (marker present) | text content: PARAPET-DTD-LOADED-3f8a / serialized: <config><name>PARAPET-DTD-LOADED-3f8a</name></config> |
+| R2 | document rejected | org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature "http://apache.org/xml/features/disallow-doctype-decl" set to true. |
+| G2 | document rejected | org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature "http://apache.org/xml/features/disallow-doctype-decl" set to true. |
+| G3 | document rejected | org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature "http://apache.org/xml/features/disallow-doctype-decl" set to true. |
+| G5 | document rejected | org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature "http://apache.org/xml/features/disallow-doctype-decl" set to true. |
+
+### D.5 setFeature calls, allocation and latency for L1 (D14, post-hoc analysis)
+
+Per workload operation the driver calls `XMLBuilder.parse` and
+`XMLBuilder.create` once each, so both `parseDocumentImpl` and
+`createDocumentImpl` build a factory. Session: long-context run.
+
+| Patch | setFeature calls per workload operation (excl. FEATURE_SECURE_PROCESSING) | Median allocation per operation (bytes) | Latency overhead vs baseline [95% CI] | How the count was derived |
+| --- | --- | --- | --- | --- |
+| baseline | 0 | 132345 | — | static count in parseDocumentImpl (0) + createDocumentImpl (0); no loops |
+| R1 | 4 (2 per factory: parse and create) | 217583 | +40.51% [+37.56, +42.77] | upstream helper loops over three feature URIs per feature and stops at the first that succeeds; on this JDK the first succeeds, so 2 calls per factory; the workload builds 2 factories per operation |
+| R2 | 1 | 153819 | +11.13% [+8.89, +12.89] | static count in parseDocumentImpl (1) + createDocumentImpl (0); no loops |
+| G2 | 8 | 302907 | +81.44% [+77.61, +85.58] | static count in parseDocumentImpl (4) + createDocumentImpl (4); no loops |
+| G3 | 8 | 302915 | +81.79% [+77.82, +84.91] | static count in parseDocumentImpl (4) + createDocumentImpl (4); no loops |
+| G5 | 8 | 302911 | +83.62% [+79.61, +89.75] | static count in parseDocumentImpl (4) + createDocumentImpl (4); no loops |
+
+Session: `step4/L1-gen-longctx` (allocation and latency from `measurement/summary.json`).
 
 Endpoint logs (model calls, Step 4):
 
@@ -607,8 +819,8 @@ task specifies. No hosted endpoint was contacted at any point.
 `--allow-hosted-control` is passed (tested in
 `tests/parapet/test_prompt_and_generator.py`). Because the local generator
 reached L4 on C2, Step 5 was not required as a diagnostic. Consequence: the
-attribution question (whether model-induced cost and failures come from the
-local generator or from the prompt and cases) is unanswered here.
+attribution question (whether the excess over matched reference and the
+failures come from the local generator or from the prompt and cases) is unanswered here.
 `controls/README.md` records the same.
 
 ## F. Paths and reproduce commands
@@ -659,12 +871,13 @@ Failures observed in the workflow (all reported above; nothing was repaired):
   G2–G5 do not compile (L1): missing imports and unresolved
   `ObjectInputFilter` types.
 - C2 generator: all five admissible, all five fail both budgets on latency.
-- L1 frozen settings: prompt truncated by the server (10,075 → 4,098 tokens);
+- L1 frozen settings: prompt truncation by the server (10,075 → 4,098 tokens);
   0/5 parseable.
 - L1 long-context variant: G1 and G4 compile but change namespace handling,
   fail 2/34 upstream tests, and leave all canaries firing (L2).
 - Budget outcomes where no admissible patch fits: C2 strict in the v2 Step 2
-  session; L1 strict in every session.
+  session; L1 strict in every session. C1 R1 misses the strict cap in the
+  post-hoc v3 session (D11).
 
 Failures in my own work:
 
@@ -867,6 +1080,67 @@ The validation outcomes are identical in the two runs.
 `OPENAI_API_KEY` nor `ANTHROPIC_API_KEY` was set (see EVIDENCE.md section E).
 This is the skip the task specifies, recorded here for completeness.
 
+#### 4. Post-hoc tasks after the final evidence commit `8c8ad50` (requested 2026-11-18, started 19:05 PST)
+
+All four are **post-hoc**: designed and run after the results above were
+seen. No model was called. No case, check, budget, decision rule, claim
+level, `LOCAL-EVIDENCE.md`, or existing run directory was changed;
+`LOCAL-EVIDENCE.md` still rebuilds byte-identically from its template.
+
+**D11 (post-hoc). v3 remeasurement of C1 and C2 (19:05:32–19:13:28 PST).**
+`python -m parapet run --case <C> --candidates-from
+evidence/mozilla-2026-11/step3/<C>/generation --budget
+parapet/budgets/strict.parapet.budget.yaml --budget
+parapet/budgets/lenient.parapet.budget.yaml`, written to `step3-v3/<C>/`,
+with the current runner (D6 memory fix; D8 Linux working directories).
+Validation outcomes are identical to v1 and v2. Every v3 latency interval
+overlaps the interval of every earlier session in which that arm was
+measured. One verdict changed relative to the earlier sessions: C1 R1's
+latency upper bound is 5.77%, so in v3 it does not fit the strict budget
+(R2 still fits and is recommended). C2 R2 fits the strict budget in v3. v3
+rows are added to the cross-session tables in EVIDENCE.md (builder kind
+`cross_v3`; the `cross` kind used by LOCAL-EVIDENCE.md is unchanged).
+
+**D12 (post-hoc, designed after seeing results). C2 arm P1 (19:13:52–19:16:40 PST).**
+P1 (`posthoc/C2-P1/`) is hand-written from the original C2 source, not from
+G2's file. It applies the same four `setFeature` calls and two setters as
+generated candidate G2 to a `DocumentBuilderFactory` built once at class load
+and reused (`newDocumentBuilder` under a lock). It is not a reference fix,
+enters no decision table, and no budget was applied. It was validated with
+the registered C2 checks (L4; the same four DTD probes rejected as R1 and G2)
+and measured in its own session with baseline, baseline-AA, R1 and G2
+(`analysis/posthoc_c2_p1.py`, output `posthoc/C2-P1-session/`). Latency
+against that session's baseline: P1 -6.60% [-7.67, -5.42], G2 +34.80%
+[+33.19, +37.23], R1 +9.98% [+8.85, +11.90]. P1 against G2: -30.72%
+[-31.84, -29.96]. P1 and G2 differ only in whether the configured factory is
+built per call or once.
+
+**D13 (post-hoc). L1 external-DTD observation (19:13:38–19:13:45 PST).** A
+supplementary program (`posthoc/L1-dtd-observation/`), not a check and not part of any claim level. It
+parses a document whose DOCTYPE names a local DTD file declaring an internal
+entity that holds a marker, with the entity used in the body. It was run
+against V0, CONTROL, R1, R2 (case files) and G2, G3, G5 (saved candidates).
+Observed: V0, CONTROL and R1 load the DTD (marker present); R2, G2, G3 and
+G5 reject the document (DOCTYPE disallowed). Section H's sentence on
+external DTDs was corrected to state this observation instead of the earlier
+inference from the benign external-DTD probe.
+
+**D14 (post-hoc). Analysis and wording only, from existing summaries.**
+(a) Tables of setFeature calls per workload operation (excluding
+`FEATURE_SECURE_PROCESSING`), median allocation per operation and latency
+overhead, per case (`analysis/posthoc_tables.py`); counts are read from patch
+sources, and for L1 R1 from the upstream helper's loop (first feature URI
+succeeds on this JDK). (b) "Model-induced cost" is renamed "excess over
+matched reference" in EVIDENCE.md. The matched reference sets fewer features
+than the candidates, so the excess is not attributed to the model. Existing
+records, run summaries and LOCAL-EVIDENCE.md keep the old label, which is
+superseded; they are not rewritten. (c) L1's frozen-settings result is
+described as prompt truncation. (d) Sessions whose A/A peak-memory upper
+bound exceeds 5% are listed, and their strict memory verdicts are marked not
+resolvable (EVIDENCE.md B.4); the recorded `decision.json` files are
+unchanged. (e) EVIDENCE.md states that L4 means "passes the registered
+checks" and that L4 patches can differ in security coverage.
+
 ## H. What these results do not show
 
 - **Architecture-level and resource-contention costs.** Every number is a
@@ -888,14 +1162,21 @@ This is the skip the task specifies, recorded here for completeness.
 - **Exploitability beyond the canaries.** "Fires" means a canary flag was
   set (C1) or a marker file's content was reflected (C2, L1). Out-of-band
   effects are not detected: a fetch of an attacker-named resource that
-  reflects no content would not make any canary fire. L1's R1 (the upstream
-  fix) accepts the benign external-DTD probe, so the parser still reads an
-  external DTD named by the document; the checks do not count that as a
-  failure. No real exploit chain was used.
+  reflects no content would not make any canary fire. Observed directly in
+  the supplementary observation (D.4, D13): with L1's R1 (the upstream fix),
+  as with the unpatched library and the control, the parser reads an external
+  DTD named by the document. A marker defined as an internal entity in that
+  DTD appears in the parsed document. R2 and the admissible generated
+  candidates G2, G3 and G5 reject that document (DOCTYPE disallowed). The
+  registered checks do not test DTD loading by itself, so R1 is L4 while
+  still reading external DTDs. (The earlier wording inferred this from R1
+  accepting the benign external-DTD probe; acceptance alone did not show
+  that the DTD was read.) No real exploit chain was used.
 - **Stability of budget verdicts.** Each session has its own A/A noise
   floor, and intervals do not cover session-to-session variation. A patch
   whose cost sits inside the noise can fit a 5% cap in one session and miss
-  it in another (C2 R2: three of four sessions). "Indistinguishable" is
+  it in another (C2 R2: four of five sessions; C1 R1: four of five, missing
+  only in v3). "Indistinguishable" is
   judged on the point estimate against the noise floor, as pre-registered.
 - **Memory.** Peak RSS of a JVM run with `-XX:+UseSerialGC -Xms64m
   -Xmx512m`; it reflects heap sizing as much as live data. v1 memory figures
@@ -947,9 +1228,9 @@ All selected PARAPET checks passed.
 
 ## J. One line per case
 
-- **C1 (CWE-502, authored):** the default local generator did not reach L4 (0/5; best L2, 1/5). An admissible patch fits the strict budget: yes, hand-written R1 and R2 in every session. Lenient: yes, R1 and R2 in every session. No generated patch fits either budget.
-- **C2 (CWE-611, authored):** the default local generator reached L4 (5/5). An admissible patch fits the strict budget: hand-written R2 only, in three of four sessions (in the v2 Step 2 session nothing fits). Lenient: yes, R1 and R2 in every session. No generated patch fits either budget.
-- **L1 (CWE-611, java-xmlbuilder):** under the frozen settings the default local generator did not reach L4 (0/5; prompt truncated, nothing parseable). Under the declared long-context variant it reached L4 (3/5). An admissible patch fits the strict budget: no, in no session. Lenient: yes, hand-written R2 only. The upstream fix R1 and every generated patch fit neither budget.
+- **C1 (CWE-502, authored):** the default local generator did not reach L4 (0/5; best L2, 1/5). An admissible patch fits the strict budget: yes, hand-written R2 in every session (5/5) and R1 in four of five (not in the post-hoc v3 session). Lenient: yes, R1 and R2 in every session. No generated patch fits either budget.
+- **C2 (CWE-611, authored):** the default local generator reached L4 (5/5). An admissible patch fits the strict budget: hand-written R2 only, in four of five sessions including the post-hoc v3 session (in the v2 Step 2 session nothing fits). Lenient: yes, R1 and R2 in every session. No generated patch fits either budget.
+- **L1 (CWE-611, java-xmlbuilder):** under the frozen settings the default local generator did not reach L4 (0/5): prompt truncation, nothing parseable. Under the declared long-context variant it reached L4 (3/5). An admissible patch fits the strict budget: no, in no session (every patch misses on latency; strict memory verdicts are not resolvable in the L1 sessions listed in B.4). Lenient: yes, hand-written R2 only. The upstream fix R1 and every generated patch fit neither budget.
 
 ---
 

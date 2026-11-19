@@ -12,8 +12,12 @@ content frozen at LOCAL-EVIDENCE (`LOCAL-EVIDENCE.md`, unchanged).
 the pre-registered runner, is invalid as a JVM measurement because it
 included the runner's own memory; **v2** is correct (DEVIATIONS D6/D7). L1
 was measured only with the corrected runner. (2) Every change after a
-pre-registration commit is in `evidence/DEVIATIONS.md` (P1–P4, D1–D10),
-reproduced in full in section G.
+pre-registration commit is in `evidence/DEVIATIONS.md` (P1–P4, D1–D14),
+reproduced in full in section G. (3) D11–D14 are **post-hoc**: designed
+and run after the results were seen (v3 remeasurement, the post-hoc arm
+P1, the L1 external-DTD observation, and analysis/wording changes; sections
+B.4, C.3, C.8–C.10, D.2, D.4, D.5 and H). They change no case, check,
+budget, decision rule, claim level, or existing run directory.
 
 Pre-registration commits: `f9f9e15` (C1, C2, budgets, protocol, prompt,
 settings; 2026-11-18 17:05:09 PST) and `083b7b8` (L1; 18:12:18 PST).
@@ -89,11 +93,11 @@ columns are invalid (D6) and shown only for completeness.
 
 C1 (CWE-502):
 
-{{cross:C1}}
+{{cross_v3:C1}}
 
 C2 (CWE-611):
 
-{{cross:C2}}
+{{cross_v3:C2}}
 
 Primary Step 2 tables (v2 session, valid memory):
 
@@ -113,18 +117,32 @@ What the hand-written patches show:
 
 - C1: R1 (serialization filter) adds a small latency cost in every session;
   R2 (data-only format) is faster than the baseline in every session. Both fit
-  both budgets in every session; the rule recommends R2 because its latency
-  upper bound is lowest. R2 rejects every token written by the original
+  both budgets in the four sessions up to LOCAL-EVIDENCE; in the post-hoc v3
+  session (D11) R1's latency interval is [+1.97, +5.77], overlapping every
+  earlier session, and its upper bound misses the strict cap, so R1 fits the
+  strict budget in four of five sessions. The rule recommends R2 in every
+  session because its latency upper bound is lowest. R2 rejects every token written by the original
   implementation (6/6 probes); R1 rejects one legacy token shape (1/6). The
   decision rule does not weigh rejected inputs; the records list them for the
   maintainer.
 - C2: R1 (reject DOCTYPE) costs about 10% latency in every session and never
   fits the strict budget; it fits the lenient one. R2 (entity resolver) is
   within the noise floor in every session, and fits the strict budget in three
-  of four sessions. In the v2 Step 2 session its latency upper bound is
+  of four sessions up to LOCAL-EVIDENCE and in the v3 session (four of five). In the v2 Step 2 session its latency upper bound is
   5.08% against a 5.0% cap, so in that session nothing fits the strict budget.
   The strict verdict for a patch whose cost sits inside the noise is therefore
   not stable from session to session.
+
+### B.4 Sessions where strict memory verdicts are not resolvable (D14, post-hoc)
+
+When a session's own A/A peak-memory interval reaches above 5%, two copies of
+the same program can differ by more than the strict memory cap. A strict
+memory verdict in that session (fits or does not fit, on memory) cannot be
+resolved by this measurement. The table covers every session in this package.
+The verdicts recorded in each `decision.json` are unchanged; this table
+qualifies them.
+
+{{posthoc:memory_resolvability}}
 
 ## C. Workflow with the default local generator
 
@@ -133,6 +151,13 @@ candidates were re-validated and re-measured once more without a model call
 (v2). Raw outputs are saved verbatim in `step3/<case>/generation/raw/`.
 
 ### C.1 Claim levels (per case; levels are not merged)
+
+**What L4 means (D14).** L4 ("admissible") means the patch passes the
+registered checks: it compiles, the reproducer and both held-out variants no
+longer fire the canary, and the functional tests pass. It does not mean
+equal security coverage. Two L4 patches can differ in what they still allow:
+which legitimate inputs they now reject (the probe columns), and whether the
+parser still reads an external DTD named by the document (section D.4).
 
 {{claims:step3-v2/C1}}
 
@@ -169,19 +194,29 @@ entity/DTD features, `setXIncludeAware(false)` and
 `setExpandEntityReferences(false)`; all are admissible (L4) and reject the
 same four DTD probes as R1.
 
-### C.3 Cost of admissible candidates (C2) and model-induced cost
+### C.3 Cost of admissible candidates (C2) and excess over matched reference
 
 The matched reference is assigned by the pre-registered rule in
 `parapet/cases/C2/case.yaml` (all five set `disallow-doctype-decl` → R1).
-Model-induced cost = candidate against R1, measured in the same session.
+Excess over matched reference = candidate against R1, measured in the same
+session. (This was labelled "model-induced cost" until D14; the label in the
+existing records and run summaries is superseded, and the records are not
+rewritten.) R1 sets one feature (`disallow-doctype-decl`) plus
+`FEATURE_SECURE_PROCESSING`. The candidates set four features plus two
+setters (see C.8), so the excess measures a different configuration. It is
+not attributed to the model.
+
+v3 (current runner, valid memory; D11):
+
+{{excess:step3-v3/C2}}
 
 v2 (valid memory):
 
-{{model_induced:step3-v2/C2}}
+{{excess:step3-v2/C2}}
 
 v1 (latency valid, memory invalid):
 
-{{model_induced:step3/C2}}
+{{excess:step3/C2}}
 
 ### C.4 Budget decisions over all admissible patches
 
@@ -237,6 +272,59 @@ C2:
 Whole-board power from `nvidia-smi` every 200 ms; includes anything else
 using the GPU (the Windows desktop). Not a per-request energy measurement.
 
+### C.8 setFeature calls, allocation and latency (D14, post-hoc analysis)
+
+Counts are setFeature calls executed per workload operation, excluding
+`FEATURE_SECURE_PROCESSING`, read from each patch's source. Allocation and
+latency come from the v3 session's summary. This is a description of what
+each configuration does; no causal claim is made about which setting costs
+what.
+
+C1 (no patch configures an XML parser; the column is 0 throughout):
+
+{{posthoc:feature_table C1 step3-v3/C1}}
+
+C2:
+
+{{posthoc:feature_table C2 step3-v3/C2}}
+
+### C.9 v3 remeasurement with the current runner (D11, post-hoc)
+
+`step3-v3/<case>`: the saved Step 3 candidates and the hand-written patches,
+re-validated and re-measured with the current runner. Since D8, fork and check
+working directories are on the Linux filesystem. No model call. Validation
+outcomes are identical to v1 and v2. The v3 rows are in the cross-session
+tables in B.3. Below, per arm: whether the v3 latency interval overlaps the
+interval of each earlier session.
+
+C1:
+
+{{posthoc:overlap_table C1}}
+
+C2:
+
+{{posthoc:overlap_table C2}}
+
+v3 budget decisions, C1:
+
+{{decisions:step3-v3/C1}}
+
+v3 budget decisions, C2:
+
+{{decisions:step3-v3/C2}}
+
+### C.10 Post-hoc arm P1 for C2 (D12) — post-hoc, designed after seeing results
+
+P1 is **not a reference fix** and enters no decision table. It is hand-written
+from the original C2 source (`posthoc/C2-P1/`). It uses the same four feature
+settings and the same two setters as generated candidate G2. The difference:
+the configured `DocumentBuilderFactory` is built once at class load and
+reused, and each call takes a new `DocumentBuilder` from it under a lock. It
+was validated with the registered C2 checks and measured in its own session
+with baseline, baseline-AA, R1 and G2 (`posthoc/C2-P1-session/`).
+
+{{posthoc:p1_report}}
+
 ## D. Real library case — L1, java-xmlbuilder (CWE-611, CVE-2014-125087)
 
 Library: java-xmlbuilder (https://github.com/jmurty/java-xmlbuilder),
@@ -271,7 +359,12 @@ R1 and R2 were measured again in each generator session (same protocol):
 
 {{cross:L1}}
 
-### D.2 Generator part, frozen settings (primary generator result)
+### D.2 Generator part, frozen settings (primary generator result): prompt truncation
+
+Result: **prompt truncation**. The server cut every prompt to fit the frozen
+context, so no candidate could be a patch (L0 5/5, L1 0/5). This shows the
+frozen settings do not fit a 46 KB file. It says nothing about the model's
+behavior on the full prompt.
 
 Exactly the Step 3 prompt template and settings (8,192-token context, 4,096
 `max_tokens`). The full prompt is 10,075 tokens; the server log records
@@ -305,10 +398,15 @@ and re-measured with `--candidates-from` (no model call) into
 
 {{measurement:step4/L1-gen-longctx}}
 
-Model-induced cost (the pre-registered rule matches G2, G3 and G5 to R2,
-because each sets `disallow-doctype-decl`):
+Excess over matched reference (formerly "model-induced cost"; D14). The
+pre-registered rule matches G2, G3 and G5 to R2 because each sets
+`disallow-doctype-decl`. R2 sets that one feature (plus
+`FEATURE_SECURE_PROCESSING`) on the parse factory only. The candidates set
+four features and further setters on both the parse and the create factory
+(see C.8). So the excess measures a different configuration and is not
+attributed to the model:
 
-{{model_induced:step4/L1-gen-longctx}}
+{{excess:step4/L1-gen-longctx}}
 
 {{decisions:step4/L1-gen-longctx}}
 
@@ -322,6 +420,24 @@ fails `testElementBefore` in both test classes and leaves every canary
 firing.
 
 {{file:analysis/step4_narrative.md}}
+
+### D.4 Supplementary observation: is an external DTD named by the document read? (D13, post-hoc)
+
+Not a check and not part of any claim level. The document's DOCTYPE names a
+local DTD file that declares an **internal** entity holding a marker string,
+and the body uses the entity (`posthoc/L1-dtd-observation/`). If the marker
+appears in the parsed document, the parser read the external DTD. One fresh
+JVM per patch, same library build layout as validation; no model call.
+
+{{file:posthoc/L1-dtd-observation/results.md}}
+
+### D.5 setFeature calls, allocation and latency for L1 (D14, post-hoc analysis)
+
+Per workload operation the driver calls `XMLBuilder.parse` and
+`XMLBuilder.create` once each, so both `parseDocumentImpl` and
+`createDocumentImpl` build a factory. Session: long-context run.
+
+{{posthoc:feature_table L1 step4/L1-gen-longctx}}
 
 Endpoint logs (model calls, Step 4):
 
@@ -351,8 +467,8 @@ task specifies. No hosted endpoint was contacted at any point.
 `--allow-hosted-control` is passed (tested in
 `tests/parapet/test_prompt_and_generator.py`). Because the local generator
 reached L4 on C2, Step 5 was not required as a diagnostic. Consequence: the
-attribution question (whether model-induced cost and failures come from the
-local generator or from the prompt and cases) is unanswered here.
+attribution question (whether the excess over matched reference and the
+failures come from the local generator or from the prompt and cases) is unanswered here.
 `controls/README.md` records the same.
 
 ## F. Paths and reproduce commands
@@ -403,12 +519,13 @@ Failures observed in the workflow (all reported above; nothing was repaired):
   G2–G5 do not compile (L1): missing imports and unresolved
   `ObjectInputFilter` types.
 - C2 generator: all five admissible, all five fail both budgets on latency.
-- L1 frozen settings: prompt truncated by the server (10,075 → 4,098 tokens);
+- L1 frozen settings: prompt truncation by the server (10,075 → 4,098 tokens);
   0/5 parseable.
 - L1 long-context variant: G1 and G4 compile but change namespace handling,
   fail 2/34 upstream tests, and leave all canaries firing (L2).
 - Budget outcomes where no admissible patch fits: C2 strict in the v2 Step 2
-  session; L1 strict in every session.
+  session; L1 strict in every session. C1 R1 misses the strict cap in the
+  post-hoc v3 session (D11).
 
 Failures in my own work:
 
@@ -451,14 +568,21 @@ Failures in my own work:
 - **Exploitability beyond the canaries.** "Fires" means a canary flag was
   set (C1) or a marker file's content was reflected (C2, L1). Out-of-band
   effects are not detected: a fetch of an attacker-named resource that
-  reflects no content would not make any canary fire. L1's R1 (the upstream
-  fix) accepts the benign external-DTD probe, so the parser still reads an
-  external DTD named by the document; the checks do not count that as a
-  failure. No real exploit chain was used.
+  reflects no content would not make any canary fire. Observed directly in
+  the supplementary observation (D.4, D13): with L1's R1 (the upstream fix),
+  as with the unpatched library and the control, the parser reads an external
+  DTD named by the document. A marker defined as an internal entity in that
+  DTD appears in the parsed document. R2 and the admissible generated
+  candidates G2, G3 and G5 reject that document (DOCTYPE disallowed). The
+  registered checks do not test DTD loading by itself, so R1 is L4 while
+  still reading external DTDs. (The earlier wording inferred this from R1
+  accepting the benign external-DTD probe; acceptance alone did not show
+  that the DTD was read.) No real exploit chain was used.
 - **Stability of budget verdicts.** Each session has its own A/A noise
   floor, and intervals do not cover session-to-session variation. A patch
   whose cost sits inside the noise can fit a 5% cap in one session and miss
-  it in another (C2 R2: three of four sessions). "Indistinguishable" is
+  it in another (C2 R2: four of five sessions; C1 R1: four of five, missing
+  only in v3). "Indistinguishable" is
   judged on the point estimate against the noise floor, as pre-registered.
 - **Memory.** Peak RSS of a JVM run with `-XX:+UseSerialGC -Xms64m
   -Xmx512m`; it reflects heap sizing as much as live data. v1 memory figures

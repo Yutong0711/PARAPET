@@ -1,0 +1,157 @@
+[
+  {
+    "profile": "strict",
+    "budget_path": "parapet/budgets/strict.parapet.budget.yaml",
+    "budget_sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+    "caps": {
+      "latency_overhead_pct": 5.0,
+      "peak_memory_overhead_pct": 5.0
+    },
+    "workload": "legitimate-path",
+    "assessed": [
+      {
+        "patch_id": "R1",
+        "fits": false,
+        "latency_overhead_pct_hi": 11.286396820890365,
+        "peak_memory_overhead_pct_hi": 1.026769244158432,
+        "reasons": [
+          "latency overhead upper bound 11.29% > cap 5.0%"
+        ]
+      },
+      {
+        "patch_id": "R2",
+        "fits": true,
+        "latency_overhead_pct_hi": 3.537974660428911,
+        "peak_memory_overhead_pct_hi": 4.203826237054087,
+        "reasons": []
+      },
+      {
+        "patch_id": "G1",
+        "fits": false,
+        "latency_overhead_pct_hi": 35.069004897274425,
+        "peak_memory_overhead_pct_hi": 0.31273364563702,
+        "reasons": [
+          "latency overhead upper bound 35.07% > cap 5.0%"
+        ]
+      },
+      {
+        "patch_id": "G2",
+        "fits": false,
+        "latency_overhead_pct_hi": 36.252561756649015,
+        "peak_memory_overhead_pct_hi": 3.6421921976310445,
+        "reasons": [
+          "latency overhead upper bound 36.25% > cap 5.0%"
+        ]
+      },
+      {
+        "patch_id": "G3",
+        "fits": false,
+        "latency_overhead_pct_hi": 36.38707554986258,
+        "peak_memory_overhead_pct_hi": 0.9090086011769971,
+        "reasons": [
+          "latency overhead upper bound 36.39% > cap 5.0%"
+        ]
+      },
+      {
+        "patch_id": "G4",
+        "fits": false,
+        "latency_overhead_pct_hi": 36.10374694563481,
+        "peak_memory_overhead_pct_hi": 0.613093934749287,
+        "reasons": [
+          "latency overhead upper bound 36.10% > cap 5.0%"
+        ]
+      },
+      {
+        "patch_id": "G5",
+        "fits": false,
+        "latency_overhead_pct_hi": 34.22989841757289,
+        "peak_memory_overhead_pct_hi": 3.685631407025114,
+        "reasons": [
+          "latency overhead upper bound 34.23% > cap 5.0%"
+        ]
+      }
+    ],
+    "fitting": [
+      "R2"
+    ],
+    "recommended": "R2",
+    "statement": "recommend R2"
+  },
+  {
+    "profile": "lenient",
+    "budget_path": "parapet/budgets/lenient.parapet.budget.yaml",
+    "budget_sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+    "caps": {
+      "latency_overhead_pct": 25.0,
+      "peak_memory_overhead_pct": 25.0
+    },
+    "workload": "legitimate-path",
+    "assessed": [
+      {
+        "patch_id": "R1",
+        "fits": true,
+        "latency_overhead_pct_hi": 11.286396820890365,
+        "peak_memory_overhead_pct_hi": 1.026769244158432,
+        "reasons": []
+      },
+      {
+        "patch_id": "R2",
+        "fits": true,
+        "latency_overhead_pct_hi": 3.537974660428911,
+        "peak_memory_overhead_pct_hi": 4.203826237054087,
+        "reasons": []
+      },
+      {
+        "patch_id": "G1",
+        "fits": false,
+        "latency_overhead_pct_hi": 35.069004897274425,
+        "peak_memory_overhead_pct_hi": 0.31273364563702,
+        "reasons": [
+          "latency overhead upper bound 35.07% > cap 25.0%"
+        ]
+      },
+      {
+        "patch_id": "G2",
+        "fits": false,
+        "latency_overhead_pct_hi": 36.252561756649015,
+        "peak_memory_overhead_pct_hi": 3.6421921976310445,
+        "reasons": [
+          "latency overhead upper bound 36.25% > cap 25.0%"
+        ]
+      },
+      {
+        "patch_id": "G3",
+        "fits": false,
+        "latency_overhead_pct_hi": 36.38707554986258,
+        "peak_memory_overhead_pct_hi": 0.9090086011769971,
+        "reasons": [
+          "latency overhead upper bound 36.39% > cap 25.0%"
+        ]
+      },
+      {
+        "patch_id": "G4",
+        "fits": false,
+        "latency_overhead_pct_hi": 36.10374694563481,
+        "peak_memory_overhead_pct_hi": 0.613093934749287,
+        "reasons": [
+          "latency overhead upper bound 36.10% > cap 25.0%"
+        ]
+      },
+      {
+        "patch_id": "G5",
+        "fits": false,
+        "latency_overhead_pct_hi": 34.22989841757289,
+        "peak_memory_overhead_pct_hi": 3.685631407025114,
+        "reasons": [
+          "latency overhead upper bound 34.23% > cap 25.0%"
+        ]
+      }
+    ],
+    "fitting": [
+      "R2",
+      "R1"
+    ],
+    "recommended": "R2",
+    "statement": "recommend R2"
+  }
+]

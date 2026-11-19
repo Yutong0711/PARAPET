@@ -1,0 +1,50 @@
+{
+  "patch_id": "G2",
+  "kind": "generated candidate",
+  "source_sha256": "e5bc4e5ac92d4c17963c8b4c51d79aeb0728dfa6bb99e999197b92afffdbf50d",
+  "patched_files": [
+    "example/prefs/PrefsCodec.java"
+  ],
+  "compile": {
+    "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3v3-C1-20261118T190532/patches/G2/classes/target /home/yzhao/parapet-work/runs/step3v3-C1-20261118T190532/patches/G2/src/example/prefs/PrefsCodec.java",
+    "ok": false,
+    "duration_s": 0.349,
+    "output": "Command 'javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3v3-C1-20261118T190532/patches/G2/classes/target /home/yzhao/parapet-work/runs/step3v3-C1-20261118T190532/patches/G2/src/example/prefs/PrefsCodec.java' failed: /home/yzhao/parapet-work/runs/step3v3-C1-20261118T190532/patches/G2/src/example/prefs/PrefsCodec.java:109: error: cannot find symbol\n            protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {\n                                            ^\n  symbol: class ObjectStreamClass\n/home/yzhao/parapet-work/runs/step3v3-C1-20261118T190532/patches/G2/src/example/prefs/PrefsCodec.java:113: error: cannot find symbol\n                    throw new InvalidClassException(\"Unauthorized deserialization attempt\", desc.getName());\n                              ^\n  symbol: class InvalidClassException\n2 errors"
+  },
+  "harness_compile": {},
+  "checks": {
+    "reproducer": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "heldout1": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "heldout2": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "functional": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "probes": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    }
+  },
+  "claim_level": "L1",
+  "admissible": false,
+  "classes": {
+    "target": "/home/yzhao/parapet-work/runs/step3v3-C1-20261118T190532/patches/G2/classes/target",
+    "harness": "/home/yzhao/parapet-work/runs/step3v3-C1-20261118T190532/patches/G2/classes/harness",
+    "support": "/home/yzhao/parapet-work/runs/step3v3-C1-20261118T190532/support-classes",
+    "jars": []
+  }
+}

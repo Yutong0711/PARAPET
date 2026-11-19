@@ -1,3 +1,9 @@
+**Re-run after the post-hoc tasks D11–D14** (2026-11-18 19:17:57 PST, same
+command): **445 passed, 0 failed, 0 skipped** (242 + 8 + 195). Raw output:
+`logs/run_tests_posthoc.log`.
+
+Earlier run at the first final commit:
+
 Command (repository root, at the final commit):
 
 ```bash

@@ -1,0 +1,86 @@
+{
+  "P1_vs_R1": {
+    "latency": {
+      "ratio": 0.8492420359184797,
+      "ratio_lo": 0.8355125758967382,
+      "ratio_hi": 0.8577106132376239,
+      "overhead_pct": -15.075796408152032,
+      "overhead_pct_lo": -16.44874241032618,
+      "overhead_pct_hi": -14.228938676237613,
+      "n_arm": 20,
+      "n_base": 20,
+      "resamples": 10000,
+      "confidence": 0.95,
+      "seed": 20261119
+    },
+    "peak_memory": {
+      "ratio": 0.9536055143160127,
+      "ratio_lo": 0.9412788857233302,
+      "ratio_hi": 1.000501997292717,
+      "overhead_pct": -4.63944856839873,
+      "overhead_pct_lo": -5.872111427666981,
+      "overhead_pct_hi": 0.050199729271693805,
+      "n_arm": 20,
+      "n_base": 20,
+      "resamples": 10000,
+      "confidence": 0.95,
+      "seed": 20261119
+    }
+  },
+  "P1_vs_G2": {
+    "latency": {
+      "ratio": 0.6928460572789669,
+      "ratio_lo": 0.6816402145319892,
+      "ratio_hi": 0.7003546184919011,
+      "overhead_pct": -30.715394272103314,
+      "overhead_pct_lo": -31.83597854680108,
+      "overhead_pct_hi": -29.964538150809894,
+      "n_arm": 20,
+      "n_base": 20,
+      "resamples": 10000,
+      "confidence": 0.95,
+      "seed": 20261119
+    },
+    "peak_memory": {
+      "ratio": 0.9839697997592735,
+      "ratio_lo": 0.9636878010349335,
+      "ratio_hi": 1.017604574179958,
+      "overhead_pct": -1.6030200240726544,
+      "overhead_pct_lo": -3.6312198965066544,
+      "overhead_pct_hi": 1.7604574179957977,
+      "n_arm": 20,
+      "n_base": 20,
+      "resamples": 10000,
+      "confidence": 0.95,
+      "seed": 20261119
+    }
+  },
+  "G2_vs_R1": {
+    "latency": {
+      "ratio": 1.2257297663693594,
+      "ratio_lo": 1.206013359003754,
+      "ratio_hi": 1.2449783022187226,
+      "overhead_pct": 22.572976636935937,
+      "overhead_pct_lo": 20.601335900375407,
+      "overhead_pct_hi": 24.497830221872263,
+      "n_arm": 20,
+      "n_base": 20,
+      "resamples": 10000,
+      "confidence": 0.95,
+      "seed": 20261119
+    },
+    "peak_memory": {
+      "ratio": 0.9691410392364793,
+      "ratio_lo": 0.9369032180630785,
+      "ratio_hi": 1.0187196500722837,
+      "overhead_pct": -3.085896076352068,
+      "overhead_pct_lo": -6.3096781936921476,
+      "overhead_pct_hi": 1.8719650072283711,
+      "n_arm": 20,
+      "n_base": 20,
+      "resamples": 10000,
+      "confidence": 0.95,
+      "seed": 20261119
+    }
+  }
+}

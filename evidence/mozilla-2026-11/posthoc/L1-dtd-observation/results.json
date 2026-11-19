@@ -1,0 +1,47 @@
+{
+  "work_dir": "/home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338",
+  "rows": [
+    {
+      "status": "DTD loaded (marker present)",
+      "detail": "text content: PARAPET-DTD-LOADED-3f8a | serialized: <config><name>PARAPET-DTD-LOADED-3f8a</name></config>",
+      "patch": "V0",
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/V0/classes/target:/home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/V0/classes/obs:/home/yzhao/parapet-work/jars/base64-2.3.8.jar obs.ExternalDtdObservation"
+    },
+    {
+      "status": "DTD loaded (marker present)",
+      "detail": "text content: PARAPET-DTD-LOADED-3f8a | serialized: <config><name>PARAPET-DTD-LOADED-3f8a</name></config>",
+      "patch": "CONTROL",
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/CONTROL/classes/target:/home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/CONTROL/classes/obs:/home/yzhao/parapet-work/jars/base64-2.3.8.jar obs.ExternalDtdObservation"
+    },
+    {
+      "status": "DTD loaded (marker present)",
+      "detail": "text content: PARAPET-DTD-LOADED-3f8a | serialized: <config><name>PARAPET-DTD-LOADED-3f8a</name></config>",
+      "patch": "R1",
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/R1/classes/target:/home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/R1/classes/obs:/home/yzhao/parapet-work/jars/base64-2.3.8.jar obs.ExternalDtdObservation"
+    },
+    {
+      "status": "document rejected",
+      "detail": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true.",
+      "patch": "R2",
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/R2/classes/target:/home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/R2/classes/obs:/home/yzhao/parapet-work/jars/base64-2.3.8.jar obs.ExternalDtdObservation"
+    },
+    {
+      "status": "document rejected",
+      "detail": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true.",
+      "patch": "G2",
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/G2/classes/target:/home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/G2/classes/obs:/home/yzhao/parapet-work/jars/base64-2.3.8.jar obs.ExternalDtdObservation"
+    },
+    {
+      "status": "document rejected",
+      "detail": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true.",
+      "patch": "G3",
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/G3/classes/target:/home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/G3/classes/obs:/home/yzhao/parapet-work/jars/base64-2.3.8.jar obs.ExternalDtdObservation"
+    },
+    {
+      "status": "document rejected",
+      "detail": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true.",
+      "patch": "G5",
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/G5/classes/target:/home/yzhao/parapet-work/runs/posthoc-L1-dtd-20261118T191338/G5/classes/obs:/home/yzhao/parapet-work/jars/base64-2.3.8.jar obs.ExternalDtdObservation"
+    }
+  ]
+}

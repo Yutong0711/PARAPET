@@ -1,0 +1,77 @@
+{
+  "V0": {
+    "evaluated": true,
+    "now_rejected": [],
+    "different_result": [],
+    "probes_total": 6
+  },
+  "R1": {
+    "evaluated": true,
+    "now_rejected": [
+      {
+        "probe": "doctype_without_subset",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "internal_entity",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "internal_default_attribute",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "external_dtd_benign_local",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    ],
+    "different_result": [],
+    "probes_total": 6
+  },
+  "G2": {
+    "evaluated": true,
+    "now_rejected": [
+      {
+        "probe": "doctype_without_subset",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "internal_entity",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "internal_default_attribute",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "external_dtd_benign_local",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    ],
+    "different_result": [],
+    "probes_total": 6
+  },
+  "P1": {
+    "evaluated": true,
+    "now_rejected": [
+      {
+        "probe": "doctype_without_subset",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "internal_entity",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "internal_default_attribute",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "external_dtd_benign_local",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    ],
+    "different_result": [],
+    "probes_total": 6
+  }
+}

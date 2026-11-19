@@ -1,0 +1,67 @@
+[
+  {
+    "profile": "strict",
+    "budget_path": "parapet/budgets/strict.parapet.budget.yaml",
+    "budget_sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+    "caps": {
+      "latency_overhead_pct": 5.0,
+      "peak_memory_overhead_pct": 5.0
+    },
+    "workload": "legitimate-path",
+    "assessed": [
+      {
+        "patch_id": "R1",
+        "fits": false,
+        "latency_overhead_pct_hi": 5.769845355973446,
+        "peak_memory_overhead_pct_hi": -0.13708693866835153,
+        "reasons": [
+          "latency overhead upper bound 5.77% > cap 5.0%"
+        ]
+      },
+      {
+        "patch_id": "R2",
+        "fits": true,
+        "latency_overhead_pct_hi": -62.53984422096619,
+        "peak_memory_overhead_pct_hi": -24.640958731999618,
+        "reasons": []
+      }
+    ],
+    "fitting": [
+      "R2"
+    ],
+    "recommended": "R2",
+    "statement": "recommend R2"
+  },
+  {
+    "profile": "lenient",
+    "budget_path": "parapet/budgets/lenient.parapet.budget.yaml",
+    "budget_sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+    "caps": {
+      "latency_overhead_pct": 25.0,
+      "peak_memory_overhead_pct": 25.0
+    },
+    "workload": "legitimate-path",
+    "assessed": [
+      {
+        "patch_id": "R1",
+        "fits": true,
+        "latency_overhead_pct_hi": 5.769845355973446,
+        "peak_memory_overhead_pct_hi": -0.13708693866835153,
+        "reasons": []
+      },
+      {
+        "patch_id": "R2",
+        "fits": true,
+        "latency_overhead_pct_hi": -62.53984422096619,
+        "peak_memory_overhead_pct_hi": -24.640958731999618,
+        "reasons": []
+      }
+    ],
+    "fitting": [
+      "R2",
+      "R1"
+    ],
+    "recommended": "R2",
+    "statement": "recommend R2"
+  }
+]

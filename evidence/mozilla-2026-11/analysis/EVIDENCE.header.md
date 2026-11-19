@@ -12,8 +12,12 @@ content frozen at LOCAL-EVIDENCE (`LOCAL-EVIDENCE.md`, unchanged).
 the pre-registered runner, is invalid as a JVM measurement because it
 included the runner's own memory; **v2** is correct (DEVIATIONS D6/D7). L1
 was measured only with the corrected runner. (2) Every change after a
-pre-registration commit is in `evidence/DEVIATIONS.md` (P1–P4, D1–D10),
-reproduced in full in section G.
+pre-registration commit is in `evidence/DEVIATIONS.md` (P1–P4, D1–D14),
+reproduced in full in section G. (3) D11–D14 are **post-hoc**: designed
+and run after the results were seen (v3 remeasurement, the post-hoc arm
+P1, the L1 external-DTD observation, and analysis/wording changes; sections
+B.4, C.3, C.8–C.10, D.2, D.4, D.5 and H). They change no case, check,
+budget, decision rule, claim level, or existing run directory.
 
 Pre-registration commits: `f9f9e15` (C1, C2, budgets, protocol, prompt,
 settings; 2026-11-18 17:05:09 PST) and `083b7b8` (L1; 18:12:18 PST).
