@@ -241,3 +241,25 @@ bound exceeds 5% are listed, and their strict memory verdicts are marked not
 resolvable (EVIDENCE.md B.4); the recorded `decision.json` files are
 unchanged. (e) EVIDENCE.md states that L4 means "passes the registered
 checks" and that L4 patches can differ in security coverage.
+
+## 5. After the evidence freeze (`75b2b954a1800f5bd8ba06ff4618a862f32e704c`)
+
+**D15. Label corrected in code; documentation and team updated (2026-11-18
+~22:55 PST).** No experiment was run and no model was called. No case, check,
+budget, decision rule, claim level, raw result, record, or run directory
+changed, and `EVIDENCE.md` and `LOCAL-EVIDENCE.md` are not rebuilt or edited.
+(a) `parapet/record.py` rendered a candidate's latency against its matched
+reference as "(model-induced cost)". It now renders "(excess over the matched
+reference; not attributed to the generator)", the wording D14 adopted in
+EVIDENCE.md. Records already in `evidence/` keep the old label, which D14
+superseded; they are not re-rendered. (b) The comment in the pre-registered
+`parapet/cases/C1/case.yaml` still says "model-induced cost". It is left
+unchanged because the file is pre-registered. The scripts under
+`evidence/mozilla-2026-11/analysis/` also keep the old name internally and
+are part of the frozen package. (c) "Closes the weakness" is replaced by
+"passes the registered checks" in `parapet/README.md`, the `parapet/__init__.py`
+docstring, and the 1.1.0-alpha section of `README.md`. (d) `README.md` now
+describes the prototype, case L1, the evidence and its limitations, and the
+team; `CHANGELOG.md` records L1 and this change. Because EVIDENCE.md is
+frozen at `75b2b95`, its section G reproduces P1–P4 and D1–D14 only; D15 is
+recorded in this file alone.

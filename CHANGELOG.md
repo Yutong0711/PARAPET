@@ -28,12 +28,29 @@ research artifacts and are unrelated.
 - `tests/parapet/`: unit tests for budget, validate, decide, record, stats,
   and the prompt; JVM tests that run the real case harness. Wired into
   `scripts/run_tests.sh` and both relevant CI jobs.
-- `evidence/`: installs, deviations, and the November 2026 evidence package.
+- One real-library case: `parapet/cases/L1` (java-xmlbuilder at a 2014
+  commit, CVE-2014-125087, CWE-611), with the upstream fix as a reference
+  fix, the library's own tests as functional tests, and dependency jars
+  pinned by SHA-256 and fetched by `fetch_jars.sh`.
+- `evidence/`: installs, deviations, and the November 2026 evidence package,
+  frozen at commit `75b2b95`.
+
+### Changed
+
+- Hardening records label a candidate's cost against its matched reference
+  as "excess over the matched reference; not attributed to the generator".
+  The earlier label, "model-induced cost", was not supported by the evidence
+  (`evidence/DEVIATIONS.md`, D14 and D15). Records already in `evidence/`
+  are not rewritten.
+- `README.md` describes the 1.1.0-alpha prototype, the real-library case, the
+  evidence and its limitations, and the current team.
 
 ### Scope
 
-- The four-stage workflow runs per weakness on two authored cases. Choosing
-  fixes across several weaknesses within one budget is planned, not built.
+- The four-stage workflow is a working prototype. It runs per weakness on two
+  authored cases and one real-library case. No generated patch fit either
+  declared budget in the November 2026 evidence. Choosing fixes across
+  several weaknesses within one budget is planned, not built.
 - CoQuIR, LUNA, PrivAuditor, and Metior are not exercised.
 - `VERSION` is unchanged (1.0): the structural tests pin it, and this
   version is not released.

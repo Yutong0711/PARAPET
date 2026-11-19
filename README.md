@@ -34,24 +34,77 @@ hardens those capabilities into a single maintainer-facing exposure-to-decision
 workflow, and it scopes how PARAPET becomes a governed open-source ecosystem.
 The sections below separate what runs here from what Track 1 adds.
 
-## PARAPET 1.1.0-alpha: the local hardening slice (unreleased)
+## PARAPET 1.1.0-alpha: a working prototype of the hardening workflow (unreleased)
 
-The `mozilla/local-slice` branch adds [`parapet/`](parapet/), the first
-implementation of the hardening workflow itself (Apache-2.0, Python). For one
-known weakness it runs four stages: **Generate** candidate fixes with a local
-open-weight model (default: Qwen2.5-Coder-7B-Instruct served by Ollama on
-loopback), **Validate** that each candidate closes the weakness and keeps
-required behavior, **Measure** what it costs on the project's own workload,
-and **Decide** which candidates fit a service budget declared in advance. Each
-patch gets a hardening record (JSON and Markdown).
+PARAPET makes security hardening a performance-budgeted decision. The
+`mozilla/local-slice` branch adds [`parapet/`](parapet/), the first
+implementation of the workflow itself (Apache-2.0, Python). It is a working
+prototype. For one known weakness it runs four stages:
 
-What runs, and what does not:
+- **Generate** candidate fixes with a local open-weight model. The default is
+  Qwen2.5-Coder-7B-Instruct served by Ollama on loopback. A hosted model is
+  refused unless a flag is passed.
+- **Validate** each candidate against the checks registered for the case: it
+  must compile, block a reproducer and two held-out exploit variants, and pass
+  the functional tests. Inputs the patch newly rejects are recorded.
+- **Measure** what the patch costs on a declared workload, against the
+  unpatched code, with a baseline-against-baseline noise floor.
+- **Decide** which admissible patches fit a service budget declared in advance.
 
-- **Runs:** the four-stage workflow, per weakness, on two authored Java cases
-  (`parapet/cases/C1`, CWE-502; `parapet/cases/C2`, CWE-611), each with a
-  reproducer, two held-out exploit variants, functional tests, a workload
-  driver, two hand-written reference fixes, and an incomplete control patch.
+Each patch gets a hardening record (JSON and Markdown).
+
+### What runs
+
+- Two authored Java cases: `parapet/cases/C1` (CWE-502) and `parapet/cases/C2`
+  (CWE-611).
+- One real-library case: `parapet/cases/L1`, java-xmlbuilder pinned at a 2014
+  commit with a disclosed and already fixed weakness (CVE-2014-125087,
+  CWE-611). The upstream fix is one of its two reference fixes.
+- Every case has a reproducer, two held-out exploit variants, functional
+  tests, a workload driver, two hand-written reference fixes, and an
+  incomplete control patch.
   `python -m parapet run --case C1 --budget <file>`.
+
+### What the November 2026 evidence shows
+
+The numbers below come from
+[`evidence/mozilla-2026-11/EVIDENCE.md`](evidence/mozilla-2026-11/EVIDENCE.md),
+frozen at commit `75b2b95`. They were measured on one machine and one JDK, on
+single-threaded workloads written for this evaluation.
+
+- **Checks.** In all three cases the unpatched code fails the checks, both
+  reference fixes pass, and the incomplete control patch is rejected by the
+  held-out variants.
+- **Generator.** The local model produced admissible patches on C2 (5 of 5)
+  and on L1 with a longer context window (3 of 5). It produced none on C1 (0 of
+  5) or on L1 at the default settings (0 of 5; the prompt was truncated).
+- **Budgets.** No generated patch fit either budget. At a 25% latency cap the
+  workflow rejected every generated patch and, on L1, the upstream fix.
+- **Cost.** Patches that pass the same checks differed widely in latency
+  overhead: about +1.5%, +9.5% and +33% on C2, and about +11% (alternative
+  fix), +40% (upstream fix) and +82% (generated) on L1.
+- **Post-hoc.** A hand-written C2 patch with the same parser settings as the
+  generated one, configured once instead of on every call, measured 6.6%
+  faster than the unpatched code. The workflow did not produce this patch.
+
+### Limitations
+
+- This is a prototype. No maintainer has used it, the authored cases are
+  small, and L1 is a single library at a historical commit.
+- Passing the registered checks is not proof of security. Patches that pass
+  can differ in coverage: L1's upstream fix still reads an external DTD named
+  by the document, and the other passing patches reject such documents.
+- The decision rule ranks admissible patches by cost only. It does not weigh
+  rejected inputs or differences in security coverage.
+- Verdicts at a 5% cap are not stable from session to session, and peak memory
+  is too noisy to resolve at that level.
+- Every workload is single-threaded. Concurrent load, resource contention and
+  architecture-level costs are not measured.
+- The generator rewrites a whole file, which fails on a large file at the
+  default settings.
+- One model was used. Nothing here compares models, and the extra cost of the
+  generated patches is not attributed to the model: they set more parser
+  features than the reference they were compared with.
 - **Planned, not implemented:** choosing fixes across several weaknesses
   within one budget; repository ingestion; pull-request integration.
 - **Not exercised by the workflow:** CoQuIR, LUNA, PrivAuditor, and Metior.
@@ -59,7 +112,7 @@ What runs, and what does not:
   `run_with_timeout` for every validation run); its own measurement backend is
   not used for workload measurement.
 
-The evidence produced with it, including every failure, is in
+The evidence, including every failure, is in
 [`evidence/mozilla-2026-11/`](evidence/mozilla-2026-11/), with installs in
 [`evidence/INSTALLS.md`](evidence/INSTALLS.md) and every change after
 pre-registration in [`evidence/DEVIATIONS.md`](evidence/DEVIATIONS.md).
@@ -212,9 +265,22 @@ lists each one and exactly what running it would require.
 
 ## Team
 
-Led by California State University, Long Beach (PI Yutong Zhao), with the
-Rochester Institute of Technology (Co-PI Derui Zhu) and the University of Arizona
-(Co-PIs Sen He and Bo Liu).
+**PARAPET 1.1.0-alpha and the Mozilla Human-Scale AI Incubator application.**
+Yutong Zhao (California State University, Long Beach), Sen He (University of
+Arizona), and Lu Xiao (Stevens Institute of Technology).
+
+**PARAPET v1.0 (NSF PESOSE Track 1 baseline).** Led by California State
+University, Long Beach (PI Yutong Zhao), with the Rochester Institute of
+Technology (Co-PI Derui Zhu) and the University of Arizona (Co-PIs Sen He and
+Bo Liu).
+
+**Acknowledgments.** Derui Zhu's research artifacts (CoQuIR, LUNA,
+PrivAuditor, and More Than Just Functional) are vendored under `projects/`,
+with provenance and licenses recorded in each project folder and in
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). Derui Zhu and Bo Liu
+contributed to PARAPET v1.0 as co-investigators and are not participants in
+the Mozilla application. The 1.1.0-alpha workflow reuses and builds on the
+v1.0 code with their agreement.
 
 ## License
 

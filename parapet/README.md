@@ -1,8 +1,8 @@
 # `parapet/` — the hardening workflow (1.1.0-alpha)
 
 Apache-2.0. For one known weakness: **Generate** candidate fixes with a local
-open-weight model, **Validate** that each closes the weakness and keeps
-required behavior, **Measure** what it costs on the project's own workload,
+open-weight model, **Validate** that each passes the checks registered for the
+case and keeps required behavior, **Measure** what it costs on the project's own workload,
 **Decide** which fit a budget declared in advance. Output: a decision and a
 hardening record per patch.
 
@@ -29,7 +29,8 @@ python -m parapet run --case C1 \
 
 Pre-registered settings: `settings/measurement.yaml`,
 `settings/generation.yaml`, `settings/decision_rule.yaml`. Cases:
-`cases/C1` (CWE-502), `cases/C2` (CWE-611). Reference and control patches live
+`cases/C1` (CWE-502), `cases/C2` (CWE-611), and `cases/L1` (java-xmlbuilder,
+CWE-611, a real library at a historical commit). Reference and control patches live
 under `cases/*/reference/`, outside the `src/` directory the prompt builder
 reads.
 

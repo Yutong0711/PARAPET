@@ -140,7 +140,7 @@ def render_markdown(r: dict) -> str:
     L.append(f"- Peak-memory overhead vs unpatched baseline: {_fmt_ci(vb and vb.get('peak_memory'))}")
     vr = cost.get("vs_matched_reference")
     if vr:
-        L.append(f"- Latency vs matched reference {vr['vs']} (model-induced cost): {_fmt_ci(vr.get('latency'))}")
+        L.append(f"- Latency vs matched reference {vr['vs']} (excess over the matched reference; not attributed to the generator): {_fmt_ci(vr.get('latency'))}")
         L.append(f"- Peak memory vs matched reference {vr['vs']}: {_fmt_ci(vr.get('peak_memory'))}")
     nf = cost.get("noise_floor_pct")
     if nf:

@@ -5,7 +5,7 @@
 For one known weakness, PARAPET runs four stages:
 
 * Generate candidate fixes (default generator: a local open-weight model),
-* Validate that a candidate closes the weakness and keeps required behavior,
+* Validate that a candidate passes the registered checks and keeps required behavior,
 * Measure what the candidate costs on the project's own workload,
 * Decide which candidates fit a budget the maintainer declared in advance.
 
