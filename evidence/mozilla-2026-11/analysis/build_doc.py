@@ -26,13 +26,21 @@ import cross_session  # noqa: E402
 SESSIONS = [("v1 Step 2", "step2"), ("v1 Step 3", "step3"), ("v2 Step 2", "step2-v2"), ("v2 Step 3", "step3-v2")]
 
 
+L1_SESSIONS = [("no generator", "step4/L1-nogen"), ("frozen-settings run", "step4/L1-gen-frozen"),
+               ("long-context run", "step4/L1-gen-longctx")]
+
+
 def cross(case: str) -> str:
     import contextlib
     import io
 
+    if case == "L1":
+        specs = [f"{lab}={BASE / d}" for lab, d in L1_SESSIONS if (BASE / d).is_dir()]
+    else:
+        specs = [f"{lab}={BASE / d / case}" for lab, d in SESSIONS if (BASE / d / case).is_dir()]
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
-        cross_session.main([case] + [f"{lab}={BASE / d / case}" for lab, d in SESSIONS if (BASE / d / case).is_dir()])
+        cross_session.main([case] + specs)
     return buf.getvalue().rstrip("\n")
 
 

@@ -1,0 +1,2 @@
+$ java -cp /home/yzhao/parapet-work/runs/step4gen-frozen-L1-20261118T181605/patches/R1/classes/target:/home/yzhao/parapet-work/runs/step4gen-frozen-L1-20261118T181605/patches/R1/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.Reproducer
+PARAPET_RESULT {"check":"reproducer","api":"XMLBuilder2.parse(String)","fired":false,"fired_by":null,"outcome":"accepted","exception":null}

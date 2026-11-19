@@ -1,0 +1,21 @@
+[parapet 18:16:05] case L1 (CWE-611); work dir /home/yzhao/parapet-work/runs/step4gen-frozen-L1-20261118T181605
+[parapet 18:16:05] generating candidates
+[parapet 18:16:25]   G1: status=success wall=19.687s tokens=4098+2048 L1=False
+[parapet 18:16:29]   G2: status=success wall=3.368s tokens=4098+464 L1=False
+[parapet 18:16:30]   G3: status=success wall=1.221s tokens=4098+164 L1=False
+[parapet 18:16:34]   G4: status=success wall=3.843s tokens=4098+528 L1=False
+[parapet 18:16:38]   G5: status=success wall=4.029s tokens=4098+559 L1=False
+[parapet 18:16:38] validating V0
+[parapet 18:16:43]   V0: L2 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 18:16:43] validating CONTROL
+[parapet 18:16:48]   CONTROL: L3 reproducer=pass, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 18:16:48] validating R1
+[parapet 18:16:53]   R1: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 18:16:53] validating R2
+[parapet 18:16:58]   R2: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 18:16:59] measuring arms ['baseline', 'baseline-AA', 'R1', 'R2'] x 20 forks
+[parapet 18:19:29] A/A noise floor: latency 1.82%, peak memory 4.40%
+[parapet 18:19:29] budget strict: fitting=[] -> no admissible patch fits the strict budget; recommend none
+[parapet 18:19:29] budget lenient: fitting=['R2'] -> recommend R2
+[parapet 18:19:30] results copied to evidence/mozilla-2026-11/step4/L1-gen-frozen
+[parapet 18:19:30] done

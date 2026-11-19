@@ -165,3 +165,18 @@ result. The variant is a secondary run, and both are reported.
 Correction note for D9 (written 2026-11-18 18:13 PST): the "~18:35 PST" in
 the D9 heading was a wrong estimate; D9 was written between 18:05 and 18:12
 PST and committed with the L1 pre-registration (`083b7b8`, 18:12:18 PST).
+
+**D10. L1 long-context run killed mid-measurement; re-measured (2026-11-18
+18:29–18:36 PST).** The first long-context run (started 18:19:57) completed
+generation (18:19:57–18:26:48) and validation, then was killed at 18:29:57 by
+my tool's 10-minute limit on foreground commands, after 61 of 140 measurement
+forks. Its output directory is kept unchanged as
+`step4/L1-gen-longctx-killed/` (generation, validation, partial raw samples,
+console log); it has no summary, decision, or records. The saved candidates
+were then re-validated and re-measured with `--candidates-from` (no model
+call), run in the background, into `step4/L1-gen-longctx/` (18:30:29–18:36:25).
+The validation outcomes are identical in the two runs.
+
+**Note on Step 5.** The hosted control was not run because neither
+`OPENAI_API_KEY` nor `ANTHROPIC_API_KEY` was set (see EVIDENCE.md section E).
+This is the skip the task specifies, recorded here for completeness.

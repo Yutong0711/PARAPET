@@ -1,0 +1,5 @@
+time=2026-11-18T18:16:10.621-08:00 level=WARN source=llama_server.go:344 msg="truncating input prompt" limit=4098 prompt=10075 keep=4 new=4098
+time=2026-11-18T18:16:25.846-08:00 level=WARN source=llama_server.go:344 msg="truncating input prompt" limit=4098 prompt=10075 keep=4 new=4098
+time=2026-11-18T18:16:29.216-08:00 level=WARN source=llama_server.go:344 msg="truncating input prompt" limit=4098 prompt=10075 keep=4 new=4098
+time=2026-11-18T18:16:30.437-08:00 level=WARN source=llama_server.go:344 msg="truncating input prompt" limit=4098 prompt=10075 keep=4 new=4098
+time=2026-11-18T18:16:34.281-08:00 level=WARN source=llama_server.go:344 msg="truncating input prompt" limit=4098 prompt=10075 keep=4 new=4098

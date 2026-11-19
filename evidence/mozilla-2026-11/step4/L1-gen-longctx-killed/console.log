@@ -1,0 +1,26 @@
+[parapet 18:19:57] case L1 (CWE-611); work dir /home/yzhao/parapet-work/runs/step4gen-longctx-L1-20261118T181957
+[parapet 18:19:57] generating candidates
+[parapet 18:21:25]   G1: status=success wall=87.731s tokens=10075+9934 L1=True
+[parapet 18:22:46]   G2: status=success wall=80.726s tokens=10075+10112 L1=True
+[parapet 18:24:07]   G3: status=success wall=81.804s tokens=10075+10128 L1=True
+[parapet 18:25:28]   G4: status=success wall=80.252s tokens=10075+9935 L1=True
+[parapet 18:26:48]   G5: status=success wall=80.003s tokens=10075+10128 L1=True
+[parapet 18:26:48] validating V0
+[parapet 18:26:53]   V0: L2 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 18:26:53] validating CONTROL
+[parapet 18:26:57]   CONTROL: L3 reproducer=pass, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 18:26:57] validating R1
+[parapet 18:27:02]   R1: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 18:27:02] validating R2
+[parapet 18:27:07]   R2: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 18:27:07] validating G1
+[parapet 18:27:12]   G1: L2 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=FAIL, probes=pass
+[parapet 18:27:12] validating G2
+[parapet 18:27:17]   G2: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 18:27:17] validating G3
+[parapet 18:27:22]   G3: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 18:27:22] validating G4
+[parapet 18:27:27]   G4: L2 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=FAIL, probes=pass
+[parapet 18:27:27] validating G5
+[parapet 18:27:31]   G5: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 18:27:32] measuring arms ['baseline', 'baseline-AA', 'R1', 'R2', 'G2', 'G3', 'G5'] x 20 forks

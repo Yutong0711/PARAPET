@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-542",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "This is a Java interface and abstract class `BaseXMLBuilder` which provides a fluent API for building XML documents. It allows you to add various types of nodes (elements, attributes, text, CDATA, etc.) to an XML document in a builder pattern manner. Here's a breakdown of some key features and methods:\n\n1. **Abstract Methods for Adding Content:**\n   - `cdata(String data)`: Adds a CDATA section with the given string data.\n   - `cdata(byte[] data)`: Adds a CDATA section with Base64-encoded byte data.\n   - `comment(String comment)`: Adds a comment node.\n   - `instruction(String target, String data)`: Adds an XML processing instruction.\n   - `reference(String name)`: Adds an entity reference.\n   - `namespace(String prefix, String namespaceURI)`: Adds a namespace declaration.\n\n2. **Synonyms for Abstract Methods:**\n   - The interface provides synonyms like `data`, `d`, `c`, `inst`, `i`, `insertInstruction`, `ref`, `r`, `ns`, and `c` for each abstract method to provide alternative spellings.\n\n3. **Methods for Navigating the Document:**\n   - `up(int steps)`: Moves up the document hierarchy by the specified number of levels.\n   - `up()`: A shorthand for moving up one level.\n   - `document()`: Returns the root document node.\n\n4. **Utility Methods:**\n   - `assertElementContainsNoOrWhitespaceOnlyTextNodes(Node anXmlElement)`: Ensures that an element does not contain non-whitespace text nodes.\n   - `toWriter(boolean wholeDocument, Writer writer, Properties outputProperties)`: Serializes the document or a specific element to a writer.\n   - `asString(Properties outputProperties)`: Serializes the document or a specific element to a string.\n   - `buildDocumentNamespaceContext()`: Creates a namespace context for the document.\n\n5. **Protected Methods:**\n   - `insertInstructionImpl(String target, String data)`: Implementations to insert a processing instruction.\n   - `referenceImpl(String name)`: Implementations to add an entity reference.\n   - `namespaceImpl(String prefix, String namespaceURI)`: Implementations to add a namespace declaration.\n\n6. **Protected Methods for Internal Use:**\n   - `upImpl(int steps)`: Internal method to navigate up the document hierarchy.\n\nThis interface and class design allows for a flexible and intuitive way to construct and manipulate XML documents, making it easier to work with XML data programmatically in Java applications.",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1795054594,
+  "model": "qwen2.5-coder:7b-instruct-q4_K_M",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "fp_ollama",
+  "usage": {
+    "completion_tokens": 528,
+    "prompt_tokens": 4098,
+    "total_tokens": 4626,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 4097
+    }
+  }
+}

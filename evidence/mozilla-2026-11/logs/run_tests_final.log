@@ -1,0 +1,10 @@
+=== Component functional and Python runtime smoke tests ===
+$ /home/yzhao/parapet-work/venv/bin/python -m pytest tests/perforch tests/more_than_just_functional tests/parapet -m not jvm
+====================== 242 passed, 8 deselected in 3.97s =======================
+=== Java/JVM end-to-end smoke tests ===
+$ /home/yzhao/parapet-work/venv/bin/python -m pytest tests/perforch tests/parapet -m jvm
+====================== 8 passed, 218 deselected in 25.37s ======================
+=== Repository and website structural checks ===
+$ /home/yzhao/parapet-work/venv/bin/python -m pytest tests/repository tests/website
+============================= 195 passed in 2.34s ==============================
+All selected PARAPET checks passed.

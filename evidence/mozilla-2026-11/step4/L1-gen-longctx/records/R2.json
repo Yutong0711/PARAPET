@@ -1,0 +1,447 @@
+{
+  "schema": "parapet.hardening-record/1",
+  "case": {
+    "id": "L1",
+    "title": "java-xmlbuilder 1.1+ (pinned 5d5caa5) parses documents with external entities enabled"
+  },
+  "weakness": {
+    "cwe": "CWE-611",
+    "name": "Improper Restriction of XML External Entity Reference"
+  },
+  "patch": {
+    "id": "R2",
+    "kind": "reference fix (hand-written)",
+    "source_sha256": "f133cecb10f259adb6d252fbe2305c4833b60bd8f8a190434038a042a6498957",
+    "source_path": "parapet/cases/L1/reference/R2/com/jamesmurty/utils/BaseXMLBuilder.java"
+  },
+  "mechanism": {
+    "route": "narrowed behavior",
+    "description": "reject any DOCTYPE declaration (disallow-doctype-decl) plus FEATURE_SECURE_PROCESSING on the parse path",
+    "guidance": [
+      "OWASP XML External Entity Prevention Cheat Sheet, Java, DocumentBuilderFactory (DOM): 'reject DOCTYPE declarations and leave XInclude disabled' (setFeature disallow-doctype-decl true; FEATURE_SECURE_PROCESSING true). https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html"
+    ]
+  },
+  "diff": "--- a/com/jamesmurty/utils/BaseXMLBuilder.java\n+++ b/com/jamesmurty/utils/BaseXMLBuilder.java\n@@ -25,6 +25,7 @@\n import java.util.Map.Entry;\n import java.util.Properties;\n \n+import javax.xml.XMLConstants;\n import javax.xml.namespace.NamespaceContext;\n import javax.xml.namespace.QName;\n import javax.xml.parsers.DocumentBuilder;\n@@ -162,6 +163,10 @@\n     {\n         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();\n         factory.setNamespaceAware(isNamespaceAware);\n+        // Reject any document that contains a DOCTYPE declaration, so no\n+        // external entity or external DTD subset can be resolved.\n+        factory.setFeature(\"http://apache.org/xml/features/disallow-doctype-decl\", true);\n+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);\n         DocumentBuilder builder = factory.newDocumentBuilder();\n         Document document = builder.parse(inputSource);\n         return document;\n",
+  "checks": [
+    {
+      "name": "compile",
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/classes/target -cp /home/yzhao/parapet-work/jars/base64-2.3.8.jar /home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/src/com/jamesmurty/utils/BaseXMLBuilder.java /home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/src/com/jamesmurty/utils/NamespaceContextImpl.java /home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/src/com/jamesmurty/utils/XMLBuilder.java /home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/src/com/jamesmurty/utils/XMLBuilder2.java /home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/src/com/jamesmurty/utils/XMLBuilderRuntimeException.java",
+      "passed": true,
+      "summary": "compiles"
+    },
+    {
+      "name": "reproducer",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.Reproducer",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "reproducer",
+        "api": "XMLBuilder2.parse(String)",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "com.jamesmurty.utils.XMLBuilderRuntimeException: org.xml.sax.SAXParseException; lineNumber: 2; columnNumber: 10; DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    },
+    {
+      "name": "heldout1",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.HeldOut1",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout1",
+        "api": "XMLBuilder.parse(InputSource)",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    },
+    {
+      "name": "heldout2",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.HeldOut2",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout2",
+        "api": "XMLBuilder.parse(String)",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    },
+    {
+      "name": "functional",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.FunctionalTests",
+      "passed": true,
+      "evaluated": true,
+      "summary": "34/34 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 34,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "testSimpleXpath(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testXmlDocumentCreation(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testAddElementsInLoop(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testCDataNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementAsString(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testModerateDocumentSizeAsString(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testSetStandaloneToYes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testNamespaces(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTextNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndXPath(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testStripWhitespaceNodesFromDocument(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementBefore(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testProcessingInstructionNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTraversalDuringBuild(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testImport(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndAmendDocWithWhitespaceNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testNoCheckedExceptions(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testExceptionWrappedInXMLBuilderRuntimeException(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testSimpleXpath(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testXmlDocumentCreation(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testAddElementsInLoop(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testCDataNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementAsString(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testModerateDocumentSizeAsString(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testSetStandaloneToYes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testNamespaces(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTextNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndXPath(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testStripWhitespaceNodesFromDocument(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementBefore(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testProcessingInstructionNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTraversalDuringBuild(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testImport(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndAmendDocWithWhitespaceNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "probes",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step4gen-longctx-remeasure-L1-20261118T183019/patches/R2/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.Probes",
+      "passed": true,
+      "evaluated": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "typical_no_doctype",
+            "status": "accepted",
+            "digest": "ed7c43499571a945",
+            "exception": null
+          },
+          {
+            "probe": "comments_cdata_charrefs",
+            "status": "accepted",
+            "digest": "74e13feb2c350f66",
+            "exception": null
+          },
+          {
+            "probe": "doctype_without_subset",
+            "status": "rejected",
+            "digest": null,
+            "exception": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          },
+          {
+            "probe": "internal_entity",
+            "status": "rejected",
+            "digest": null,
+            "exception": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          },
+          {
+            "probe": "internal_default_attribute",
+            "status": "rejected",
+            "digest": null,
+            "exception": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          },
+          {
+            "probe": "external_dtd_benign_local",
+            "status": "rejected",
+            "digest": null,
+            "exception": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          }
+        ]
+      }
+    }
+  ],
+  "claim_level": "L4",
+  "admissible": true,
+  "inputs_now_rejected": {
+    "evaluated": true,
+    "now_rejected": [
+      {
+        "probe": "doctype_without_subset",
+        "exception": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "internal_entity",
+        "exception": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "internal_default_attribute",
+        "exception": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "external_dtd_benign_local",
+        "exception": "org.xml.sax.SAXParseException: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    ],
+    "different_result": [],
+    "probes_total": 6
+  },
+  "cost": {
+    "vs_baseline": {
+      "vs": "baseline",
+      "latency": {
+        "ratio": 1.1113450849471502,
+        "ratio_lo": 1.0888849985208273,
+        "ratio_hi": 1.12893411567504,
+        "overhead_pct": 11.134508494715023,
+        "overhead_pct_lo": 8.888499852082731,
+        "overhead_pct_hi": 12.89341156750401,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": false
+      },
+      "peak_memory": {
+        "ratio": 1.0784051927777665,
+        "ratio_lo": 1.0245794285129313,
+        "ratio_hi": 1.10008177562816,
+        "overhead_pct": 7.8405192777766475,
+        "overhead_pct_lo": 2.4579428512931267,
+        "overhead_pct_hi": 10.008177562816002,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": false
+      }
+    },
+    "vs_matched_reference": null,
+    "noise_floor_pct": {
+      "latency_pct": 2.9298219381821644,
+      "peak_memory_pct": 6.219426974143949
+    },
+    "raw_samples": {
+      "path": "measurement/raw_samples.jsonl",
+      "sha256": "5aefdc587cb04548c484fd7c287923a71f6a8051eda296db87e3833f30aaaf31"
+    }
+  },
+  "budgets": [
+    {
+      "profile": "strict",
+      "path": "parapet/budgets/strict.parapet.budget.yaml",
+      "sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+      "caps": {
+        "latency_overhead_pct": 5.0,
+        "peak_memory_overhead_pct": 5.0
+      },
+      "fits": false,
+      "reasons": [
+        "latency overhead upper bound 12.89% > cap 5.0%",
+        "peak-memory overhead upper bound 10.01% > cap 5.0%"
+      ],
+      "recommended_patch": null,
+      "this_patch_recommended": false,
+      "claim_level": "L4"
+    },
+    {
+      "profile": "lenient",
+      "path": "parapet/budgets/lenient.parapet.budget.yaml",
+      "sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+      "caps": {
+        "latency_overhead_pct": 25.0,
+        "peak_memory_overhead_pct": 25.0
+      },
+      "fits": true,
+      "reasons": [],
+      "recommended_patch": "R2",
+      "this_patch_recommended": true,
+      "claim_level": "L5"
+    }
+  ],
+  "generator": {
+    "name": "hand-written reference"
+  },
+  "prompt": null,
+  "environment": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "6.6.114.1-microsoft-standard-WSL2",
+    "wsl": true,
+    "cpu": "Intel(R) Core(TM) i9-14900KF",
+    "logical_cpus": 32,
+    "ram_gib": 31.2,
+    "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 610.60",
+    "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "jdk_full": [
+      "openjdk version \"21.0.13.0.3\" 2026-10-24",
+      "OpenJDK Runtime Environment (build 21.0.13.0.3+1-1-26.04.1-Ubuntu)",
+      "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-26.04.1-Ubuntu, mixed mode, sharing)"
+    ],
+    "javac": "javac 21.0.13.0.3",
+    "python": "3.14.4",
+    "python_packages": {
+      "numpy": "2.5.5",
+      "openai": "2.54.0"
+    },
+    "loadavg": [
+      1.51123046875,
+      4.083984375,
+      3.46630859375
+    ],
+    "cwd_is_linux_fs": false
+  },
+  "reproduce": "python -m parapet run --case L1 --budget parapet/budgets/strict.parapet.budget.yaml --budget parapet/budgets/lenient.parapet.budget.yaml --no-generator",
+  "repo": {
+    "commit": "2ac56563e219ecf72c31ee33d8c4dd262d97d0f5",
+    "branch": "mozilla/local-slice",
+    "dirty_outside_evidence": []
+  }
+}

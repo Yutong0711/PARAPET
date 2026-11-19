@@ -63,3 +63,27 @@ evidence directory with the run outputs).
 
 Model-call endpoints are logged separately, per run, in each run's
 `generation/endpoint_log.jsonl`.
+
+## Step 4 (real library case L1) — network endpoints and downloads
+
+No software was installed for Step 4. The library source and three
+dependency jars were downloaded into `~/parapet-work/step4/` and
+`~/parapet-work/jars/` (outside the repository); each jar's SHA-1 matched
+Maven Central's `.sha1` file and its SHA-256 is pinned in
+`parapet/cases/L1/case.yaml`.
+
+| Time (PST) | Endpoint | Purpose |
+| --- | --- | --- |
+| 2026-11-18 18:02:58 | `https://github.com/jmurty/java-xmlbuilder.git` (git clone) | library source at the pinned commits |
+| 2026-11-18 18:04:20 | `https://repo1.maven.org/maven2/net/iharder/base64/2.3.8/base64-2.3.8.jar` (+ `.sha1`) | compile/runtime dependency |
+| 2026-11-18 18:04:20 | `https://repo1.maven.org/maven2/junit/junit/4.11/junit-4.11.jar` (+ `.sha1`) | test dependency |
+| 2026-11-18 18:04:20 | `https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar` (+ `.sha1`) | test dependency |
+| 2026-11-18 18:04:20 | `https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2014-125087` | CVE record |
+| 2026-11-18 18:04:23 | `https://api.github.com/repos/jmurty/java-xmlbuilder/contributors?per_page=100`, `.../java-xmlbuilder`, `.../issues/6` | maintainer count, repository metadata, disclosure issue |
+| 2026-11-18 18:04:24 and 18:04:33 | `https://api.deps.dev/v3alpha/systems/maven/packages/com.jamesmurty.utils%3Ajava-xmlbuilder/versions/{1.1,1.3}:dependents` | dependent counts (fetched twice; the first responses were overwritten by a file-name collision) |
+| 2026-11-18 18:05:53 | `http://127.0.0.1:11434/api/tokenize` (local) | probe; returned 404 |
+
+Additional local model servers (user processes, loopback only): a CPU-only
+server on `127.0.0.1:11435` (D5, stopped after use) and a long-context
+server on `127.0.0.1:11436` with `OLLAMA_CONTEXT_LENGTH=32768` (D9, stopped
+after use).
