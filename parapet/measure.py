@@ -92,7 +92,7 @@ def run_fork(arm: Arm, main: str, settings: dict, ops: int, fork_dir: Path) -> d
     started = time.time()
     t0 = time.monotonic()
     with open(out_path, "w") as fo, open(err_path, "w") as fe:
-        proc = subprocess.Popen(argv, stdout=fo, stderr=fe, start_new_session=True)
+        proc = subprocess.Popen(argv, stdout=fo, stderr=fe, start_new_session=True, cwd=str(fork_dir))
 
         def _kill():
             timed_out["v"] = True

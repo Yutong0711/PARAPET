@@ -148,7 +148,7 @@ def validate_patch(case: Case, patch_id: str, kind: str, source_text: str, root:
                                    "summary": "not run: harness program does not compile against this patch"}
             continue
         r = javatools.java(programs[name], cp=[target_classes, support_dir, harness_classes],
-                           sysprops=sysprops, timeout=check_timeout)
+                           sysprops=sysprops, timeout=check_timeout, cwd=pdir)
         (logs_dir / f"check_{name}.txt").write_text(f"$ {r.command}\n{r.output}", encoding="utf-8")
         result = parse_result(r.output)
         passed, summary = evaluate_check(name, result)

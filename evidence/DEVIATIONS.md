@@ -129,3 +129,15 @@ model was called, and the generation directory (including its power samples)
 was copied into the v2 run unchanged. Everything else (cases, budgets,
 protocol, decision rule) is as pre-registered. Validation outcomes in v2 are
 identical to v1 for every patch.
+
+**D8. Working directory of forked JVMs (noted 2026-11-18 17:58 PST).** In all
+Step 2 and Step 3 runs (v1 and v2) the forked JVMs (validation checks and
+workload forks) inherited the CLI's working directory, the repository on
+`/mnt/d`. Class files, compilation, fork output files and C2's temporary
+canary files were on the Linux filesystem (`~/parapet-work/runs`, `/tmp`);
+the C1 validation checks read their fixtures from the repository on `/mnt/d`
+(validation only, untimed); the timed workload section performs no file I/O.
+From Step 4 on, each fork runs with its own fork directory, and each check
+with its patch directory, as working directory (`parapet/measure.py`,
+`parapet/validate.py`, `parapet/javatools.py`). Steps 2 and 3 are reported as
+run.

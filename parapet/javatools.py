@@ -61,12 +61,12 @@ def javac(sources, out_dir: Path, *, cp=(), sourcepath: Path | None = None, rele
     return run(argv, timeout=timeout)
 
 
-def java(main: str, *, cp, args=(), sysprops=None, timeout: int = 60, flags=()) -> CommandResult:
+def java(main: str, *, cp, args=(), sysprops=None, timeout: int = 60, flags=(), cwd: Path | None = None) -> CommandResult:
     argv = ["java", *flags]
     for k, v in (sysprops or {}).items():
         argv.append(f"-D{k}={v}")
     argv += ["-cp", classpath(*cp), main, *[str(a) for a in args]]
-    return run(argv, timeout=timeout)
+    return run(argv, timeout=timeout, cwd=cwd)
 
 
 def jdk_version() -> dict:
