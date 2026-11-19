@@ -65,3 +65,53 @@ kept as `ollama-serve-gpu-session1.log`.
 concurrently with Step 3 generation using `--power-sample` (nvidia-smi every
 200 ms), because it costs no extra time. It is listed under Step 6 in
 EVIDENCE.md.
+
+**D4. Record-assembly bug fixed; Step 3 records re-rendered (2026-11-18
+17:28 PST).** The Step 3 runs computed each candidate's matched reference
+(and used it for the "vs matched reference" measurement), but `parapet/cli.py`
+did not write the resulting mechanism route into the candidates' hardening
+records (`"mechanism": null`). Fixed by moving record writing into
+`emit_records()` and adding `python -m parapet rerecord <run dir>`, which
+rebuilds `records/` from the saved run outputs, refuses if any patch source
+no longer matches the SHA-256 recorded at validation time, and re-runs
+nothing. Both Step 3 run directories were re-rendered; the first-written
+records are kept unchanged in `records-as-first-written/` next to them. Only
+the `mechanism` field (and a new `rendered` field) differs. Same commit: the
+dirty-tree check in `git_info()` stripped the first status column, so the
+C1 Step 3 manifest lists `M evidence/DEVIATIONS.md` as "outside evidence/";
+it was inside `evidence/` (the record keeps the value as written). Step 2
+records were not affected (references carry their declared route).
+
+**D5. CPU-only generation timing (2026-11-18 17:28–17:34 PST).** Run on a
+second user-level Ollama server on `127.0.0.1:11435` with the GPU hidden
+(`CUDA_VISIBLE_DEVICES=-1 GGML_VK_VISIBLE_DEVICES=-1 OLLAMA_VULKAN=0`; the
+server log reports `library=cpu`), same model files, same frozen prompt and
+generation settings, case C2 only, by calling `parapet.generate.generate()`
+directly with the base URL overridden. These five outputs are saved verbatim
+under `step3/cpu-only-C2/` for timing; they were not validated or measured
+and are not part of the Step 3 candidate set.
+
+**D6. Peak-memory samples were contaminated by the runner's own memory; fixed
+and re-measured (found 2026-11-18 ~17:40 PST, fixed ~17:47 PST).** While
+writing up Step 3, every R2 fork in the C1 Step 3 session reported exactly
+100,832 KiB, which was also the minimum of the other arms. Diagnosis (reproduced
+with `/bin/true`, output in `evidence/mozilla-2026-11/logs/rss_diagnosis.txt`):
+`ru_maxrss` returned by the runner's `wait4` includes the parent Python
+process's RSS high-water mark, which Linux carries into the child at `exec`.
+The pre-registered sample was therefore max(runner high-water, JVM peak). The
+runner's high-water mark was about 76 MB in the Step 2 sessions (the
+environment capture imports the OpenAI SDK) and about 101 MB in the Step 3
+sessions. Any JVM whose true peak was below that was clamped upward. Latency is
+unaffected (timed inside the JVM).
+Fix: `parapet/measure.py` launches each fork under GNU `time -f %M -o <file>`.
+GNU time forks the JVM from its own small process and reports only that
+child's peak RSS. The runner refuses to measure without GNU time. The `wait4`
+value is still saved per fork as `maxrss_kib_wait4_includes_parent`.
+`parapet/settings/measurement.yaml` (`memory_sample`) is updated to say so.
+New test: `tests/parapet/test_measure.py`.
+Consequence: all v1 peak-memory overheads (Step 2 and Step 3 runs) are
+invalid as JVM measurements. They are kept unchanged and reported as v1.
+Step 2 and Step 3 were measured again with the fixed runner (v2). Step 3 v2
+reuses the saved candidates (`--candidates-from`, no new model call). The v2
+sessions also give an independent replicate of every latency estimate.
+Both versions are reported in EVIDENCE.md.

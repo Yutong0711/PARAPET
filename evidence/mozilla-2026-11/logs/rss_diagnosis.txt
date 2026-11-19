@@ -1,0 +1,10 @@
+# Diagnosis for DEVIATIONS.md D6 (2026-11-18, ~17:40-17:46 PST), commands run with ~/parapet-work/venv/bin/python
+# 1) wait4 ru_maxrss of a /bin/true child tracks the parent's VmHWM:
+parent VmHWM KiB 11852 | /bin/true child ru_maxrss KiB 11776
+after numpy+yaml: parent VmHWM 28832 | child 28672
+after openai: parent VmHWM 76320 | child 75740
+after touching 150 MiB: parent VmHWM 229944 | child 229340
+# 2) GNU time %M (GNU Time, /usr/bin/time) from the same kind of parent (parent VmHWM 228752 kB):
+/bin/true            time %M, wait4: (1280, 228352)
+python 200MiB alloc  time %M, wait4: (214272, 228352)
+java -version        time %M, wait4: (36864, 228352)

@@ -42,8 +42,10 @@ jobs:
       # Functional tests of PerfOrch's deterministic core and the More Than Just
       # Functional AST profiler transform, plus end-to-end tests that execute
       # generated Python through PerfOrch's own runtime backend.
+      # Also the parapet workflow package's unit tests (budget, validate,
+      # decide, record, stats, prompt). None of them calls a model.
       - name: Run component tests
-        run: python -m pytest tests/perforch tests/more_than_just_functional -m "not jvm"
+        run: python -m pytest tests/perforch tests/more_than_just_functional tests/parapet -m "not jvm"
 
   jvm-smoke:
     name: Java/JVM end-to-end smoke
@@ -76,8 +78,10 @@ jobs:
           javac -version
           java -version
 
+      # PerfOrch's Java backend smoke tests, and the parapet C1/C2 harness run
+      # against the unpatched source, the control patch, and a reference fix.
       - name: Run JVM end-to-end tests
-        run: python -m pytest tests/perforch -m jvm
+        run: python -m pytest tests/perforch tests/parapet -m jvm
 
   repository-sanity:
     name: Repository and website structural checks

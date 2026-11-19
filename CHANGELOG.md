@@ -6,6 +6,38 @@ Version numbers refer to **PARAPET's own** release version, tracked in
 [`VERSION`](VERSION). Version strings inside `projects/` belong to upstream
 research artifacts and are unrelated.
 
+## v1.1.0-alpha (unreleased; branch `mozilla/local-slice`)
+
+### Added
+
+- `parapet/`, the hardening workflow as a Python package (Apache-2.0):
+  `budget.py` (load and validate `parapet.budget.yaml`; strict and lenient
+  profiles in `parapet/budgets/`), `generate.py` (k candidates from a local
+  open-weight model through PerfOrch's `llm_generator.generate_text`; hosted
+  generators refused unless `--allow-hosted-control`), `validate.py`
+  (compile, reproducer, two held-out variants, functional tests, probes for
+  inputs the patch now rejects), `measure.py` (forked JVMs per arm,
+  interleaved, warm-up discarded, raw samples, ratio of medians with a 95%
+  bootstrap interval, A/A noise floor), `decide.py` (a patch fits only if the
+  upper interval bound is at or below each cap), `record.py` (hardening
+  records, JSON and Markdown), and the CLI `python -m parapet run --case C1
+  --budget <file>`.
+- Two authored Java cases: `parapet/cases/C1` (CWE-502) and
+  `parapet/cases/C2` (CWE-611), each with two hand-written reference fixes
+  citing published guidance and one incomplete control patch.
+- `tests/parapet/`: unit tests for budget, validate, decide, record, stats,
+  and the prompt; JVM tests that run the real case harness. Wired into
+  `scripts/run_tests.sh` and both relevant CI jobs.
+- `evidence/`: installs, deviations, and the November 2026 evidence package.
+
+### Scope
+
+- The four-stage workflow runs per weakness on two authored cases. Choosing
+  fixes across several weaknesses within one budget is planned, not built.
+- CoQuIR, LUNA, PrivAuditor, and Metior are not exercised.
+- `VERSION` is unchanged (1.0): the structural tests pin it, and this
+  version is not released.
+
 ## v1.0
 
 First public release of the PARAPET repository.

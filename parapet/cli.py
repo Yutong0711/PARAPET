@@ -49,7 +49,7 @@ def log(msg: str) -> None:
 def git_info() -> dict:
     def g(*args):
         p = subprocess.run(["git", *args], cwd=REPO_ROOT, capture_output=True, text=True)
-        return p.stdout.strip()
+        return p.stdout.rstrip("\n")
 
     dirty = [line for line in g("status", "--porcelain").splitlines()
              if line and not line[3:].startswith("evidence/") and not line[3:].startswith(".coverage")]
@@ -231,46 +231,9 @@ def cmd_run(args) -> int:
         log(f"budget {d['profile']}: fitting={d['fitting']} -> {d['statement']}")
 
     # ---------------------------------------------------------------- Record
-    raw_rel = "measurement/raw_samples.jsonl"
-    raw_info = {"path": raw_rel, "sha256": summary["raw_samples_sha256"]}
-    budget_args = " ".join(f"--budget {shlex.quote(_rel(Path(b), REPO_ROOT))}" for b in args.budget)
-    base_cmd = f"python -m parapet run --case {case.id} {budget_args}"
     prec = prompt_record(case)
-    for p in patches:
-        pid = p["id"]
-        v = validations[pid]
-        if "generation" in p:
-            e = p["generation"]
-            model = gen_result["model"]
-            generator = {"name": gen_result["generator"].get("model"),
-                         "product_name": gen_result["generator"].get("product_name"),
-                         "digest": model.get("manifest_digest"), "serving": model.get("serving"),
-                         "seed": e.get("seed"), "wall_s": e.get("wall_s"),
-                         "prompt_tokens": e.get("prompt_tokens"), "completion_tokens": e.get("completion_tokens"),
-                         "raw_output": f"generation/{e['raw_path']}", "raw_sha256": e.get("raw_sha256"),
-                         "extraction": e.get("extraction")}
-            prompt = gen_result["prompt"]
-            reproduce = (f"{base_cmd} --candidates-from <this run>/generation   # re-validate and re-measure "
-                         f"the saved candidates\n{base_cmd}   # regenerate (sampling may differ)")
-        else:
-            generator = {"name": "hand-written reference" if pid in case.references else
-                         ("hand-written control" if pid == "CONTROL" else "unpatched original")}
-            prompt = None
-            reproduce = f"{base_cmd} --no-generator"
-        mech = p.get("mechanism")
-        if mech is None:
-            ref = p.get("matched_reference") or case.match_reference(p["source"])
-            mech = {"route": f"same mechanism as {ref} ({case.references[ref].route}) by pre-registered rule",
-                    "description": f"matched reference: {ref} — {case.references[ref].mechanism}"}
-        record = build_record(
-            case=case, patch=p, validation=v, probes_cmp=probes_cmp[pid],
-            cost=summary["vs_baseline"].get(pid if pid != "V0" else "__none__"),
-            cost_vs_ref=summary["vs_matched_reference"].get(pid),
-            raw_samples=raw_info if pid in measured_ids or pid == "V0" else None,
-            noise_floor=summary.get("noise_floor"), decisions=decisions, generator=generator,
-            prompt=prompt, environment=env, reproduce=reproduce, repo=repo,
-            original_source=original, patched_source=p["source"])
-        write_record(record, out / "records", pid)
+    emit_records(case, patches, validations, probes_cmp, summary, decisions, gen_result, env, repo,
+                 args.budget, out / "records", measured_ids)
 
     # ---------------------------------------------------------------- Manifest
     manifest = {
@@ -319,6 +282,113 @@ def cmd_run(args) -> int:
         (out / "run.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
         log(f"results copied to {dest}")
     log("done")
+    return 0
+
+
+def emit_records(case, patches, validations, probes_cmp, summary, decisions, gen_result, env, repo,
+                 budget_paths, records_dir: Path, measured_ids, rendered=None) -> None:
+    """Write one hardening record (JSON + Markdown) per patch."""
+    original = case.read_target()
+    raw_info = {"path": "measurement/raw_samples.jsonl", "sha256": summary["raw_samples_sha256"]}
+    budget_args = " ".join(f"--budget {shlex.quote(_rel(Path(b), REPO_ROOT))}" for b in budget_paths)
+    base_cmd = f"python -m parapet run --case {case.id} {budget_args}"
+    for p in patches:
+        pid = p["id"]
+        v = validations[pid]
+        if "generation" in p:
+            e = p["generation"]
+            model = gen_result["model"]
+            generator = {"name": gen_result["generator"].get("model"),
+                         "product_name": gen_result["generator"].get("product_name"),
+                         "digest": model.get("manifest_digest"), "serving": model.get("serving"),
+                         "seed": e.get("seed"), "wall_s": e.get("wall_s"),
+                         "prompt_tokens": e.get("prompt_tokens"), "completion_tokens": e.get("completion_tokens"),
+                         "raw_output": f"generation/{e['raw_path']}", "raw_sha256": e.get("raw_sha256"),
+                         "extraction": e.get("extraction")}
+            prompt = gen_result["prompt"]
+            reproduce = (f"{base_cmd} --candidates-from <this run>/generation   # re-validate and re-measure "
+                         f"the saved candidates\n{base_cmd}   # regenerate (sampling may differ)")
+        else:
+            generator = {"name": "hand-written reference" if pid in case.references else
+                         ("hand-written control" if pid == "CONTROL" else "unpatched original")}
+            prompt = None
+            reproduce = f"{base_cmd} --no-generator"
+        if p.get("mechanism") is None:
+            ref = p.get("matched_reference") or case.match_reference(p["source"])
+            p["mechanism"] = {
+                "route": f"same mechanism as {ref} ({case.references[ref].route}), by the pre-registered rule",
+                "description": f"matched reference: {ref} — {case.references[ref].mechanism}",
+                "matched_reference": ref}
+        record = build_record(
+            case=case, patch=p, validation=v, probes_cmp=probes_cmp[pid],
+            cost=summary["vs_baseline"].get(pid if pid != "V0" else "__none__"),
+            cost_vs_ref=summary["vs_matched_reference"].get(pid),
+            raw_samples=raw_info if pid in measured_ids or pid == "V0" else None,
+            noise_floor=summary.get("noise_floor"), decisions=decisions, generator=generator,
+            prompt=prompt, environment=env, reproduce=reproduce, repo=repo,
+            original_source=original, patched_source=p["source"])
+        if rendered:
+            record["rendered"] = rendered
+        write_record(record, records_dir, pid)
+
+
+def cmd_rerecord(args) -> int:
+    """Rebuild records/ from a saved run directory. Re-runs nothing.
+
+    Sources are re-read and checked against the SHA-256 stored in each
+    validation file; measurement, validation, and decisions are read back as
+    saved. The previous records/ is kept as records-as-first-written/.
+    """
+    run = Path(args.run_dir)
+    manifest = json.loads((run / "run.json").read_text())
+    case = load_case(manifest["case"])
+    validations = {f.stem: json.loads(f.read_text()) for f in sorted((run / "validation").glob("*.json"))}
+    summary = json.loads((run / "measurement" / "summary.json").read_text())
+    decisions = json.loads((run / "decision.json").read_text())
+    patches = [{"id": "V0", "kind": "vulnerable (unpatched baseline)", "source": case.read_target(),
+                "source_path": _rel(case.target_path, REPO_ROOT),
+                "mechanism": {"route": "none", "description": "unpatched vulnerable source"}},
+               {"id": "CONTROL", "kind": "incomplete control patch (hand-written)",
+                "source": case.control_path.read_text(encoding="utf-8"),
+                "source_path": _rel(case.control_path, REPO_ROOT),
+                "mechanism": {"route": "none (incomplete by design)", "description": case.control_description}}]
+    for rid, ref in case.references.items():
+        patches.append({"id": rid, "kind": "reference fix (hand-written)",
+                        "source": ref.path.read_text(encoding="utf-8"), "source_path": _rel(ref.path, REPO_ROOT),
+                        "mechanism": {"route": ref.route, "description": ref.mechanism,
+                                      "guidance": list(ref.guidance)}})
+    gen_result = None
+    gdir = run / "generation"
+    if gdir.is_dir():
+        entries = [json.loads(line) for line in (gdir / "generation_log.jsonl").read_text().splitlines()
+                   if line.strip()]
+        gen_result = {"candidates": entries, "model": json.loads((gdir / "model.json").read_text()),
+                      "prompt": json.loads((gdir / "prompt.json").read_text()),
+                      "generator": json.loads((gdir / "settings.json").read_text())["generator"]}
+        for e in entries:
+            if e.get("L1"):
+                patches.append({"id": e["candidate"], "kind": "generated candidate",
+                                "source": (gdir / e["extracted_path"]).read_text(encoding="utf-8"),
+                                "source_path": f"generation/{e['extracted_path']}", "generation": e,
+                                "matched_reference": (summary["per_arm"].get(e["candidate"]) or {}).get(
+                                    "matched_reference")})
+    for p in patches:
+        want = validations[p["id"]]["source_sha256"]
+        if sha256_text(p["source"]) != want:
+            log(f"source of {p['id']} does not match the run (sha256 {want}); refusing")
+            return 5
+    probes_cmp = {pid: compare_probes(validations["V0"], v) for pid, v in validations.items()}
+    measured_ids = [a for a, st in summary["per_arm"].items() if a not in ("baseline", "baseline-AA")]
+    budget_paths = [b["path"] for b in manifest["budgets"]]
+    rec_dir = run / "records"
+    keep = run / "records-as-first-written"
+    if rec_dir.is_dir() and not keep.exists():
+        shutil.copytree(rec_dir, keep)
+    rendered = {"by": "python -m parapet rerecord", "at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+                "reason": args.reason}
+    emit_records(case, patches, validations, probes_cmp, summary, decisions, gen_result,
+                 manifest["environment"], manifest["repo"], budget_paths, rec_dir, measured_ids, rendered)
+    log(f"re-rendered {len(patches)} records in {rec_dir}")
     return 0
 
 
@@ -426,6 +496,10 @@ def main(argv=None) -> int:
     p = sub.add_parser("prompt", help="print the frozen prompt for a case")
     p.add_argument("--case", required=True)
     p.set_defaults(func=cmd_prompt)
+    rr = sub.add_parser("rerecord", help="rebuild records/ from a saved run directory (re-runs nothing)")
+    rr.add_argument("run_dir")
+    rr.add_argument("--reason", required=True)
+    rr.set_defaults(func=cmd_rerecord)
     e = sub.add_parser("env", help="print the captured environment")
     e.set_defaults(func=cmd_env)
     args = ap.parse_args(argv)

@@ -9,7 +9,10 @@ cpu_affinity: "2-5"        # taskset -c; same for every fork and every arm
 fork_timeout_s: 120
 schedule_seed: 20261118    # fork i runs every arm once, in an order shuffled with Random(seed * 1000 + i)
 latency_sample: mean nanoseconds per operation over the measured rounds of one fork
-memory_sample: peak resident set size of the forked JVM (ru_maxrss from wait4, KiB)
+memory_sample: peak resident set size of the forked JVM (KiB), from GNU time's %M
+# v1 (prereg) read ru_maxrss from the runner's own wait4. Linux carries the
+# parent's RSS high-water mark into the child at exec, so that value was
+# max(runner high-water, JVM peak). Changed 2026-11-18; see evidence/DEVIATIONS.md D6.
 statistic: ratio of medians across forks (arm / unpatched baseline)
 bootstrap:
   resamples: 10000

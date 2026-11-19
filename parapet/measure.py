@@ -38,6 +38,13 @@ from parapet.paths import SETTINGS_DIR
 from parapet.stats import median, noise_floor_pct, ratio_of_medians_ci
 
 WORKLOAD_PREFIX = "PARAPET_WORKLOAD "
+GNU_TIME = "/usr/bin/time"
+
+
+def require_gnu_time() -> None:
+    import shutil as _sh
+    if not (Path(GNU_TIME).is_file() and _sh.which(GNU_TIME)):
+        raise RuntimeError(f"{GNU_TIME} (GNU time) is required to measure the JVM's own peak RSS")
 
 
 def load_settings(path: Path | None = None) -> dict:
@@ -69,7 +76,13 @@ def schedule(arm_ids: list, forks: int, seed: int) -> list:
 
 def run_fork(arm: Arm, main: str, settings: dict, ops: int, fork_dir: Path) -> dict:
     fork_dir.mkdir(parents=True, exist_ok=True)
-    argv = []
+    rss_file = fork_dir / "maxrss_kib.txt"
+    # Peak RSS comes from GNU time, which forks the JVM from its own small
+    # process and reports that child's ru_maxrss. Taking ru_maxrss from our
+    # own wait4 is wrong: Linux carries the parent's (this Python process's)
+    # RSS high-water mark into the child at exec, so wait4 reports
+    # max(parent high-water, JVM peak). See evidence/DEVIATIONS.md, D6.
+    argv = [GNU_TIME, "-f", "%M", "-o", str(rss_file)]
     if settings.get("cpu_affinity"):
         argv += ["taskset", "-c", str(settings["cpu_affinity"])]
     argv += ["java", *settings["jvm_flags"], "-cp", classpath(*arm.cp), main,
@@ -98,11 +111,17 @@ def run_fork(arm: Arm, main: str, settings: dict, ops: int, fork_dir: Path) -> d
     wall = time.monotonic() - t0
     stdout = out_path.read_text(errors="replace")
     stderr = err_path.read_text(errors="replace")
+    try:
+        jvm_maxrss = int(rss_file.read_text().split()[-1])
+    except (OSError, ValueError, IndexError):
+        jvm_maxrss = None
     sample = {
         "arm": arm.id, "kind": arm.kind, "patch_id": arm.patch_id,
         "argv": argv, "started_at": started, "wall_s": wall,
         "exit_code": proc.returncode, "timed_out": timed_out["v"],
-        "maxrss_kib": rusage.ru_maxrss, "user_s": rusage.ru_utime, "sys_s": rusage.ru_stime,
+        "maxrss_kib": jvm_maxrss, "maxrss_source": "GNU time %M (JVM process only)",
+        "maxrss_kib_wait4_includes_parent": rusage.ru_maxrss,
+        "user_s": rusage.ru_utime, "sys_s": rusage.ru_stime,
         "ok": False, "ns_per_op": None, "round_ns": None, "alloc_bytes_per_op": None,
         "stderr_tail": stderr[-500:],
     }
@@ -113,7 +132,7 @@ def run_fork(arm: Arm, main: str, settings: dict, ops: int, fork_dir: Path) -> d
                 payload = json.loads(line[len(WORKLOAD_PREFIX):])
             except json.JSONDecodeError:
                 payload = None
-    if payload and proc.returncode == 0 and not timed_out["v"]:
+    if payload and proc.returncode == 0 and not timed_out["v"] and jvm_maxrss is not None:
         rounds = payload["round_ns"]
         if len(rounds) == settings["measured_rounds"]:
             sample["round_ns"] = rounds
@@ -127,6 +146,7 @@ def run_session(case, arms: list, settings: dict, out_dir: Path, work_dir: Path,
                 forks: int | None = None, progress=print) -> dict:
     """Run every arm, interleaved; write raw samples; return the summary."""
     forks = forks or settings["forks_per_arm"]
+    require_gnu_time()
     out_dir.mkdir(parents=True, exist_ok=True)
     raw_path = out_dir / "raw_samples.jsonl"
     by_id = {a.id: a for a in arms}

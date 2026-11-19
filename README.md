@@ -34,6 +34,37 @@ hardens those capabilities into a single maintainer-facing exposure-to-decision
 workflow, and it scopes how PARAPET becomes a governed open-source ecosystem.
 The sections below separate what runs here from what Track 1 adds.
 
+## PARAPET 1.1.0-alpha: the local hardening slice (unreleased)
+
+The `mozilla/local-slice` branch adds [`parapet/`](parapet/), the first
+implementation of the hardening workflow itself (Apache-2.0, Python). For one
+known weakness it runs four stages: **Generate** candidate fixes with a local
+open-weight model (default: Qwen2.5-Coder-7B-Instruct served by Ollama on
+loopback), **Validate** that each candidate closes the weakness and keeps
+required behavior, **Measure** what it costs on the project's own workload,
+and **Decide** which candidates fit a service budget declared in advance. Each
+patch gets a hardening record (JSON and Markdown).
+
+What runs, and what does not:
+
+- **Runs:** the four-stage workflow, per weakness, on two authored Java cases
+  (`parapet/cases/C1`, CWE-502; `parapet/cases/C2`, CWE-611), each with a
+  reproducer, two held-out exploit variants, functional tests, a workload
+  driver, two hand-written reference fixes, and an incomplete control patch.
+  `python -m parapet run --case C1 --budget <file>`.
+- **Planned, not implemented:** choosing fixes across several weaknesses
+  within one budget; repository ingestion; pull-request integration.
+- **Not exercised by the workflow:** CoQuIR, LUNA, PrivAuditor, and Metior.
+  PerfOrch is reused by import (its `generate_text` for every model call, its
+  `run_with_timeout` for every validation run); its own measurement backend is
+  not used for workload measurement.
+
+The evidence produced with it, including every failure, is in
+[`evidence/mozilla-2026-11/`](evidence/mozilla-2026-11/), with installs in
+[`evidence/INSTALLS.md`](evidence/INSTALLS.md) and every change after
+pre-registration in [`evidence/DEVIATIONS.md`](evidence/DEVIATIONS.md).
+`VERSION` still reads 1.0, the version of record of the last release.
+
 ## The unified story
 
 The hardening loop has three jobs, and each founding artifact owns part of one:
@@ -73,6 +104,8 @@ projects/
   privauditor/                README.md + src/   data-protection review for model adaptation
   more-than-just-functional/  README.md + src/   background: multi-candidate generation + critique
 index.html, styles.css, script.js   the PARAPET website (GitHub Pages)
+parapet/                            the hardening workflow (1.1.0-alpha): cases, budgets, stages, CLI
+evidence/                           evidence package for the local slice (installs, deviations, runs)
 tests/                              PARAPET's automated test suite
 scripts/run_tests.sh                one command to run the supported checks
 .github/workflows/                  CI, GitHub Pages deployment, release validation
@@ -145,6 +178,10 @@ prompt construction, the model-selection memory, benchmark loading, and the
 per-language benchmark-loop transformations — and runs generated candidates
 end-to-end through its Python and Java backends, compiling and executing them.
 It also exercises the More Than Just Functional AST profiler transform.
+It runs the unit tests of the `parapet/` workflow package (budgets, validation
+semantics, decision rule, records, statistics, prompt contents) and, in the JVM
+job, the C1/C2 harness against the unpatched source, the control patch, and a
+reference fix. No CI job calls a model or measures performance.
 
 CI does **not** functionally test CoQuIR, LUNA, PrivAuditor, or Metior, and
 does not compile or run anything through the Go, Rust, or C++ backends: those
