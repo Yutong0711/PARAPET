@@ -1,0 +1,354 @@
+{
+  "patch_id": "V0",
+  "kind": "vulnerable (unpatched baseline)",
+  "source_sha256": "7e66d540a99ae86cd5bb5e63b910d22b8e3ec67ab072dc72d2717cd7c66f4464",
+  "patched_files": [
+    "com/jamesmurty/utils/BaseXMLBuilder.java"
+  ],
+  "compile": {
+    "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target -cp /home/yzhao/parapet-work/jars/base64-2.3.8.jar /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/src/com/jamesmurty/utils/BaseXMLBuilder.java /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/src/com/jamesmurty/utils/NamespaceContextImpl.java /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/src/com/jamesmurty/utils/XMLBuilder.java /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/src/com/jamesmurty/utils/XMLBuilder2.java /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/src/com/jamesmurty/utils/XMLBuilderRuntimeException.java",
+    "ok": true,
+    "duration_s": 0.541,
+    "output": "Note: /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/src/com/jamesmurty/utils/NamespaceContextImpl.java uses unchecked or unsafe operations.\nNote: Recompile with -Xlint:unchecked for details.\n"
+  },
+  "harness_compile": {
+    "reproducer": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness:/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/lib/src/test/java' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness/harness/l1/Reproducer.java'",
+      "ok": true,
+      "duration_s": 0.609,
+      "output": ""
+    },
+    "heldout1": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness:/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/lib/src/test/java' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness/harness/l1/HeldOut1.java'",
+      "ok": true,
+      "duration_s": 0.611,
+      "output": ""
+    },
+    "heldout2": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness:/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/lib/src/test/java' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness/harness/l1/HeldOut2.java'",
+      "ok": true,
+      "duration_s": 0.612,
+      "output": ""
+    },
+    "functional": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness:/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/lib/src/test/java' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness/harness/l1/FunctionalTests.java'",
+      "ok": true,
+      "duration_s": 0.782,
+      "output": ""
+    },
+    "probes": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness:/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/lib/src/test/java' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness/harness/l1/Probes.java'",
+      "ok": true,
+      "duration_s": 0.638,
+      "output": ""
+    },
+    "workload": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness:/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/lib/src/test/java' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/L1/harness/harness/l1/Workload.java'",
+      "ok": true,
+      "duration_s": 0.654,
+      "output": ""
+    }
+  },
+  "checks": {
+    "reproducer": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target:/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.Reproducer",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.121,
+      "evaluated": true,
+      "passed": false,
+      "summary": "canary fired (parsed document)",
+      "result": {
+        "check": "reproducer",
+        "api": "XMLBuilder2.parse(String)",
+        "fired": true,
+        "fired_by": "parsed document",
+        "outcome": "accepted",
+        "exception": null
+      }
+    },
+    "heldout1": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target:/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.HeldOut1",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.11,
+      "evaluated": true,
+      "passed": false,
+      "summary": "canary fired (parsed document)",
+      "result": {
+        "check": "heldout1",
+        "api": "XMLBuilder.parse(InputSource)",
+        "fired": true,
+        "fired_by": "parsed document",
+        "outcome": "accepted",
+        "exception": null
+      }
+    },
+    "heldout2": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target:/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.HeldOut2",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.106,
+      "evaluated": true,
+      "passed": false,
+      "summary": "canary fired (parsed document)",
+      "result": {
+        "check": "heldout2",
+        "api": "XMLBuilder.parse(String)",
+        "fired": true,
+        "fired_by": "parsed document",
+        "outcome": "accepted",
+        "exception": null
+      }
+    },
+    "functional": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target:/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.FunctionalTests",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.418,
+      "evaluated": true,
+      "passed": true,
+      "summary": "34/34 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 34,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "testSimpleXpath(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testXmlDocumentCreation(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testAddElementsInLoop(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testCDataNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementAsString(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testModerateDocumentSizeAsString(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testSetStandaloneToYes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testNamespaces(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTextNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndXPath(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testStripWhitespaceNodesFromDocument(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementBefore(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testProcessingInstructionNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTraversalDuringBuild(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testImport(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndAmendDocWithWhitespaceNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testNoCheckedExceptions(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testExceptionWrappedInXMLBuilderRuntimeException(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testSimpleXpath(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testXmlDocumentCreation(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testAddElementsInLoop(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testCDataNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementAsString(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testModerateDocumentSizeAsString(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testSetStandaloneToYes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testNamespaces(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTextNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndXPath(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testStripWhitespaceNodesFromDocument(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementBefore(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testProcessingInstructionNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTraversalDuringBuild(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testImport(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndAmendDocWithWhitespaceNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    "probes": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target:/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.Probes",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.12,
+      "evaluated": true,
+      "passed": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "typical_no_doctype",
+            "status": "accepted",
+            "digest": "ed7c43499571a945",
+            "exception": null
+          },
+          {
+            "probe": "comments_cdata_charrefs",
+            "status": "accepted",
+            "digest": "74e13feb2c350f66",
+            "exception": null
+          },
+          {
+            "probe": "doctype_without_subset",
+            "status": "accepted",
+            "digest": "cac327dbb29eec15",
+            "exception": null
+          },
+          {
+            "probe": "internal_entity",
+            "status": "accepted",
+            "digest": "83c097cdd97752c4",
+            "exception": null
+          },
+          {
+            "probe": "internal_default_attribute",
+            "status": "accepted",
+            "digest": "bf82844d3400e469",
+            "exception": null
+          },
+          {
+            "probe": "external_dtd_benign_local",
+            "status": "accepted",
+            "digest": "cac327dbb29eec15",
+            "exception": null
+          }
+        ]
+      }
+    }
+  },
+  "claim_level": "L2",
+  "admissible": false,
+  "classes": {
+    "target": "/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/target",
+    "harness": "/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/V0/classes/harness",
+    "support": null,
+    "jars": [
+      "/home/yzhao/parapet-work/jars/base64-2.3.8.jar",
+      "/home/yzhao/parapet-work/jars/junit-4.11.jar",
+      "/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar"
+    ]
+  },
+  "workload_ready": true
+}

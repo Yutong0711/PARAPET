@@ -161,3 +161,7 @@ variant `parapet/settings/generation-longctx.yaml` (32,768-token context,
 file (~46 KB) cannot fit the frozen settings (8,192 context, 4,096 output
 tokens). The frozen settings are run first and are the primary L1 generator
 result. The variant is a secondary run, and both are reported.
+
+Correction note for D9 (written 2026-11-18 18:13 PST): the "~18:35 PST" in
+the D9 heading was a wrong estimate; D9 was written between 18:05 and 18:12
+PST and committed with the L1 pre-registration (`083b7b8`, 18:12:18 PST).
