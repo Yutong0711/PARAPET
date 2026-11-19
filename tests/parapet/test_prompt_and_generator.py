@@ -43,3 +43,21 @@ def test_default_generator_is_local_and_hosted_is_refused():
         assert_allowed("https://api.openai.com/v1", allow_hosted_control=False)
     assert_allowed("https://api.openai.com/v1", allow_hosted_control=True)
     assert s["k"] == 5 and len(s["seeds"]) == 5
+
+
+def test_library_case_prompt_reads_only_the_target_file():
+    """L1 needs pinned dependency jars (fetch_jars.sh); skipped where they are absent, e.g. in CI."""
+    from parapet.case import CaseError
+
+    try:
+        case = load_case("L1")
+    except CaseError as e:
+        pytest.skip(f"L1 not available here: {e}")
+    prompt = build_prompt(case)
+    assert case.read_target().rstrip("\n") in prompt
+    assert "CWE-611" in prompt
+    # The upstream fix's new method and the other library files are not in the prompt.
+    assert "enableOrDisableExternalEntityParsing" not in prompt
+    assert "public class XMLBuilder2" not in prompt
+    for marker in ("PARAPET-CANARY", "ext.dtd", "PUBLIC", "disallow-doctype-decl"):
+        assert marker not in prompt

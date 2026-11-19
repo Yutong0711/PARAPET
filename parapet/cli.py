@@ -37,8 +37,9 @@ from parapet.hashing import sha256_file, sha256_text
 from parapet.measure import Arm, load_settings, run_session
 from parapet.paths import REPO_ROOT, default_workdir, is_windows_mount
 from parapet.prompt import build_prompt, prompt_record
-from parapet.record import build_record, write_record
-from parapet.validate import compare_probes, prepare_support, validate_patch
+from parapet.record import build_record, unified_diff, write_record
+from parapet.validate import (compare_probes, harness_sourcepath, patch_files, patch_sha256, prepare_support,
+                              validate_patch, write_sources)
 from parapet import javatools
 
 
@@ -57,21 +58,28 @@ def git_info() -> dict:
             "dirty_outside_evidence": dirty}
 
 
-def compile_for_workload(case, arm_id: str, source: str, root: Path, support_dir) -> tuple[Path, Path]:
+def compile_for_workload(case, arm_id: str, source, root: Path, support_dir) -> tuple[Path, Path]:
     pdir = root / "patches" / arm_id
-    src = pdir / "src" / case.target_relpath
-    src.parent.mkdir(parents=True, exist_ok=True)
-    src.write_text(source, encoding="utf-8")
+    srcs = write_sources(case, patch_files(case, source), pdir / "src")
     t, h = pdir / "classes" / "target", pdir / "classes" / "harness"
-    r = javatools.javac([src], t, release=case.java_release)
+    r = javatools.javac(srcs, t, cp=list(case.jars), release=case.java_release)
     if not r.ok:
         raise RuntimeError(f"{arm_id}: compile failed: {r.output}")
     main_src = case.harness_sourcepath / (case.workload_main.replace(".", "/") + ".java")
-    r = javatools.javac([main_src], h, cp=[t, support_dir], sourcepath=case.harness_sourcepath,
-                        release=case.java_release)
+    r = javatools.javac([main_src], h, cp=[t, support_dir, *case.harness_classpath_jars],
+                        sourcepath=harness_sourcepath(case), release=case.java_release)
     if not r.ok:
         raise RuntimeError(f"{arm_id}: workload compile failed: {r.output}")
     return t, h
+
+
+def reference_patch(case, rid: str, ref) -> dict:
+    fmap = ref.file_map(case.target_relpath)
+    files = {rel: Path(p).read_text(encoding="utf-8") for rel, p in fmap.items()}
+    kind = case.provenance.get(f"{rid}_kind") or "reference fix (hand-written)"
+    return {"id": rid, "kind": kind, "source": files.get(case.target_relpath, case.read_target()),
+            "files": files, "source_path": ", ".join(_rel(Path(p), REPO_ROOT) for p in fmap.values()),
+            "mechanism": {"route": ref.route, "description": ref.mechanism, "guidance": list(ref.guidance)}}
 
 
 def harness_problems(v0: dict) -> list:
@@ -128,11 +136,7 @@ def cmd_run(args) -> int:
          "mechanism": {"route": "none (incomplete by design)", "description": case.control_description}},
     ]
     for rid, ref in case.references.items():
-        patches.append({"id": rid, "kind": "reference fix (hand-written)",
-                        "source": ref.path.read_text(encoding="utf-8"),
-                        "source_path": _rel(ref.path, REPO_ROOT),
-                        "mechanism": {"route": ref.route, "description": ref.mechanism,
-                                      "guidance": list(ref.guidance)}})
+        patches.append(reference_patch(case, rid, ref))
 
     # ---------------------------------------------------------------- Generate
     gen_result = None
@@ -153,7 +157,7 @@ def cmd_run(args) -> int:
         else:
             from parapet.generate import generate, load_generation_settings
 
-            gs = load_generation_settings()
+            gs = load_generation_settings(Path(args.generation_settings) if args.generation_settings else None)
             generator = None
             if args.generator_config:
                 generator = json.loads(Path(args.generator_config).read_text())
@@ -167,7 +171,7 @@ def cmd_run(args) -> int:
             if e.get("L1"):
                 patches.append({"id": e["candidate"], "kind": "generated candidate",
                                 "source": (gdir / e["extracted_path"]).read_text(encoding="utf-8"),
-                                "source_path": _rel(gdir / e["extracted_path"], root),
+                                "source_path": f"generation/{e['extracted_path']}",
                                 "generation": e})
         phases["generate_s"] = round(time.time() - t0, 1)
 
@@ -177,7 +181,7 @@ def cmd_run(args) -> int:
     validations = {}
     for p in patches:
         log(f"validating {p['id']}")
-        v = validate_patch(case, p["id"], p["kind"], p["source"], root, support_dir,
+        v = validate_patch(case, p["id"], p["kind"], p.get("files") or p["source"], root, support_dir,
                            logs_dir=out / "validation" / "logs" / p["id"])
         validations[p["id"]] = v
         (out / "validation").mkdir(parents=True, exist_ok=True)
@@ -194,10 +198,11 @@ def cmd_run(args) -> int:
 
     # ---------------------------------------------------------------- Measure
     t0 = time.time()
+    jars = list(case.jars)
     arms = [Arm("baseline", "baseline", [Path(validations["V0"]["classes"]["target"]), support_dir,
-                                         Path(validations["V0"]["classes"]["harness"])], "V0")]
+                                         Path(validations["V0"]["classes"]["harness"]), *jars], "V0")]
     aa_t, aa_h = compile_for_workload(case, "V0-AA", original, root, support_dir)
-    arms.append(Arm("baseline-AA", "aa", [aa_t, support_dir, aa_h], "V0"))
+    arms.append(Arm("baseline-AA", "aa", [aa_t, support_dir, aa_h, *jars], "V0"))
     measured_ids = []
     for p in patches:
         v = validations[p["id"]]
@@ -207,7 +212,7 @@ def cmd_run(args) -> int:
         matched = None if kind == "reference" else case.match_reference(p["source"])
         p["matched_reference"] = matched
         arms.append(Arm(p["id"], kind, [Path(v["classes"]["target"]), support_dir,
-                                        Path(v["classes"]["harness"])], p["id"], matched_reference=matched))
+                                        Path(v["classes"]["harness"]), *jars], p["id"], matched_reference=matched))
         measured_ids.append(p["id"])
     log(f"measuring arms {[a.id for a in arms]} x {args.forks or msettings['forks_per_arm']} forks")
     summary = run_session(case, arms, msettings, out / "measurement", root / "measure", forks=args.forks,
@@ -319,8 +324,10 @@ def emit_records(case, patches, validations, probes_cmp, summary, decisions, gen
                 "route": f"same mechanism as {ref} ({case.references[ref].route}), by the pre-registered rule",
                 "description": f"matched reference: {ref} — {case.references[ref].mechanism}",
                 "matched_reference": ref}
+        files = p.get("files") or {case.target_relpath: p["source"]}
+        diff = "".join(unified_diff(case.read_original(rel), text, rel) for rel, text in sorted(files.items()))
         record = build_record(
-            case=case, patch=p, validation=v, probes_cmp=probes_cmp[pid],
+            case=case, patch=p, validation=v, probes_cmp=probes_cmp[pid], diff=diff,
             cost=summary["vs_baseline"].get(pid if pid != "V0" else "__none__"),
             cost_vs_ref=summary["vs_matched_reference"].get(pid),
             raw_samples=raw_info if pid in measured_ids or pid == "V0" else None,
@@ -353,10 +360,7 @@ def cmd_rerecord(args) -> int:
                 "source_path": _rel(case.control_path, REPO_ROOT),
                 "mechanism": {"route": "none (incomplete by design)", "description": case.control_description}}]
     for rid, ref in case.references.items():
-        patches.append({"id": rid, "kind": "reference fix (hand-written)",
-                        "source": ref.path.read_text(encoding="utf-8"), "source_path": _rel(ref.path, REPO_ROOT),
-                        "mechanism": {"route": ref.route, "description": ref.mechanism,
-                                      "guidance": list(ref.guidance)}})
+        patches.append(reference_patch(case, rid, ref))
     gen_result = None
     gdir = run / "generation"
     if gdir.is_dir():
@@ -374,7 +378,7 @@ def cmd_rerecord(args) -> int:
                                     "matched_reference")})
     for p in patches:
         want = validations[p["id"]]["source_sha256"]
-        if sha256_text(p["source"]) != want:
+        if patch_sha256(case, p.get("files") or p["source"]) != want:
             log(f"source of {p['id']} does not match the run (sha256 {want}); refusing")
             return 5
     probes_cmp = {pid: compare_probes(validations["V0"], v) for pid, v in validations.items()}
@@ -484,6 +488,7 @@ def main(argv=None) -> int:
     r.add_argument("--no-generator", action="store_true", help="hand-written patches only (no model call)")
     r.add_argument("--candidates-from", help="reuse a saved generation/ directory instead of calling the model")
     r.add_argument("--generator-config", help="JSON file overriding the default generator (controls only)")
+    r.add_argument("--generation-settings", help="generation settings YAML (default parapet/settings/generation.yaml)")
     r.add_argument("--allow-hosted-control", action="store_true",
                    help="permit a hosted generator; attribution controls only, never the default path")
     r.add_argument("--id-prefix", default="G", help="candidate id prefix (default G)")

@@ -141,3 +141,23 @@ From Step 4 on, each fork runs with its own fork directory, and each check
 with its patch directory, as working directory (`parapet/measure.py`,
 `parapet/validate.py`, `parapet/javatools.py`). Steps 2 and 3 are reported as
 run.
+
+## 3. Step 4 (after LOCAL-EVIDENCE `fe998326ff39b3ed3bb47a5e4081e3b6e415ad05`)
+
+**D9. Step 4 additions, declared before any L1 run (2026-11-18 ~18:35 PST).**
+(a) Case L1 (java-xmlbuilder, CWE-611) is pre-registered in its own
+`prereg:` commit, after LOCAL-EVIDENCE: case definition, upstream fix as R1,
+hand-written R2 and control, checks, workload, and probes. The checks were
+run on the unpatched library and the workload was timed on the unpatched
+library only (to set `ops_per_round` to 800) before that commit. R1, R2 and
+the control have not been run. (b) Package changes needed for a library case:
+multi-file reference patches, compiling the whole library with a patch
+applied, dependency jars pinned by SHA-256, library test sources on the
+harness sourcepath, `--generation-settings`. C1/C2 behavior is unchanged
+(regression-checked by re-rendering a copy of `step3-v2/C2`: identical
+records apart from a cosmetic `source_path` prefix). (c) A generation-settings
+variant `parapet/settings/generation-longctx.yaml` (32,768-token context,
+16,384 `max_tokens`, request timeout 1,200 s, on a second loopback server, port 11436). L1's target
+file (~46 KB) cannot fit the frozen settings (8,192 context, 4,096 output
+tokens). The frozen settings are run first and are the primary L1 generator
+result. The variant is a secondary run, and both are reported.

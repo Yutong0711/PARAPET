@@ -191,3 +191,14 @@ Resolved since the previous revision:
 The version numbers referenced above (`v1.0` for the Derui Zhu artifact bundle,
 `0.3.0.dev0` for the vendored PEFT fork, `1.0` for MIMIR) are **upstream**
 version identifiers and are unrelated to PARAPET's own release version.
+
+## Test fixture: java-xmlbuilder (case L1, branch `mozilla/local-slice`)
+
+`parapet/cases/L1/lib/` holds the main and test sources of java-xmlbuilder
+(https://github.com/jmurty/java-xmlbuilder) at commit
+`5d5caa583b14ade1d6713b8e73b58679de50361f`, unmodified, and
+`parapet/cases/L1/reference/R1/` holds three main-source files at commit
+`e6fddca201790abab4f2c274341c0bb8835c3e73`. Both are by James Murty and are
+licensed under the Apache License 2.0; the upstream license text is preserved
+at `parapet/cases/L1/lib/LICENSE-2.0.txt`. They are used as a hardening
+case, not as a dependency of PARAPET.

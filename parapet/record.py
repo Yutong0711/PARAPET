@@ -32,7 +32,8 @@ def unified_diff(original: str, patched: str, path: str) -> str:
 def build_record(*, case, patch: dict, validation: dict, probes_cmp: dict, cost: dict | None,
                  cost_vs_ref: dict | None, raw_samples: dict | None, noise_floor: dict | None,
                  decisions: list, generator: dict, prompt: dict | None, environment: dict,
-                 reproduce: str, repo: dict, original_source: str, patched_source: str) -> dict:
+                 reproduce: str, repo: dict, original_source: str, patched_source: str,
+                 diff: str | None = None) -> dict:
     checks = []
     comp = validation.get("compile") or {}
     checks.append({"name": "compile", "command": comp.get("command"), "passed": bool(comp.get("ok")),
@@ -59,7 +60,7 @@ def build_record(*, case, patch: dict, validation: dict, probes_cmp: dict, cost:
         "patch": {"id": patch["id"], "kind": patch["kind"], "source_sha256": validation.get("source_sha256"),
                   "source_path": patch.get("source_path")},
         "mechanism": patch.get("mechanism"),
-        "diff": unified_diff(original_source, patched_source, case.target_relpath),
+        "diff": diff if diff is not None else unified_diff(original_source, patched_source, case.target_relpath),
         "checks": checks,
         "claim_level": validation.get("claim_level"),
         "admissible": bool(validation.get("admissible")),

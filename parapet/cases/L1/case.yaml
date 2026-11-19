@@ -1,0 +1,77 @@
+# PARAPET case L1 -- real library, pre-registered definition. Paths relative to this directory.
+id: L1
+title: java-xmlbuilder 1.1+ (pinned 5d5caa5) parses documents with external entities enabled
+cwe:
+  id: CWE-611
+  name: Improper Restriction of XML External Entity Reference
+language: java
+java_release: 17
+
+provenance:
+  library: java-xmlbuilder (com.jamesmurty.utils:java-xmlbuilder)
+  repository: https://github.com/jmurty/java-xmlbuilder
+  vulnerable_commit: 5d5caa583b14ade1d6713b8e73b58679de50361f   # parent of the fix; after the v1.1 release
+  fix_commit: e6fddca201790abab4f2c274341c0bb8835c3e73          # "Disable external entities by default ...", released in v1.2
+  advisory: CVE-2014-125087 (CWE-611); upstream issue https://github.com/jmurty/java-xmlbuilder/issues/6
+  license: Apache-2.0 (lib/LICENSE-2.0.txt)
+  R1_kind: upstream fix (commit e6fddca, three files)
+
+# The ONLY file the prompt builder reads: the file whose parse path has the weakness.
+target:
+  src_root: lib/src/main/java
+  path: com/jamesmurty/utils/BaseXMLBuilder.java
+
+library:
+  sources_root: lib/src/main/java          # every .java here is compiled, with a patch's files substituted
+  test_sources_root: lib/src/test/java     # the library's own tests (functional tests)
+  jars:
+    - {coordinate: "net.iharder:base64:2.3.8", file: base64-2.3.8.jar, sha256: bbf41fda22877a538f6bc2d5ad0aa372a7ddf4a756af3386aa09d3d4eea84f7f}
+  test_jars:
+    - {coordinate: "junit:junit:4.11", file: junit-4.11.jar, sha256: 90a8e1603eeca48e7e879f3afbc9560715322985f39a274f6f6070b43f9d06fe}
+    - {coordinate: "org.hamcrest:hamcrest-core:1.3", file: hamcrest-core-1.3.jar, sha256: 66fdef91e9739348df7a096aa384a5685f4e875584cce89386a7a47251c4d8e9}
+
+harness:
+  sourcepath: harness
+  support_root: null
+  support_sources: []
+  fixtures: null
+
+checks:
+  reproducer: harness.l1.Reproducer   # issue #6 shape: XMLBuilder2.parse(String), internal-subset SYSTEM entity
+  heldout1: harness.l1.HeldOut1       # XMLBuilder.parse(InputSource), entity declared in an external DTD subset
+  heldout2: harness.l1.HeldOut2       # XMLBuilder.parse(String), PUBLIC external entity
+  functional: harness.l1.FunctionalTests   # upstream JUnit suite at the vulnerable commit
+  probes: harness.l1.Probes
+
+workload:
+  name: legitimate-path
+  main: harness.l1.Workload
+  description: per operation, XMLBuilder.parse of a ~7 KB configuration document plus XMLBuilder.create of a small document
+  ops_per_round: 800
+
+references:
+  R1:
+    path: reference/R1/com/jamesmurty/utils/BaseXMLBuilder.java
+    files:
+      com/jamesmurty/utils/BaseXMLBuilder.java: reference/R1/com/jamesmurty/utils/BaseXMLBuilder.java
+      com/jamesmurty/utils/XMLBuilder.java: reference/R1/com/jamesmurty/utils/XMLBuilder.java
+      com/jamesmurty/utils/XMLBuilder2.java: reference/R1/com/jamesmurty/utils/XMLBuilder2.java
+    route: narrowed behavior
+    mechanism: upstream fix -- explicitly disable external-general-entities and external-parameter-entities on every DocumentBuilderFactory (parse and create), with new opt-in overloads
+    guidance:
+      - "Upstream commit e6fddca201790abab4f2c274341c0bb8835c3e73 (java-xmlbuilder v1.2), referenced by CVE-2014-125087. https://github.com/jmurty/java-xmlbuilder/commit/e6fddca201790abab4f2c274341c0bb8835c3e73"
+  R2:
+    path: reference/R2/com/jamesmurty/utils/BaseXMLBuilder.java
+    route: narrowed behavior
+    mechanism: reject any DOCTYPE declaration (disallow-doctype-decl) plus FEATURE_SECURE_PROCESSING on the parse path
+    guidance:
+      - "OWASP XML External Entity Prevention Cheat Sheet, Java, DocumentBuilderFactory (DOM): 'reject DOCTYPE declarations and leave XInclude disabled' (setFeature disallow-doctype-decl true; FEATURE_SECURE_PROCESSING true). https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html"
+
+control:
+  path: reference/CONTROL/com/jamesmurty/utils/BaseXMLBuilder.java
+  description: regex denylist for the reproducer's shape (<!ENTITY name SYSTEM ...) on character-stream input only
+
+mechanism_match:
+  - ref: R2
+    any_of: ['disallow-doctype-decl"\s*,\s*true']
+  - ref: R1

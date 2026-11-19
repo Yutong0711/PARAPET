@@ -66,6 +66,13 @@ def prepare_support(case: Case, root: Path):
     return out, {"command": r.command, "ok": r.ok, "duration_s": round(r.duration_s, 3)}
 
 
+def harness_sourcepath(case: Case):
+    """Harness sources, plus the library's own test sources for a library case."""
+    if case.library_test_sources_root is not None:
+        return javatools.classpath(case.harness_sourcepath, case.library_test_sources_root)
+    return case.harness_sourcepath
+
+
 def evaluate_check(name: str, result) -> tuple[bool, str]:
     if result is None:
         return False, "no result line (JVM crash, timeout, or harness error)"
@@ -96,30 +103,69 @@ def claim_level(compiled: bool, checks: dict) -> str:
     return "L3"
 
 
-def validate_patch(case: Case, patch_id: str, kind: str, source_text: str, root: Path,
+def patch_files(case: Case, source) -> dict:
+    """Normalize a patch to {relpath: text}; a plain string replaces the target file."""
+    if isinstance(source, str):
+        return {case.target_relpath: source}
+    return dict(source)
+
+
+def patch_sha256(case: Case, source) -> str:
+    """SHA-256 of a patch: of the target text for a single-file patch (as in
+    every C1/C2 record), of the sorted {relpath: text} JSON otherwise."""
+    files = patch_files(case, source)
+    if list(files) == [case.target_relpath]:
+        return sha256_text(files[case.target_relpath])
+    return sha256_text(json.dumps(sorted(files.items())))
+
+
+def write_sources(case: Case, files: dict, src_root: Path) -> list:
+    """Lay out the sources to compile: the patched target alone for a
+    self-contained case; the whole library with the patched files
+    substituted for a library case."""
+    if case.is_library:
+        tree = case.library_files()
+        unknown = set(files) - set(tree)
+        if unknown:
+            raise ValueError(f"patch names files outside the library: {sorted(unknown)}")
+        tree.update(files)
+    else:
+        tree = files
+    out = []
+    for rel, text in tree.items():
+        p = src_root / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8")
+        out.append(p)
+    return out
+
+
+def validate_patch(case: Case, patch_id: str, kind: str, source, root: Path,
                    support_dir: Path | None, logs_dir: Path, check_timeout: int = 60) -> dict:
     pdir = root / "patches" / patch_id
-    src = pdir / "src" / case.target_relpath
-    src.parent.mkdir(parents=True, exist_ok=True)
-    src.write_text(source_text, encoding="utf-8")
+    files = patch_files(case, source)
+    srcs = write_sources(case, files, pdir / "src")
     logs_dir.mkdir(parents=True, exist_ok=True)
     target_classes = pdir / "classes" / "target"
     harness_classes = pdir / "classes" / "harness"
+    jars = list(case.jars)
 
     rec = {
         "patch_id": patch_id,
         "kind": kind,
-        "source_sha256": sha256_text(source_text),
+        "source_sha256": patch_sha256(case, source),
+        "patched_files": sorted(files),
         "compile": None,
         "harness_compile": {},
         "checks": {},
         "claim_level": None,
         "admissible": False,
         "classes": {"target": str(target_classes), "harness": str(harness_classes),
-                    "support": str(support_dir) if support_dir else None},
+                    "support": str(support_dir) if support_dir else None,
+                    "jars": [str(j) for j in case.harness_classpath_jars]},
     }
 
-    c = javatools.javac([src], target_classes, release=case.java_release)
+    c = javatools.javac(srcs, target_classes, cp=jars, release=case.java_release)
     (logs_dir / "compile.txt").write_text(f"$ {c.command}\n{c.output}", encoding="utf-8")
     rec["compile"] = {"command": c.command, "ok": c.ok, "duration_s": round(c.duration_s, 3),
                       "output": _trim(c.output)}
@@ -132,11 +178,12 @@ def validate_patch(case: Case, patch_id: str, kind: str, source_text: str, root:
 
     programs = {name: case.checks[name] for name in CHECK_NAMES}
     programs["workload"] = case.workload_main
-    cp_compile = [target_classes, support_dir]
+    cp_compile = [target_classes, support_dir, *case.harness_classpath_jars]
+    sourcepath = harness_sourcepath(case)
     for name, main in programs.items():
         main_src = case.harness_sourcepath / (main.replace(".", "/") + ".java")
         r = javatools.javac([main_src], harness_classes, cp=cp_compile,
-                            sourcepath=case.harness_sourcepath, release=case.java_release)
+                            sourcepath=sourcepath, release=case.java_release)
         (logs_dir / f"harness_compile_{name}.txt").write_text(f"$ {r.command}\n{r.output}", encoding="utf-8")
         rec["harness_compile"][name] = {"command": r.command, "ok": r.ok,
                                         "duration_s": round(r.duration_s, 3), "output": _trim(r.output)}
@@ -147,7 +194,8 @@ def validate_patch(case: Case, patch_id: str, kind: str, source_text: str, root:
             rec["checks"][name] = {"evaluated": False, "passed": False,
                                    "summary": "not run: harness program does not compile against this patch"}
             continue
-        r = javatools.java(programs[name], cp=[target_classes, support_dir, harness_classes],
+        r = javatools.java(programs[name], cp=[target_classes, support_dir, harness_classes,
+                                               *case.harness_classpath_jars],
                            sysprops=sysprops, timeout=check_timeout, cwd=pdir)
         (logs_dir / f"check_{name}.txt").write_text(f"$ {r.command}\n{r.output}", encoding="utf-8")
         result = parse_result(r.output)

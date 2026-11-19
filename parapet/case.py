@@ -3,12 +3,14 @@
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
 
+from parapet.hashing import sha256_file
 from parapet.paths import CASES_DIR
 
 CHECK_NAMES = ("reproducer", "heldout1", "heldout2", "functional", "probes")
@@ -21,10 +23,16 @@ class CaseError(ValueError):
 @dataclass(frozen=True)
 class Reference:
     id: str
-    path: Path
+    path: Path            # the patched target file
     route: str
     mechanism: str
     guidance: tuple
+    files: tuple = ()     # ((relpath, Path), ...) for a multi-file reference (e.g. an upstream fix)
+
+    def file_map(self, target_relpath: str) -> dict:
+        if self.files:
+            return {rel: Path(p) for rel, p in self.files}
+        return {target_relpath: self.path}
 
 
 @dataclass(frozen=True)
@@ -50,6 +58,30 @@ class Case:
     control_path: Path
     control_description: str
     mechanism_match: tuple = field(default_factory=tuple)
+    library_sources_root: Path | None = None
+    library_test_sources_root: Path | None = None
+    jars: tuple = ()          # compile + runtime classpath jars (verified Paths)
+    test_jars: tuple = ()     # harness classpath jars (verified Paths)
+    provenance: dict = field(default_factory=dict)
+
+    @property
+    def is_library(self) -> bool:
+        return self.library_sources_root is not None
+
+    def read_original(self, relpath: str) -> str:
+        root = self.library_sources_root if self.is_library else self.target_src_root
+        return (root / relpath).read_text(encoding="utf-8")
+
+    def library_files(self) -> dict:
+        """relpath -> original text for every compiled source file of the case."""
+        if not self.is_library:
+            return {self.target_relpath: self.read_target()}
+        root = self.library_sources_root
+        return {str(f.relative_to(root)): f.read_text(encoding="utf-8") for f in sorted(root.rglob("*.java"))}
+
+    @property
+    def harness_classpath_jars(self) -> list:
+        return list(self.jars) + list(self.test_jars)
 
     @property
     def target_path(self) -> Path:
@@ -80,6 +112,23 @@ class Case:
         return "R1"
 
 
+def jars_dir() -> Path:
+    """Where dependency jars live (outside the repository; see each case's fetch_jars.sh)."""
+    env = os.environ.get("PARAPET_JARS_DIR")
+    return Path(env).expanduser() if env else Path.home() / "parapet-work" / "jars"
+
+
+def _resolve_jar(spec: dict, ctx: str) -> Path:
+    p = jars_dir() / spec["file"]
+    if not p.is_file():
+        raise CaseError(f"{ctx}: dependency jar {p} not found; run the case's fetch_jars.sh "
+                        f"({spec.get('coordinate')})")
+    digest = sha256_file(p)
+    if digest != spec["sha256"]:
+        raise CaseError(f"{ctx}: {p} sha256 {digest} != pinned {spec['sha256']}")
+    return p
+
+
 def _req(d: dict, key: str, ctx: str):
     if key not in d:
         raise CaseError(f"{ctx}: missing key {key!r}")
@@ -104,17 +153,24 @@ def load_case(case_id: str, cases_dir: Path = CASES_DIR) -> Case:
     workload = _req(data, "workload", ctx)
     refs = {}
     for rid, r in _req(data, "references", ctx).items():
+        files = tuple((rel, cdir / path) for rel, path in (r.get("files") or {}).items())
         refs[rid] = Reference(
             id=rid,
             path=cdir / _req(r, "path", f"{ctx} references.{rid}"),
             route=_req(r, "route", f"{ctx} references.{rid}"),
             mechanism=_req(r, "mechanism", f"{ctx} references.{rid}"),
             guidance=tuple(_req(r, "guidance", f"{ctx} references.{rid}")),
+            files=files,
         )
     if set(refs) != {"R1", "R2"}:
         raise CaseError(f"{ctx}: exactly two reference fixes R1 and R2 are required")
     control = _req(data, "control", ctx)
     fixtures = harness.get("fixtures")
+    lib = data.get("library") or {}
+    jars, test_jars = (), ()
+    if lib:
+        jars = tuple(_resolve_jar(j, ctx) for j in lib.get("jars") or ())
+        test_jars = tuple(_resolve_jar(j, ctx) for j in lib.get("test_jars") or ())
     case = Case(
         id=case_id,
         dir=cdir,
@@ -137,11 +193,17 @@ def load_case(case_id: str, cases_dir: Path = CASES_DIR) -> Case:
         control_path=cdir / _req(control, "path", ctx),
         control_description=control.get("description", ""),
         mechanism_match=tuple(data.get("mechanism_match") or ()),
+        library_sources_root=(cdir / lib["sources_root"]) if lib.get("sources_root") else None,
+        library_test_sources_root=(cdir / lib["test_sources_root"]) if lib.get("test_sources_root") else None,
+        jars=jars,
+        test_jars=test_jars,
+        provenance=dict(data.get("provenance") or {}),
     )
     # Reference and control patches must live outside the directory the
     # prompt builder reads.
     src_root = case.target_src_root.resolve()
-    for p in [r.path for r in refs.values()] + [case.control_path]:
+    ref_paths = [p for r in refs.values() for p in r.file_map(case.target_relpath).values()]
+    for p in ref_paths + [r.path for r in refs.values()] + [case.control_path]:
         if src_root in p.resolve().parents:
             raise CaseError(f"{ctx}: {p} is inside the prompt source root {src_root}")
         if not p.is_file():
