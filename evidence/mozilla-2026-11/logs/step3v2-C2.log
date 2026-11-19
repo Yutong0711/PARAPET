@@ -1,0 +1,26 @@
+[parapet 17:49:28] case C2 (CWE-611); work dir /home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928
+[parapet 17:49:29] reusing saved candidates from evidence/mozilla-2026-11/step3/C2/generation
+[parapet 17:49:29] validating V0
+[parapet 17:49:33]   V0: L2 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 17:49:33] validating CONTROL
+[parapet 17:49:36]   CONTROL: L3 reproducer=pass, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 17:49:36] validating R1
+[parapet 17:49:40]   R1: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:49:40] validating R2
+[parapet 17:49:44]   R2: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:49:44] validating G1
+[parapet 17:49:48]   G1: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:49:48] validating G2
+[parapet 17:49:52]   G2: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:49:52] validating G3
+[parapet 17:49:56]   G3: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:49:56] validating G4
+[parapet 17:50:00]   G4: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:50:00] validating G5
+[parapet 17:50:04]   G5: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:50:04] measuring arms ['baseline', 'baseline-AA', 'R1', 'R2', 'G1', 'G2', 'G3', 'G4', 'G5'] x 20 forks
+[parapet 17:55:17] A/A noise floor: latency 2.99%, peak memory 4.83%
+[parapet 17:55:17] budget strict: fitting=['R2'] -> recommend R2
+[parapet 17:55:17] budget lenient: fitting=['R2', 'R1'] -> recommend R2
+[parapet 17:55:20] results copied to evidence/mozilla-2026-11/step3-v2/C2
+[parapet 17:55:20] done

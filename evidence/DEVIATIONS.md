@@ -92,7 +92,8 @@ under `step3/cpu-only-C2/` for timing; they were not validated or measured
 and are not part of the Step 3 candidate set.
 
 **D6. Peak-memory samples were contaminated by the runner's own memory; fixed
-and re-measured (found 2026-11-18 ~17:40 PST, fixed ~17:47 PST).** While
+and re-measured (found between 17:34 and 17:40 PST on 2026-11-18; fix
+committed 17:40:50 PST as `37b153c`).** While
 writing up Step 3, every R2 fork in the C1 Step 3 session reported exactly
 100,832 KiB, which was also the minimum of the other arms. Diagnosis (reproduced
 with `/bin/true`, output in `evidence/mozilla-2026-11/logs/rss_diagnosis.txt`):
@@ -115,3 +116,16 @@ Step 2 and Step 3 were measured again with the fixed runner (v2). Step 3 v2
 reuses the saved candidates (`--candidates-from`, no new model call). The v2
 sessions also give an independent replicate of every latency estimate.
 Both versions are reported in EVIDENCE.md.
+
+Correction note for D6 (added 17:56 PST): the times first written in the D6
+heading ("~17:40", "~17:47") were estimates made while writing; the times now
+in the heading come from the CPU-only run log and the git commit timestamp.
+
+**D7. v2 measurement sessions (2026-11-18 17:41–17:55 PST).** With the D6 fix
+(commit `37b153c`), Step 2 was re-run for C1 and C2 (`step2-v2/`), and Step 3
+was re-run for C1 and C2 with `--candidates-from step3/<case>/generation`
+(`step3-v2/`): the saved candidates were re-validated and re-measured, no
+model was called, and the generation directory (including its power samples)
+was copied into the v2 run unchanged. Everything else (cases, budgets,
+protocol, decision rule) is as pre-registered. Validation outcomes in v2 are
+identical to v1 for every patch.

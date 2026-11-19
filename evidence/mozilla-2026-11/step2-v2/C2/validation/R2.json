@@ -1,0 +1,228 @@
+{
+  "patch_id": "R2",
+  "kind": "reference fix (hand-written)",
+  "source_sha256": "37f68b697660d44502142a19db2a1e613ebf75111de825842848bfb829c2c629",
+  "compile": {
+    "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/src/example/config/ConfigLoader.java",
+    "ok": true,
+    "duration_s": 0.357,
+    "output": ""
+  },
+  "harness_compile": {
+    "reproducer": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/Reproducer.java'",
+      "ok": true,
+      "duration_s": 0.53,
+      "output": ""
+    },
+    "heldout1": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/HeldOut1.java'",
+      "ok": true,
+      "duration_s": 0.557,
+      "output": ""
+    },
+    "heldout2": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/HeldOut2.java'",
+      "ok": true,
+      "duration_s": 0.599,
+      "output": ""
+    },
+    "functional": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/FunctionalTests.java'",
+      "ok": true,
+      "duration_s": 0.579,
+      "output": ""
+    },
+    "probes": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/Probes.java'",
+      "ok": true,
+      "duration_s": 0.596,
+      "output": ""
+    },
+    "workload": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/Workload.java'",
+      "ok": true,
+      "duration_s": 0.452,
+      "output": ""
+    }
+  },
+  "checks": {
+    "reproducer": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness harness.c2.Reproducer",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.072,
+      "evaluated": true,
+      "passed": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "reproducer",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: external entity or DTD reference refused: file:///tmp/parapet-c2-11936068607990363369/secret.txt"
+      }
+    },
+    "heldout1": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness harness.c2.HeldOut1",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.07,
+      "evaluated": true,
+      "passed": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout1",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: external entity or DTD reference refused: file:///tmp/parapet-c2-11994287627598676858/ext.dtd"
+      }
+    },
+    "heldout2": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness harness.c2.HeldOut2",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.067,
+      "evaluated": true,
+      "passed": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout2",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: external entity or DTD reference refused: file:///tmp/parapet-c2-7899641371565897735/secret.txt"
+      }
+    },
+    "functional": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness harness.c2.FunctionalTests",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.098,
+      "evaluated": true,
+      "passed": true,
+      "summary": "11/11 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 11,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "nested_elements",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "attributes",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "comments_ignored",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "cdata_section",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "predefined_and_char_refs",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "whitespace_trimmed",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "unicode_text",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "xml_declaration",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "document_order_preserved",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "workload_document",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "malformed_rejected_with_ioexception",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    "probes": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness harness.c2.Probes",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.095,
+      "evaluated": true,
+      "passed": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "typical_no_doctype",
+            "status": "accepted",
+            "digest": "3149f0242a7d87c8",
+            "exception": null
+          },
+          {
+            "probe": "comments_cdata_charrefs",
+            "status": "accepted",
+            "digest": "c509f25f81f99611",
+            "exception": null
+          },
+          {
+            "probe": "doctype_without_subset",
+            "status": "accepted",
+            "digest": "b06dc4384d63e841",
+            "exception": null
+          },
+          {
+            "probe": "internal_entity",
+            "status": "accepted",
+            "digest": "2323f75ff486a800",
+            "exception": null
+          },
+          {
+            "probe": "internal_default_attribute",
+            "status": "accepted",
+            "digest": "3259025ec762553a",
+            "exception": null
+          },
+          {
+            "probe": "external_dtd_benign_local",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: invalid configuration document: external entity or DTD reference refused: file:///tmp/parapet-c2-12579397285159610545/benign.dtd"
+          }
+        ]
+      }
+    }
+  },
+  "claim_level": "L4",
+  "admissible": true,
+  "classes": {
+    "target": "/home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/target",
+    "harness": "/home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/R2/classes/harness",
+    "support": null
+  },
+  "workload_ready": true
+}

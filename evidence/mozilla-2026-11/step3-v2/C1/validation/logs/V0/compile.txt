@@ -1,0 +1,1 @@
+$ javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/V0/classes/target /home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/V0/src/example/prefs/PrefsCodec.java

@@ -1,0 +1,136 @@
+{
+  "parapet_version": "1.1.0-alpha",
+  "case": "C1",
+  "label": "step3v2",
+  "argv": [
+    "/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/__main__.py",
+    "run",
+    "--case",
+    "C1",
+    "--candidates-from",
+    "evidence/mozilla-2026-11/step3/C1/generation",
+    "--budget",
+    "parapet/budgets/strict.parapet.budget.yaml",
+    "--budget",
+    "parapet/budgets/lenient.parapet.budget.yaml",
+    "--label",
+    "step3v2",
+    "--out",
+    "evidence/mozilla-2026-11/step3-v2/C1"
+  ],
+  "started_at": 1795052817.8060715,
+  "finished_at": 1795052964.381024,
+  "phases": {
+    "generate_s": 0.1,
+    "validate_s": 21.2,
+    "measure_s": 122.8
+  },
+  "repo": {
+    "commit": "a137f02c4678bde5889045623cbff42e007829a2",
+    "branch": "mozilla/local-slice",
+    "dirty_outside_evidence": []
+  },
+  "environment": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "6.6.114.1-microsoft-standard-WSL2",
+    "wsl": true,
+    "cpu": "Intel(R) Core(TM) i9-14900KF",
+    "logical_cpus": 32,
+    "ram_gib": 31.2,
+    "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 610.60",
+    "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "jdk_full": [
+      "openjdk version \"21.0.13.0.3\" 2026-10-24",
+      "OpenJDK Runtime Environment (build 21.0.13.0.3+1-1-26.04.1-Ubuntu)",
+      "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-26.04.1-Ubuntu, mixed mode, sharing)"
+    ],
+    "javac": "javac 21.0.13.0.3",
+    "python": "3.14.4",
+    "python_packages": {
+      "numpy": "2.5.5",
+      "openai": "2.54.0"
+    },
+    "loadavg": [
+      1.4921875,
+      2.20361328125,
+      2.98291015625
+    ],
+    "cwd_is_linux_fs": false
+  },
+  "work_dir": "/home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700",
+  "copied_to": "evidence/mozilla-2026-11/step3-v2/C1",
+  "budgets": [
+    {
+      "version": 1,
+      "profile": "strict",
+      "workload": "legitimate-path",
+      "caps": {
+        "latency_overhead_pct": 5.0,
+        "peak_memory_overhead_pct": 5.0
+      },
+      "description": "Security hardening may add at most 5% latency and at most 5% peak memory on the legitimate-path workload, judged on the upper end of the 95% bootstrap interval.",
+      "path": "parapet/budgets/strict.parapet.budget.yaml",
+      "sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3"
+    },
+    {
+      "version": 1,
+      "profile": "lenient",
+      "workload": "legitimate-path",
+      "caps": {
+        "latency_overhead_pct": 25.0,
+        "peak_memory_overhead_pct": 25.0
+      },
+      "description": "Security hardening may add at most 25% latency and at most 25% peak memory on the legitimate-path workload, judged on the upper end of the 95% bootstrap interval.",
+      "path": "parapet/budgets/lenient.parapet.budget.yaml",
+      "sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28"
+    }
+  ],
+  "measurement_settings": {
+    "path": "/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/settings/measurement.yaml",
+    "sha256": "4b3e8fbacd0a76f825e326f4603a93a809e4336822462cc41bfad26262b5882d"
+  },
+  "support_classes": {
+    "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/support-classes '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/support/thirdparty/canary/Canary.java' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/support/thirdparty/canary/GadgetA.java' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/support/thirdparty/canary/GadgetB.java' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/support/thirdparty/canary/GadgetC.java'",
+    "ok": true,
+    "duration_s": 0.409
+  },
+  "prompt": {
+    "template": "parapet/prompts/harden_v1.txt",
+    "template_sha256": "d5b3c33c4650e1a53437ad477bd4031896f35b4b33193efb946968f8ed90edbc",
+    "prompt_sha256": "ca4de091367f148432505594779160045f56343829121931948f4c2bf83c07ea",
+    "inputs": {
+      "source_file": "parapet/cases/C1/src/example/prefs/PrefsCodec.java",
+      "cwe_id": "CWE-502",
+      "cwe_name": "Deserialization of Untrusted Data"
+    }
+  },
+  "generator_used": true,
+  "claim_levels": {
+    "V0": "L2",
+    "CONTROL": "L3",
+    "R1": "L4",
+    "R2": "L4",
+    "G1": "L2",
+    "G2": "L1",
+    "G3": "L1",
+    "G4": "L1",
+    "G5": "L1"
+  },
+  "candidate_claim_levels": {
+    "G1": "L2",
+    "G2": "L1",
+    "G3": "L1",
+    "G4": "L1",
+    "G5": "L1"
+  },
+  "l5": {
+    "strict": [
+      "R2",
+      "R1"
+    ],
+    "lenient": [
+      "R2",
+      "R1"
+    ]
+  }
+}

@@ -1,0 +1,2 @@
+$ java -cp /home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/V0/classes/target:/home/yzhao/parapet-work/runs/step2v2-C2-20261118T174352/patches/V0/classes/harness harness.c2.Reproducer
+PARAPET_RESULT {"check":"reproducer","fired":true,"fired_by":"result:config.name","outcome":"accepted","exception":null}
