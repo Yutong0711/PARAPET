@@ -1,0 +1,319 @@
+{
+  "schema": "parapet.hardening-record/1",
+  "case": {
+    "id": "C1",
+    "title": "Preference tokens restored with Java object serialization"
+  },
+  "weakness": {
+    "cwe": "CWE-502",
+    "name": "Deserialization of Untrusted Data"
+  },
+  "patch": {
+    "id": "R1",
+    "kind": "reference fix (hand-written)",
+    "source_sha256": "cbb87003cfe9561fdcc01fbd1d471f5a925891ab138342d38d71984e64f6bac0",
+    "source_path": "parapet/cases/C1/reference/R1/example/prefs/PrefsCodec.java"
+  },
+  "mechanism": {
+    "route": "added work on the call path",
+    "description": "per-stream JEP 290 serialization filter (class allowlist plus graph and size limits)",
+    "guidance": [
+      "OWASP Deserialization Cheat Sheet, Java: 'Configure serialization filters with an application-specific class allowlist and resource limits before reading objects.' https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+      "Oracle, Secure Coding Guidelines for Java SE, Guideline 8-6 / SERIAL-6: Filter untrusted serial data. https://www.oracle.com/java/technologies/javase/seccodeguide.html",
+      "Oracle, Java SE 21 Core Libraries, Serialization Filtering (allow-lists, pattern-based filters). https://docs.oracle.com/en/java/javase/21/core/serialization-filtering1.html"
+    ]
+  },
+  "diff": "--- a/example/prefs/PrefsCodec.java\n+++ b/example/prefs/PrefsCodec.java\n@@ -3,6 +3,7 @@\n import java.io.ByteArrayInputStream;\n import java.io.ByteArrayOutputStream;\n import java.io.IOException;\n+import java.io.ObjectInputFilter;\n import java.io.ObjectInputStream;\n import java.io.ObjectOutputStream;\n import java.io.Serializable;\n@@ -24,6 +25,19 @@\n \n     private PrefsCodec() {\n     }\n+\n+    /**\n+     * Allowlist for preference tokens (JEP 290 serialization filter): only the\n+     * classes encode() writes may be deserialized, plus the array component\n+     * types that ArrayList and HashMap check while reading; every other class\n+     * is rejected before it is instantiated. Graph limits bound resource use.\n+     */\n+    private static final ObjectInputFilter PREFS_FILTER = ObjectInputFilter.Config.createFilter(\n+            \"maxdepth=10;maxrefs=100000;maxbytes=4194304;maxarray=100000;\"\n+            + \"example.prefs.PrefsCodec$UserPrefs;\"\n+            + \"java.util.ArrayList;java.util.LinkedHashMap;java.util.HashMap;\"\n+            + \"java.lang.Object;java.util.Map$Entry;\"\n+            + \"!*\");\n \n     /** A user's editor preferences. */\n     public static final class UserPrefs implements Serializable {\n@@ -105,6 +119,7 @@\n     public static UserPrefs decode(String token) throws IOException {\n         byte[] data = Base64.getDecoder().decode(token);\n         try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(data))) {\n+            in.setObjectInputFilter(PREFS_FILTER);\n             return (UserPrefs) in.readObject();\n         } catch (ClassNotFoundException e) {\n             throw new IOException(\"unknown class in preferences token\", e);\n",
+  "checks": [
+    {
+      "name": "compile",
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/classes/target /home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/src/example/prefs/PrefsCodec.java",
+      "passed": true,
+      "summary": "compiles"
+    },
+    {
+      "name": "reproducer",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/classes/target:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/support-classes:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/classes/harness harness.c1.Reproducer",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "reproducer",
+        "fixture": "reproducer.b64",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.InvalidClassException: filter status: REJECTED"
+      }
+    },
+    {
+      "name": "heldout1",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/classes/target:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/support-classes:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/classes/harness harness.c1.HeldOut1",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout1",
+        "fixture": "heldout1.b64",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.InvalidClassException: filter status: REJECTED"
+      }
+    },
+    {
+      "name": "heldout2",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/classes/target:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/support-classes:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/classes/harness harness.c1.HeldOut2",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout2",
+        "fixture": "heldout2.b64",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.InvalidClassException: filter status: REJECTED"
+      }
+    },
+    {
+      "name": "functional",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/classes/target:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/support-classes:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/classes/harness harness.c1.FunctionalTests",
+      "passed": true,
+      "evaluated": true,
+      "summary": "11/11 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 11,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "roundtrip_typical",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_empty_collections",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_null_theme",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_unicode",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_500_recent_files",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "order_preserved",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "int_extremes",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "token_is_base64_text",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decoded_collections_are_read_only",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decode_rejects_truncated_token",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decode_rejects_non_token_text",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "probes",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/classes/target:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/support-classes:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/R1/classes/harness harness.c1.Probes",
+      "passed": true,
+      "evaluated": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "probe_typical.b64",
+            "status": "accepted",
+            "digest": "3114ad04a5a61b2e",
+            "exception": null
+          },
+          {
+            "probe": "probe_empty.b64",
+            "status": "accepted",
+            "digest": "50ef533edd2673f8",
+            "exception": null
+          },
+          {
+            "probe": "probe_large.b64",
+            "status": "accepted",
+            "digest": "c5ded95ec6d61b17",
+            "exception": null
+          },
+          {
+            "probe": "probe_unicode.b64",
+            "status": "accepted",
+            "digest": "5b9f121b070c77f5",
+            "exception": null
+          },
+          {
+            "probe": "probe_legacy_linkedlist.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.InvalidClassException: filter status: REJECTED"
+          },
+          {
+            "probe": "probe_legacy_hashmap.b64",
+            "status": "accepted",
+            "digest": "e988a74108279b23",
+            "exception": null
+          }
+        ]
+      }
+    }
+  ],
+  "claim_level": "L4",
+  "admissible": true,
+  "inputs_now_rejected": {
+    "evaluated": true,
+    "now_rejected": [
+      {
+        "probe": "probe_legacy_linkedlist.b64",
+        "exception": "java.io.InvalidClassException: filter status: REJECTED"
+      }
+    ],
+    "different_result": [],
+    "probes_total": 6
+  },
+  "cost": {
+    "vs_baseline": {
+      "vs": "baseline",
+      "latency": {
+        "ratio": 1.027320952950285,
+        "ratio_lo": 1.0085605583983384,
+        "ratio_hi": 1.0424211191899646,
+        "overhead_pct": 2.7320952950284916,
+        "overhead_pct_lo": 0.8560558398338358,
+        "overhead_pct_hi": 4.242111918996461,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": false
+      },
+      "peak_memory": {
+        "ratio": 0.9847763667546683,
+        "ratio_lo": 0.956757272293753,
+        "ratio_hi": 1.0116752542503715,
+        "overhead_pct": -1.5223633245331714,
+        "overhead_pct_lo": -4.324272770624704,
+        "overhead_pct_hi": 1.1675254250371525,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": true
+      }
+    },
+    "vs_matched_reference": null,
+    "noise_floor_pct": {
+      "latency_pct": 1.2317682815510378,
+      "peak_memory_pct": 1.8065313054890675
+    },
+    "raw_samples": {
+      "path": "measurement/raw_samples.jsonl",
+      "sha256": "fa10b25430acf50639751e2b6132199345665e05adffb0f35f8791e08a790362"
+    }
+  },
+  "budgets": [
+    {
+      "profile": "strict",
+      "path": "parapet/budgets/strict.parapet.budget.yaml",
+      "sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+      "caps": {
+        "latency_overhead_pct": 5.0,
+        "peak_memory_overhead_pct": 5.0
+      },
+      "fits": true,
+      "reasons": [],
+      "recommended_patch": "R2",
+      "this_patch_recommended": false,
+      "claim_level": "L5"
+    },
+    {
+      "profile": "lenient",
+      "path": "parapet/budgets/lenient.parapet.budget.yaml",
+      "sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+      "caps": {
+        "latency_overhead_pct": 25.0,
+        "peak_memory_overhead_pct": 25.0
+      },
+      "fits": true,
+      "reasons": [],
+      "recommended_patch": "R2",
+      "this_patch_recommended": false,
+      "claim_level": "L5"
+    }
+  ],
+  "generator": {
+    "name": "hand-written reference"
+  },
+  "prompt": null,
+  "environment": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "6.6.114.1-microsoft-standard-WSL2",
+    "wsl": true,
+    "cpu": "Intel(R) Core(TM) i9-14900KF",
+    "logical_cpus": 32,
+    "ram_gib": 31.2,
+    "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 610.60",
+    "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "jdk_full": [
+      "openjdk version \"21.0.13.0.3\" 2026-10-24",
+      "OpenJDK Runtime Environment (build 21.0.13.0.3+1-1-26.04.1-Ubuntu)",
+      "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-26.04.1-Ubuntu, mixed mode, sharing)"
+    ],
+    "javac": "javac 21.0.13.0.3",
+    "python": "3.14.4",
+    "python_packages": {
+      "numpy": "2.5.5",
+      "openai": "2.54.0"
+    },
+    "loadavg": [
+      0.81689453125,
+      0.630859375,
+      0.36328125
+    ],
+    "cwd_is_linux_fs": false
+  },
+  "reproduce": "python -m parapet run --case C1 --budget parapet/budgets/strict.parapet.budget.yaml --budget parapet/budgets/lenient.parapet.budget.yaml --no-generator",
+  "repo": {
+    "commit": "08900879fc58faef8b286e802179fef4522f831b",
+    "branch": "mozilla/local-slice",
+    "dirty_outside_evidence": []
+  }
+}

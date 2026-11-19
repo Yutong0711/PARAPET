@@ -1,0 +1,15 @@
+[parapet 17:11:44] case C2 (CWE-611); work dir /home/yzhao/parapet-work/runs/step2-C2-20261118T171144
+[parapet 17:11:44] validating V0
+[parapet 17:11:48]   V0: L2 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 17:11:48] validating CONTROL
+[parapet 17:11:52]   CONTROL: L3 reproducer=pass, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 17:11:52] validating R1
+[parapet 17:11:56]   R1: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:11:56] validating R2
+[parapet 17:12:00]   R2: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:12:00] measuring arms ['baseline', 'baseline-AA', 'R1', 'R2'] x 20 forks
+[parapet 17:14:01] A/A noise floor: latency 4.93%, peak memory 3.65%
+[parapet 17:14:01] budget strict: fitting=['R2'] -> recommend R2
+[parapet 17:14:01] budget lenient: fitting=['R2', 'R1'] -> recommend R2
+[parapet 17:14:02] results copied to evidence/mozilla-2026-11/step2/C2
+[parapet 17:14:02] done

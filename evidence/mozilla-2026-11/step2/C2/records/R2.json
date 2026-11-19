@@ -1,0 +1,315 @@
+{
+  "schema": "parapet.hardening-record/1",
+  "case": {
+    "id": "C2",
+    "title": "Tenant configuration documents parsed with a default DOM parser"
+  },
+  "weakness": {
+    "cwe": "CWE-611",
+    "name": "Improper Restriction of XML External Entity Reference"
+  },
+  "patch": {
+    "id": "R2",
+    "kind": "reference fix (hand-written)",
+    "source_sha256": "37f68b697660d44502142a19db2a1e613ebf75111de825842848bfb829c2c629",
+    "source_path": "parapet/cases/C2/reference/R2/example/config/ConfigLoader.java"
+  },
+  "mechanism": {
+    "route": "added work on the call path",
+    "description": "EntityResolver that refuses every external entity and external DTD subset; internal DTD subsets still processed; FEATURE_SECURE_PROCESSING",
+    "guidance": [
+      "OWASP XML External Entity Prevention Cheat Sheet, Java, 'Other providers and required DTDs': 'If internal DTDs are required, install an EntityResolver on the DOM builder or SAX reader that throws SAXException for external references.' and 'enable FEATURE_SECURE_PROCESSING where supported'. https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html",
+      "SEI CERT Oracle Coding Standard for Java, IDS17-J. Prevent XML External Entity Attacks, 'Compliant Solution (EntityResolver)'. https://wiki.sei.cmu.edu/confluence/display/java/IDS17-J.+Prevent+XML+External+Entity+Attacks"
+    ]
+  },
+  "diff": "--- a/example/config/ConfigLoader.java\n+++ b/example/config/ConfigLoader.java\n@@ -4,6 +4,7 @@\n import java.io.StringReader;\n import java.util.LinkedHashMap;\n import java.util.Map;\n+import javax.xml.XMLConstants;\n import javax.xml.parsers.DocumentBuilder;\n import javax.xml.parsers.DocumentBuilderFactory;\n import javax.xml.parsers.ParserConfigurationException;\n@@ -12,6 +13,7 @@\n import org.w3c.dom.NamedNodeMap;\n import org.w3c.dom.Node;\n import org.w3c.dom.NodeList;\n+import org.xml.sax.EntityResolver;\n import org.xml.sax.InputSource;\n import org.xml.sax.SAXException;\n \n@@ -24,6 +26,10 @@\n  */\n public final class ConfigLoader {\n \n+    private static final EntityResolver REFUSE_EXTERNAL = (publicId, systemId) -> {\n+        throw new SAXException(\"external entity or DTD reference refused: \" + systemId);\n+    };\n+\n     private ConfigLoader() {\n     }\n \n@@ -31,7 +37,11 @@\n     public static Map<String, String> load(String xml) throws IOException {\n         try {\n             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();\n+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);\n             DocumentBuilder builder = factory.newDocumentBuilder();\n+            // Refuse every external entity and external DTD subset. Internal DTD\n+            // subsets (internal entities, attribute defaults) are still processed.\n+            builder.setEntityResolver(REFUSE_EXTERNAL);\n             Document doc = builder.parse(new InputSource(new StringReader(xml)));\n             Element root = doc.getDocumentElement();\n             Map<String, String> out = new LinkedHashMap<>();\n",
+  "checks": [
+    {
+      "name": "compile",
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/target /home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/src/example/config/ConfigLoader.java",
+      "passed": true,
+      "summary": "compiles"
+    },
+    {
+      "name": "reproducer",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/harness harness.c2.Reproducer",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "reproducer",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: external entity or DTD reference refused: file:///tmp/parapet-c2-3833442299617664071/secret.txt"
+      }
+    },
+    {
+      "name": "heldout1",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/harness harness.c2.HeldOut1",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout1",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: external entity or DTD reference refused: file:///tmp/parapet-c2-7356669765818643873/ext.dtd"
+      }
+    },
+    {
+      "name": "heldout2",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/harness harness.c2.HeldOut2",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout2",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: external entity or DTD reference refused: file:///tmp/parapet-c2-3216594358925318056/secret.txt"
+      }
+    },
+    {
+      "name": "functional",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/harness harness.c2.FunctionalTests",
+      "passed": true,
+      "evaluated": true,
+      "summary": "11/11 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 11,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "nested_elements",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "attributes",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "comments_ignored",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "cdata_section",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "predefined_and_char_refs",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "whitespace_trimmed",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "unicode_text",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "xml_declaration",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "document_order_preserved",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "workload_document",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "malformed_rejected_with_ioexception",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "probes",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/harness harness.c2.Probes",
+      "passed": true,
+      "evaluated": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "typical_no_doctype",
+            "status": "accepted",
+            "digest": "3149f0242a7d87c8",
+            "exception": null
+          },
+          {
+            "probe": "comments_cdata_charrefs",
+            "status": "accepted",
+            "digest": "c509f25f81f99611",
+            "exception": null
+          },
+          {
+            "probe": "doctype_without_subset",
+            "status": "accepted",
+            "digest": "b06dc4384d63e841",
+            "exception": null
+          },
+          {
+            "probe": "internal_entity",
+            "status": "accepted",
+            "digest": "2323f75ff486a800",
+            "exception": null
+          },
+          {
+            "probe": "internal_default_attribute",
+            "status": "accepted",
+            "digest": "3259025ec762553a",
+            "exception": null
+          },
+          {
+            "probe": "external_dtd_benign_local",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: invalid configuration document: external entity or DTD reference refused: file:///tmp/parapet-c2-6545239911926136494/benign.dtd"
+          }
+        ]
+      }
+    }
+  ],
+  "claim_level": "L4",
+  "admissible": true,
+  "inputs_now_rejected": {
+    "evaluated": true,
+    "now_rejected": [
+      {
+        "probe": "external_dtd_benign_local",
+        "exception": "java.io.IOException: invalid configuration document: external entity or DTD reference refused: file:///tmp/parapet-c2-6545239911926136494/benign.dtd"
+      }
+    ],
+    "different_result": [],
+    "probes_total": 6
+  },
+  "cost": {
+    "vs_baseline": {
+      "vs": "baseline",
+      "latency": {
+        "ratio": 1.0129689277756055,
+        "ratio_lo": 0.9624655397432681,
+        "ratio_hi": 1.031733884296784,
+        "overhead_pct": 1.2968927775605543,
+        "overhead_pct_lo": -3.7534460256731905,
+        "overhead_pct_hi": 3.173388429678403,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": true
+      },
+      "peak_memory": {
+        "ratio": 0.9793054191590037,
+        "ratio_lo": 0.9567219674000794,
+        "ratio_hi": 1.0335650446871896,
+        "overhead_pct": -2.069458084099629,
+        "overhead_pct_lo": -4.3278032599920575,
+        "overhead_pct_hi": 3.356504468718957,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": true
+      }
+    },
+    "vs_matched_reference": null,
+    "noise_floor_pct": {
+      "latency_pct": 4.927745171693687,
+      "peak_memory_pct": 3.6530011983005872
+    },
+    "raw_samples": {
+      "path": "measurement/raw_samples.jsonl",
+      "sha256": "0e718a2a514b9fbe181937f9cef5895f677367385b1b210c73c44f7b2c81dc91"
+    }
+  },
+  "budgets": [
+    {
+      "profile": "strict",
+      "path": "parapet/budgets/strict.parapet.budget.yaml",
+      "sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+      "caps": {
+        "latency_overhead_pct": 5.0,
+        "peak_memory_overhead_pct": 5.0
+      },
+      "fits": true,
+      "reasons": [],
+      "recommended_patch": "R2",
+      "this_patch_recommended": true,
+      "claim_level": "L5"
+    },
+    {
+      "profile": "lenient",
+      "path": "parapet/budgets/lenient.parapet.budget.yaml",
+      "sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+      "caps": {
+        "latency_overhead_pct": 25.0,
+        "peak_memory_overhead_pct": 25.0
+      },
+      "fits": true,
+      "reasons": [],
+      "recommended_patch": "R2",
+      "this_patch_recommended": true,
+      "claim_level": "L5"
+    }
+  ],
+  "generator": {
+    "name": "hand-written reference"
+  },
+  "prompt": null,
+  "environment": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "6.6.114.1-microsoft-standard-WSL2",
+    "wsl": true,
+    "cpu": "Intel(R) Core(TM) i9-14900KF",
+    "logical_cpus": 32,
+    "ram_gib": 31.2,
+    "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 610.60",
+    "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "jdk_full": [
+      "openjdk version \"21.0.13.0.3\" 2026-10-24",
+      "OpenJDK Runtime Environment (build 21.0.13.0.3+1-1-26.04.1-Ubuntu)",
+      "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-26.04.1-Ubuntu, mixed mode, sharing)"
+    ],
+    "javac": "javac 21.0.13.0.3",
+    "python": "3.14.4",
+    "python_packages": {
+      "numpy": "2.5.5",
+      "openai": "2.54.0"
+    },
+    "loadavg": [
+      1.1943359375,
+      0.93115234375,
+      0.52783203125
+    ],
+    "cwd_is_linux_fs": false
+  },
+  "reproduce": "python -m parapet run --case C2 --budget parapet/budgets/strict.parapet.budget.yaml --budget parapet/budgets/lenient.parapet.budget.yaml --no-generator",
+  "repo": {
+    "commit": "08900879fc58faef8b286e802179fef4522f831b",
+    "branch": "mozilla/local-slice",
+    "dirty_outside_evidence": []
+  }
+}

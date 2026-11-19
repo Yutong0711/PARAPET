@@ -1,0 +1,2 @@
+$ java -cp /home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/R2/classes/harness harness.c2.HeldOut1
+PARAPET_RESULT {"check":"heldout1","fired":false,"fired_by":null,"outcome":"rejected","exception":"java.io.IOException: invalid configuration document: external entity or DTD reference refused: file:///tmp/parapet-c2-7356669765818643873/ext.dtd"}
