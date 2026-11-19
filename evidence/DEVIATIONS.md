@@ -45,4 +45,23 @@ the last release (1.0).
 
 ## 2. Deviations after pre-registration
 
-(none yet)
+**D1. Post-prereg plumbing run (2026-11-18 17:05 PST).** After the prereg
+commit and before Step 2, I ran the CLI once on C2 with `--forks 2`
+(`--workdir ~/parapet-work/dev/cli-dryrun --label dryrun`) to check the
+pipeline end to end. With 2 forks every arm is below `min_valid_forks`, so no
+cost estimate and no fit was produced. Not evidence; outputs remain in
+`~/parapet-work/dev/cli-dryrun/` and its SUMMARY.md is copied to
+`evidence/mozilla-2026-11/dev-runs/`. No pre-registered file changed.
+
+**D2. Model server restarted with `OLLAMA_NO_CLOUD=1` (2026-11-18 ~17:17
+PST).** Before the first model run, the user-level Ollama server was
+restarted with the same settings as in `evidence/INSTALLS.md` plus
+`OLLAMA_NO_CLOUD=1`, which turns off Ollama's cloud-model features. Reason:
+keep the generator strictly local. Generation settings
+(`parapet/settings/generation.yaml`) are unchanged. The first server log is
+kept as `ollama-serve-gpu-session1.log`.
+
+**D3. GPU power sampled during generation.** Step 6 (power draw) was run
+concurrently with Step 3 generation using `--power-sample` (nvidia-smi every
+200 ms), because it costs no extra time. It is listed under Step 6 in
+EVIDENCE.md.
