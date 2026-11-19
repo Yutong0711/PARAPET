@@ -31,6 +31,11 @@ for _path in _VENDORED_SRC_ON_PATH:
     if _resolved not in sys.path:
         sys.path.insert(0, _resolved)
 
+# PARAPET's own package (``parapet/`` at the repository root) is imported by
+# tests/parapet; make the root importable however pytest is invoked.
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 
 @pytest.fixture(scope="session")
 def repo_root() -> Path:
