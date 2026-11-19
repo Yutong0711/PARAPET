@@ -78,6 +78,9 @@ def render(kind: str, arg: str) -> str:
         return endpoints(arg)
     if kind == "file":
         return (BASE / arg).read_text().rstrip("\n")
+    if kind == "file_demoted":   # include a Markdown file with its headings pushed down two levels
+        return re.sub(r"(?m)^(#+) ", lambda m: "#" * min(6, len(m.group(1)) + 2) + " ",
+                      (BASE / arg).read_text().rstrip("\n"))
     d = tables.load(BASE / arg)
     fn = {
         "validation": tables.validation_table,

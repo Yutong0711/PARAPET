@@ -45,6 +45,8 @@ model saw only the last 4,098 tokens of the file and not the instructions.
 
 Outputs: G1 a fenced fragment of the file's last methods (no class
 declaration); G2–G5 prose descriptions of the class. None is a patch.
+G1's time includes loading the model (the server log shows a model load at
+18:16:07; the server had been idle past its keep-alive).
 
 ### D.3 Generator part, long-context variant (secondary; declared in D9)
 
@@ -98,7 +100,7 @@ and saw only loopback-to-loopback connections for the Ollama processes.
 
 GPU board power during Step 4 generation (long-context variant):
 
-{{power:step4/L1-gen-longctx-killed}}
+{{power:step4/L1-gen-longctx}}
 
 ## E. Appendix — hosted control (Step 5)
 
@@ -139,8 +141,8 @@ rebuilt from these files by `analysis/tables.py`, `analysis/cross_session.py`
 and `analysis/build_doc.py`.
 
 One reproduce command per case (from the repository root, Linux, JDK 17+,
-GNU `time`, `taskset`, Python venv with `requirements-dev.txt` plus
-`openai`; re-validates and re-measures the hand-written patches and the saved
+GNU `time`, `taskset`, Python 3.10+ with `requirements-dev.txt`; the `openai`
+package is needed only to regenerate; re-validates and re-measures the hand-written patches and the saved
 candidates without calling a model):
 
 ```bash
@@ -187,7 +189,7 @@ Failures in my own work:
 
 `evidence/DEVIATIONS.md` in full:
 
-{{file:../DEVIATIONS.md}}
+{{file_demoted:../DEVIATIONS.md}}
 
 ## H. What these results do not show
 
