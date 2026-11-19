@@ -1,0 +1,277 @@
+{
+  "schema": "parapet.hardening-record/1",
+  "case": {
+    "id": "C2",
+    "title": "Tenant configuration documents parsed with a default DOM parser"
+  },
+  "weakness": {
+    "cwe": "CWE-611",
+    "name": "Improper Restriction of XML External Entity Reference"
+  },
+  "patch": {
+    "id": "CONTROL",
+    "kind": "incomplete control patch (hand-written)",
+    "source_sha256": "de6ab9a327835f726e8e0cd0fa699499c2d0a1951720b23a9aab6f6310e2d0c0",
+    "source_path": "parapet/cases/C2/reference/CONTROL/example/config/ConfigLoader.java"
+  },
+  "mechanism": {
+    "route": "none (incomplete by design)",
+    "description": "regex denylist for the reproducer's shape (<!ENTITY name SYSTEM ...) only"
+  },
+  "diff": "--- a/example/config/ConfigLoader.java\n+++ b/example/config/ConfigLoader.java\n@@ -4,6 +4,7 @@\n import java.io.StringReader;\n import java.util.LinkedHashMap;\n import java.util.Map;\n+import java.util.regex.Pattern;\n import javax.xml.parsers.DocumentBuilder;\n import javax.xml.parsers.DocumentBuilderFactory;\n import javax.xml.parsers.ParserConfigurationException;\n@@ -24,11 +25,18 @@\n  */\n public final class ConfigLoader {\n \n+    // INCOMPLETE CONTROL PATCH: blocks only the reported payload shape,\n+    // an internal-subset entity declared with a SYSTEM identifier.\n+    private static final Pattern SYSTEM_ENTITY = Pattern.compile(\"<!ENTITY\\\\s+\\\\S+\\\\s+SYSTEM\");\n+\n     private ConfigLoader() {\n     }\n \n     /** Parses a configuration document. */\n     public static Map<String, String> load(String xml) throws IOException {\n+        if (SYSTEM_ENTITY.matcher(xml).find()) {\n+            throw new IOException(\"external entities are not allowed\");\n+        }\n         try {\n             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();\n             DocumentBuilder builder = factory.newDocumentBuilder();\n",
+  "checks": [
+    {
+      "name": "compile",
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/classes/target /home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/src/example/config/ConfigLoader.java",
+      "passed": true,
+      "summary": "compiles"
+    },
+    {
+      "name": "reproducer",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/classes/target:/home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/classes/harness harness.c2.Reproducer",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "reproducer",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: external entities are not allowed"
+      }
+    },
+    {
+      "name": "heldout1",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/classes/target:/home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/classes/harness harness.c2.HeldOut1",
+      "passed": false,
+      "evaluated": true,
+      "summary": "canary fired (result:config.name)",
+      "result": {
+        "check": "heldout1",
+        "fired": true,
+        "fired_by": "result:config.name",
+        "outcome": "accepted",
+        "exception": null
+      }
+    },
+    {
+      "name": "heldout2",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/classes/target:/home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/classes/harness harness.c2.HeldOut2",
+      "passed": false,
+      "evaluated": true,
+      "summary": "canary fired (result:config.name)",
+      "result": {
+        "check": "heldout2",
+        "fired": true,
+        "fired_by": "result:config.name",
+        "outcome": "accepted",
+        "exception": null
+      }
+    },
+    {
+      "name": "functional",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/classes/target:/home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/classes/harness harness.c2.FunctionalTests",
+      "passed": true,
+      "evaluated": true,
+      "summary": "11/11 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 11,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "nested_elements",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "attributes",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "comments_ignored",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "cdata_section",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "predefined_and_char_refs",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "whitespace_trimmed",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "unicode_text",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "xml_declaration",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "document_order_preserved",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "workload_document",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "malformed_rejected_with_ioexception",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "probes",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/classes/target:/home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/CONTROL/classes/harness harness.c2.Probes",
+      "passed": true,
+      "evaluated": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "typical_no_doctype",
+            "status": "accepted",
+            "digest": "3149f0242a7d87c8",
+            "exception": null
+          },
+          {
+            "probe": "comments_cdata_charrefs",
+            "status": "accepted",
+            "digest": "c509f25f81f99611",
+            "exception": null
+          },
+          {
+            "probe": "doctype_without_subset",
+            "status": "accepted",
+            "digest": "b06dc4384d63e841",
+            "exception": null
+          },
+          {
+            "probe": "internal_entity",
+            "status": "accepted",
+            "digest": "2323f75ff486a800",
+            "exception": null
+          },
+          {
+            "probe": "internal_default_attribute",
+            "status": "accepted",
+            "digest": "3259025ec762553a",
+            "exception": null
+          },
+          {
+            "probe": "external_dtd_benign_local",
+            "status": "accepted",
+            "digest": "b06dc4384d63e841",
+            "exception": null
+          }
+        ]
+      }
+    }
+  ],
+  "claim_level": "L3",
+  "admissible": false,
+  "inputs_now_rejected": {
+    "evaluated": true,
+    "now_rejected": [],
+    "different_result": [],
+    "probes_total": 6
+  },
+  "cost": {
+    "vs_baseline": null,
+    "vs_matched_reference": null,
+    "noise_floor_pct": {
+      "latency_pct": 4.324864011979956,
+      "peak_memory_pct": 3.6926795829274495
+    },
+    "raw_samples": null
+  },
+  "budgets": [
+    {
+      "profile": "strict",
+      "path": "parapet/budgets/strict.parapet.budget.yaml",
+      "sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+      "caps": {
+        "latency_overhead_pct": 5.0,
+        "peak_memory_overhead_pct": 5.0
+      },
+      "fits": false,
+      "reasons": [
+        "not assessed"
+      ],
+      "recommended_patch": "R2",
+      "this_patch_recommended": false,
+      "claim_level": "L3"
+    },
+    {
+      "profile": "lenient",
+      "path": "parapet/budgets/lenient.parapet.budget.yaml",
+      "sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+      "caps": {
+        "latency_overhead_pct": 25.0,
+        "peak_memory_overhead_pct": 25.0
+      },
+      "fits": false,
+      "reasons": [
+        "not assessed"
+      ],
+      "recommended_patch": "R2",
+      "this_patch_recommended": false,
+      "claim_level": "L3"
+    }
+  ],
+  "generator": {
+    "name": "hand-written control"
+  },
+  "prompt": null,
+  "environment": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "6.6.114.1-microsoft-standard-WSL2",
+    "wsl": true,
+    "cpu": "Intel(R) Core(TM) i9-14900KF",
+    "logical_cpus": 32,
+    "ram_gib": 31.2,
+    "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 610.60",
+    "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "jdk_full": [
+      "openjdk version \"21.0.13.0.3\" 2026-10-24",
+      "OpenJDK Runtime Environment (build 21.0.13.0.3+1-1-26.04.1-Ubuntu)",
+      "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-26.04.1-Ubuntu, mixed mode, sharing)"
+    ],
+    "javac": "javac 21.0.13.0.3",
+    "python": "3.14.4",
+    "python_packages": {
+      "numpy": "2.5.5",
+      "openai": "2.54.0"
+    },
+    "loadavg": [
+      1.04052734375,
+      1.61767578125,
+      1.0966796875
+    ],
+    "cwd_is_linux_fs": false
+  },
+  "reproduce": "python -m parapet run --case C2 --budget parapet/budgets/strict.parapet.budget.yaml --budget parapet/budgets/lenient.parapet.budget.yaml --no-generator",
+  "repo": {
+    "commit": "6dda2e9b974ea5218acb26807d2a3aa876a60500",
+    "branch": "mozilla/local-slice",
+    "dirty_outside_evidence": []
+  }
+}

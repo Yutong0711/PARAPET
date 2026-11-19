@@ -1,0 +1,32 @@
+[parapet 17:15:45] WARNING: uncommitted changes outside evidence/: ['M evidence/DEVIATIONS.md']
+[parapet 17:15:45] case C1 (CWE-502); work dir /home/yzhao/parapet-work/runs/step3-C1-20261118T171545
+[parapet 17:15:45] generating candidates
+[parapet 17:16:24]   G1: status=success wall=38.549s tokens=845+710 L1=True
+[parapet 17:16:30]   G2: status=success wall=6.334s tokens=845+902 L1=True
+[parapet 17:16:37]   G3: status=success wall=6.933s tokens=845+975 L1=True
+[parapet 17:16:43]   G4: status=success wall=6.248s tokens=845+849 L1=True
+[parapet 17:16:51]   G5: status=success wall=7.462s tokens=845+1058 L1=True
+[parapet 17:16:52] validating V0
+[parapet 17:16:55]   V0: L2 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 17:16:55] validating CONTROL
+[parapet 17:16:59]   CONTROL: L3 reproducer=pass, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 17:16:59] validating R1
+[parapet 17:17:03]   R1: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:17:03] validating R2
+[parapet 17:17:07]   R2: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:17:07] validating G1
+[parapet 17:17:11]   G1: L2 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 17:17:11] validating G2
+[parapet 17:17:11]   G2: L1 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=FAIL, probes=FAIL
+[parapet 17:17:11] validating G3
+[parapet 17:17:11]   G3: L1 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=FAIL, probes=FAIL
+[parapet 17:17:11] validating G4
+[parapet 17:17:12]   G4: L1 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=FAIL, probes=FAIL
+[parapet 17:17:12] validating G5
+[parapet 17:17:12]   G5: L1 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=FAIL, probes=FAIL
+[parapet 17:17:13] measuring arms ['baseline', 'baseline-AA', 'R1', 'R2'] x 20 forks
+[parapet 17:19:15] A/A noise floor: latency 1.60%, peak memory 2.33%
+[parapet 17:19:15] budget strict: fitting=['R2', 'R1'] -> recommend R2
+[parapet 17:19:15] budget lenient: fitting=['R2', 'R1'] -> recommend R2
+[parapet 17:19:17] results copied to evidence/mozilla-2026-11/step3/C1
+[parapet 17:19:17] done

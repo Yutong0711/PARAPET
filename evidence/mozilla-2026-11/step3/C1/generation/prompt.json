@@ -1,0 +1,10 @@
+{
+  "template": "parapet/prompts/harden_v1.txt",
+  "template_sha256": "d5b3c33c4650e1a53437ad477bd4031896f35b4b33193efb946968f8ed90edbc",
+  "prompt_sha256": "ca4de091367f148432505594779160045f56343829121931948f4c2bf83c07ea",
+  "inputs": {
+    "source_file": "parapet/cases/C1/src/example/prefs/PrefsCodec.java",
+    "cwe_id": "CWE-502",
+    "cwe_name": "Deserialization of Untrusted Data"
+  }
+}

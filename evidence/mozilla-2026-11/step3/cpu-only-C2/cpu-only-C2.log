@@ -1,0 +1,6 @@
+17:30:04   G1: status=success wall=68.748s tokens=627+596 L1=True
+17:31:01   G2: status=success wall=56.367s tokens=627+587 L1=True
+17:31:56   G3: status=success wall=55.721s tokens=627+587 L1=True
+17:32:53   G4: status=success wall=56.769s tokens=627+587 L1=True
+17:33:47   G5: status=success wall=53.627s tokens=627+587 L1=True
+total wall s 291.9

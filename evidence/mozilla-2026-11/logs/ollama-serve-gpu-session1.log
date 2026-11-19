@@ -1,0 +1,30 @@
+Couldn't find '/home/yzhao/.ollama/id_ed25519'. Generating new private key.
+Your new public key is: 
+
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPgyFTQx8FkL7WjFTR0W0MnePT+QGbeMlEWjyCfPNeXB
+
+time=2026-11-18T16:46:57.195-08:00 level=INFO source=routes.go:2474 msg="server config" env="map[CUDA_VISIBLE_DEVICES: GGML_VK_VISIBLE_DEVICES: GPU_DEVICE_ORDINAL: HIP_VISIBLE_DEVICES: HSA_OVERRIDE_GFX_VERSION: HTTPS_PROXY: HTTP_PROXY: LLAMA_ARG_FIT: LLAMA_ARG_FIT_TARGET: NO_PROXY: OLLAMA_CONTEXT_LENGTH:8192 OLLAMA_CREATE_REMOTE:false OLLAMA_DEBUG:INFO OLLAMA_DEBUG_LOG_REQUESTS:false OLLAMA_EDITOR: OLLAMA_FLASH_ATTENTION:false OLLAMA_GO_TEMPLATE:true OLLAMA_GPU_OVERHEAD:0 OLLAMA_HOST:http://127.0.0.1:11434 OLLAMA_IGPU_ENABLE: OLLAMA_KEEP_ALIVE:30m0s OLLAMA_KV_CACHE_TYPE: OLLAMA_LLM_LIBRARY: OLLAMA_LOAD_TIMEOUT:5m0s OLLAMA_MAX_LOADED_MODELS:0 OLLAMA_MAX_QUEUE:512 OLLAMA_MAX_TRANSFER_STREAMS:4 OLLAMA_MODELS:/home/yzhao/parapet-work/ollama-models OLLAMA_NOHISTORY:false OLLAMA_NOPRUNE:false OLLAMA_NO_CLOUD:false OLLAMA_NUM_PARALLEL:1 OLLAMA_ORIGINS:[http://localhost https://localhost http://localhost:* https://localhost:* http://127.0.0.1 https://127.0.0.1 http://127.0.0.1:* https://127.0.0.1:* http://0.0.0.0 https://0.0.0.0 http://0.0.0.0:* https://0.0.0.0:* app://* file://* tauri://* vscode-webview://* vscode-file://*] OLLAMA_REMOTES:[ollama.com] OLLAMA_SCHED_SPREAD:false OLLAMA_VULKAN:true ROCR_VISIBLE_DEVICES: http_proxy: https_proxy: no_proxy:]"
+time=2026-11-18T16:46:57.196-08:00 level=INFO source=routes.go:2476 msg="Ollama cloud disabled: false"
+time=2026-11-18T16:46:57.196-08:00 level=INFO source=images.go:1033 msg="total blobs: 0"
+time=2026-11-18T16:46:57.196-08:00 level=INFO source=images.go:1042 msg="total unused blobs removed: 0"
+time=2026-11-18T16:46:57.196-08:00 level=INFO source=routes.go:2536 msg="Listening on 127.0.0.1:11434 (version 0.40.16)"
+time=2026-11-18T16:46:57.198-08:00 level=INFO source=runner.go:60 msg="discovering available GPUs..."
+time=2026-11-18T16:46:57.550-08:00 level=INFO source=model_recommendations.go:177 msg="model recommendations cache sleep scheduled" wait=4h40m52.829175735s consecutive_failures=0
+time=2026-11-18T16:46:59.701-08:00 level=INFO source=types.go:32 msg="inference compute" id=0 filter_id=0 library=CUDA compute=8.9 name=CUDA0 description="NVIDIA GeForce RTX 4090" libdirs=ollama,cuda_v13 driver=13.3 pci_id=0000:01:00.0 type=discrete total="24.0 GiB" available="22.4 GiB"
+time=2026-11-18T16:46:59.701-08:00 level=INFO source=routes.go:2586 msg="vram-based default context" total_vram="24.0 GiB" default_num_ctx=32768
+[GIN] 2026/11/18 - 16:47:01 | 200 | 75.936µs |       127.0.0.1 | GET      "/api/version"
+[GIN] 2026/11/18 - 16:47:08 | 200 | 15.423µs |       127.0.0.1 | HEAD     "/"
+time=2026-11-18T16:47:09.843-08:00 level=INFO source=download.go:182 msg="downloading 60e05f210007 in 16 292 MB part(s)"
+[GIN] 2026/11/18 - 16:50:15 | 200 | 17.615µs |       127.0.0.1 | HEAD     "/"
+[GIN] 2026/11/18 - 16:50:15 | 200 | 486.598µs |       127.0.0.1 | GET      "/api/tags"
+time=2026-11-18T16:57:18.928-08:00 level=INFO source=download.go:418 msg="60e05f210007 part 7 stalled; retrying. If this persists, press ctrl-c to exit, then 'ollama pull' to find a faster connection."
+[GIN] 2026/11/18 - 17:03:13 | 200 | 20.808µs |       127.0.0.1 | HEAD     "/"
+[GIN] 2026/11/18 - 17:03:13 | 200 | 366.996µs |       127.0.0.1 | GET      "/api/tags"
+time=2026-11-18T17:07:00.936-08:00 level=INFO source=download.go:182 msg="downloading 66b9ea09bd5b in 1 68 B part(s)"
+time=2026-11-18T17:07:01.401-08:00 level=INFO source=download.go:182 msg="downloading 1e65450c3067 in 1 1.6 KB part(s)"
+time=2026-11-18T17:07:01.786-08:00 level=INFO source=download.go:182 msg="downloading 832dd9e00a68 in 1 11 KB part(s)"
+[GIN] 2026/11/18 - 17:07:05 | 200 |   19m50s |       127.0.0.1 | POST     "/api/pull"
+[GIN] 2026/11/18 - 17:08:43 | 200 | 111.335µs |       127.0.0.1 | HEAD     "/"
+[GIN] 2026/11/18 - 17:08:43 | 200 |  22.71ms |       127.0.0.1 | GET      "/api/tags"
+[GIN] 2026/11/18 - 17:14:33 | 200 | 558.279µs |       127.0.0.1 | GET      "/api/tags"
+[GIN] 2026/11/18 - 17:14:33 | 200 |  18.56ms |       127.0.0.1 | POST     "/api/show"

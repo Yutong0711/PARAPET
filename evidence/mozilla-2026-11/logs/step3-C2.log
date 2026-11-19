@@ -1,0 +1,31 @@
+[parapet 17:20:12] case C2 (CWE-611); work dir /home/yzhao/parapet-work/runs/step3-C2-20261118T172012
+[parapet 17:20:12] generating candidates
+[parapet 17:20:17]   G1: status=success wall=4.434s tokens=627+595 L1=True
+[parapet 17:20:21]   G2: status=success wall=4.042s tokens=627+587 L1=True
+[parapet 17:20:25]   G3: status=success wall=4.058s tokens=627+587 L1=True
+[parapet 17:20:29]   G4: status=success wall=4.044s tokens=627+587 L1=True
+[parapet 17:20:33]   G5: status=success wall=4.077s tokens=627+587 L1=True
+[parapet 17:20:33] validating V0
+[parapet 17:20:37]   V0: L2 reproducer=FAIL, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 17:20:37] validating CONTROL
+[parapet 17:20:40]   CONTROL: L3 reproducer=pass, heldout1=FAIL, heldout2=FAIL, functional=pass, probes=pass
+[parapet 17:20:40] validating R1
+[parapet 17:20:44]   R1: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:20:44] validating R2
+[parapet 17:20:48]   R2: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:20:48] validating G1
+[parapet 17:20:52]   G1: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:20:52] validating G2
+[parapet 17:20:56]   G2: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:20:56] validating G3
+[parapet 17:21:00]   G3: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:21:00] validating G4
+[parapet 17:21:04]   G4: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:21:04] validating G5
+[parapet 17:21:07]   G5: L4 reproducer=pass, heldout1=pass, heldout2=pass, functional=pass, probes=pass
+[parapet 17:21:09] measuring arms ['baseline', 'baseline-AA', 'R1', 'R2', 'G1', 'G2', 'G3', 'G4', 'G5'] x 20 forks
+[parapet 17:26:20] A/A noise floor: latency 4.32%, peak memory 3.69%
+[parapet 17:26:20] budget strict: fitting=['R2'] -> recommend R2
+[parapet 17:26:20] budget lenient: fitting=['R2', 'R1'] -> recommend R2
+[parapet 17:26:22] results copied to evidence/mozilla-2026-11/step3/C2
+[parapet 17:26:22] done

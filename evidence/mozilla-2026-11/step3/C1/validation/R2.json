@@ -1,0 +1,231 @@
+{
+  "patch_id": "R2",
+  "kind": "reference fix (hand-written)",
+  "source_sha256": "3e62b47b2d6339c333d27c84ecbed1bc37dd53a6ed9ff7fb4fdbce1fafc800a1",
+  "compile": {
+    "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/src/example/prefs/PrefsCodec.java",
+    "ok": true,
+    "duration_s": 0.385,
+    "output": ""
+  },
+  "harness_compile": {
+    "reproducer": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness/harness/c1/Reproducer.java'",
+      "ok": true,
+      "duration_s": 0.452,
+      "output": ""
+    },
+    "heldout1": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness/harness/c1/HeldOut1.java'",
+      "ok": true,
+      "duration_s": 0.485,
+      "output": ""
+    },
+    "heldout2": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness/harness/c1/HeldOut2.java'",
+      "ok": true,
+      "duration_s": 0.449,
+      "output": ""
+    },
+    "functional": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness/harness/c1/FunctionalTests.java'",
+      "ok": true,
+      "duration_s": 0.602,
+      "output": ""
+    },
+    "probes": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness/harness/c1/Probes.java'",
+      "ok": true,
+      "duration_s": 0.519,
+      "output": ""
+    },
+    "workload": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/harness/harness/c1/Workload.java'",
+      "ok": true,
+      "duration_s": 0.476,
+      "output": ""
+    }
+  },
+  "checks": {
+    "reproducer": {
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness harness.c1.Reproducer",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.052,
+      "evaluated": true,
+      "passed": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "reproducer",
+        "fixture": "reproducer.b64",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: not a preferences token"
+      }
+    },
+    "heldout1": {
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness harness.c1.HeldOut1",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.053,
+      "evaluated": true,
+      "passed": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout1",
+        "fixture": "heldout1.b64",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: not a preferences token"
+      }
+    },
+    "heldout2": {
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness harness.c1.HeldOut2",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.053,
+      "evaluated": true,
+      "passed": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout2",
+        "fixture": "heldout2.b64",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: not a preferences token"
+      }
+    },
+    "functional": {
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness harness.c1.FunctionalTests",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.073,
+      "evaluated": true,
+      "passed": true,
+      "summary": "11/11 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 11,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "roundtrip_typical",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_empty_collections",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_null_theme",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_unicode",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_500_recent_files",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "order_preserved",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "int_extremes",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "token_is_base64_text",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decoded_collections_are_read_only",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decode_rejects_truncated_token",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decode_rejects_non_token_text",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    "probes": {
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness harness.c1.Probes",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.073,
+      "evaluated": true,
+      "passed": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "probe_typical.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          },
+          {
+            "probe": "probe_empty.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          },
+          {
+            "probe": "probe_large.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          },
+          {
+            "probe": "probe_unicode.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          },
+          {
+            "probe": "probe_legacy_linkedlist.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          },
+          {
+            "probe": "probe_legacy_hashmap.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          }
+        ]
+      }
+    }
+  },
+  "claim_level": "L4",
+  "admissible": true,
+  "classes": {
+    "target": "/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/target",
+    "harness": "/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/R2/classes/harness",
+    "support": "/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes"
+  },
+  "workload_ready": true
+}
