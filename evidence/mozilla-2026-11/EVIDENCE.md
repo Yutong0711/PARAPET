@@ -1197,6 +1197,12 @@ checks" and that L4 patches can differ in security coverage.
 
 ## I. Test results
 
+**Re-run after the post-hoc tasks D11–D14** (2026-11-18 19:17:57 PST, same
+command): **445 passed, 0 failed, 0 skipped** (242 + 8 + 195). Raw output:
+`logs/run_tests_posthoc.log`.
+
+Earlier run at the first final commit:
+
 Command (repository root, at the final commit):
 
 ```bash
@@ -1236,4 +1242,4 @@ All selected PARAPET checks passed.
 
 Branch: `mozilla/local-slice`
 LOCAL-EVIDENCE: `fe998326ff39b3ed3bb47a5e4081e3b6e415ad05`
-Final: `eca25f47a83189ad1fed08f66b322d7c0090aba2` — the last evidence commit before this file; the commit that adds this file is the head of `mozilla/local-slice` (`git rev-parse mozilla/local-slice`).
+Final: `01f001bbeccf130f63639e0d1b94fee8966f2292` — the post-hoc results commit (D11–D14), the last evidence commit before this version of the file. The commit that adds this version is the head of `mozilla/local-slice` (`git rev-parse mozilla/local-slice`). Previous final (before D11–D14): `8c8ad50572f6188171600b7899de488b9725ecfc`; previous results commit: `eca25f47a83189ad1fed08f66b322d7c0090aba2`.
