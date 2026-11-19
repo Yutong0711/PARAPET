@@ -1,0 +1,27 @@
+This Java class `BaseXMLBuilder` is an abstract class that provides a high-level API for constructing and manipulating XML documents. It uses DOM (Document Object Model) to represent the XML structure and provides methods to add elements, attributes, text, CDATA sections, comments, processing instructions, and references. The class also includes methods to navigate the XML document hierarchy by accessing parent and ancestor elements.
+
+Key features of `BaseXMLBuilder` include:
+
+1. **Element Construction and Manipulation**:
+   - Methods like `element`, `e`, and `el` are used to create new elements.
+   - Methods like `attribute`, `attr`, and `a` are used to add attributes to elements.
+   - Methods like `text`, `t`, and `tx` are used to add text nodes to elements.
+   - Methods like `cdata`, `data`, and `d` are used to add CDATA sections.
+   - Methods like `comment`, `cmnt`, and `c` are used to add comment nodes.
+   - Methods like `instruction`, `inst`, and `i` are used to add processing instructions.
+   - Methods like `reference`, `ref`, and `r` are used to add entity references.
+   - Methods like `namespace`, `ns`, and `ns` are used to add XML namespace attributes.
+
+2. **Document Navigation**:
+   - Methods like `up`, `up(int steps)`, and `document` are used to navigate up the document hierarchy and access the root node.
+
+3. **Error Handling**:
+   - The `assertElementContainsNoOrWhitespaceOnlyTextNodes` method ensures that an element does not contain any non-whitespace text nodes before adding sub-elements.
+
+4. **Serialization**:
+   - Methods like `toWriter`, `asString`, and `elementAsString` are used to serialize the XML document or element to a string or writer.
+
+5. **Namespace Management**:
+   - The `buildDocumentNamespaceContext` method provides a namespace context to help with XPath queries.
+
+The class is designed to be abstract, requiring subclasses to implement the abstract methods that create specific types of nodes (e.g., `elementImpl`, `attributeImpl`). This allows for flexibility in how the XML document is constructed and modified.

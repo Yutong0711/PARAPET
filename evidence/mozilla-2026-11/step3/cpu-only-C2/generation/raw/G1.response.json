@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-690",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "```java\npackage example.config;\n\nimport java.io.IOException;\nimport java.io.StringReader;\nimport java.util.LinkedHashMap;\nimport java.util.Map;\nimport javax.xml.parsers.DocumentBuilder;\nimport javax.xml.parsers.DocumentBuilderFactory;\nimport javax.xml.parsers.ParserConfigurationException;\nimport org.w3c.dom.Document;\nimport org.w3c.dom.Element;\nimport org.w3c.dom.NamedNodeMap;\nimport org.w3c.dom.Node;\nimport org.w3c.dom.NodeList;\nimport org.xml.sax.InputSource;\nimport org.xml.sax.SAXException;\nimport org.xml.sax.helpers.XMLReaderFactory;\n\n/**\n * Loads a service configuration document into a flat key/value map.\n *\n * Tenants upload configuration documents through the admin console. Element\n * paths become keys (\"config.server.port\"), attributes become \"path@name\",\n * and the text of leaf elements is trimmed.\n */\npublic final class ConfigLoader {\n\n    private ConfigLoader() {\n    }\n\n    /** Parses a configuration document. */\n    public static Map<String, String> load(String xml) throws IOException {\n        try {\n            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();\n            factory.setFeature(\"http://apache.org/xml/features/disallow-doctype-decl\", true);\n            factory.setFeature(\"http://xml.org/sax/features/external-general-entities\", false);\n            factory.setFeature(\"http://xml.org/sax/features/external-parameter-entities\", false);\n            factory.setFeature(\"http://apache.org/xml/features/nonvalidating/load-external-dtd\", false);\n            factory.setXIncludeAware(false);\n            factory.setExpandEntityReferences(false);\n            DocumentBuilder builder = factory.newDocumentBuilder();\n            Document doc = builder.parse(new InputSource(new StringReader(xml)));\n            Element root = doc.getDocumentElement();\n            Map<String, String> out = new LinkedHashMap<>();\n            collect(root, root.getTagName(), out);\n            return out;\n        } catch (ParserConfigurationException | SAXException e) {\n            throw new IOException(\"invalid configuration document: \" + e.getMessage(), e);\n        }\n    }\n\n    private static void collect(Element element, String path, Map<String, String> out) {\n        NamedNodeMap attributes = element.getAttributes();\n        for (int i = 0; i < attributes.getLength(); i++) {\n            Node attribute = attributes.item(i);\n            out.put(path + \"@\" + attribute.getNodeName(), attribute.getNodeValue());\n        }\n        boolean hasChildElements = false;\n        NodeList children = element.getChildNodes();\n        for (int i = 0; i < children.getLength(); i++) {\n            Node child = children.item(i);\n            if (child.getNodeType() == Node.ELEMENT_NODE) {\n                hasChildElements = true;\n                Element childElement = (Element) child;\n                collect(childElement, path + \".\" + childElement.getTagName(), out);\n            }\n        }\n        if (!hasChildElements) {\n            out.put(path, element.getTextContent().trim());\n        }\n    }\n}\n```",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1795051804,
+  "model": "qwen2.5-coder:7b-instruct-q4_K_M",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "fp_ollama",
+  "usage": {
+    "completion_tokens": 596,
+    "prompt_tokens": 627,
+    "total_tokens": 1223,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 0
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "patch_id": "G5",
+  "kind": "generated candidate",
+  "source_sha256": "f8edb40d9adfc96fd8cd74261fb25e340d3d6848f618ee4b04ac55825a1712f3",
+  "compile": {
+    "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/classes/target /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java",
+    "ok": false,
+    "duration_s": 0.343,
+    "output": "Command 'javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/classes/target /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java' failed: /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:116: error: cannot find symbol\n    private static class CustomObjectInputFilter implements ObjectInputFilter {\n                                                            ^\n  symbol:   class ObjectInputFilter\n  location: class PrefsCodec\n/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:118: error: cannot find symbol\n        public Status checkInput(FilterInfo filterInfo) {\n                                 ^\n  symbol:   class FilterInfo\n  location: class CustomObjectInputFilter\n/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:118: error: cannot find symbol\n        public Status checkInput(FilterInfo filterInfo) {\n               ^\n  symbol:   class Status\n  location: class CustomObjectInputFilter\n/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:108: error: incompatible types: CustomObjectInputFilter cannot be converted to ObjectInputFilter\n            in.setObjectInputFilter(new CustomObjectInputFilter());\n                                    ^\n/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:117: error: method does not override or implement a method from a supertype\n        @Override\n        ^\n/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:120: error: cannot find symbol\n                return Status.UNDECIDED;\n                       ^\n  symbol:   variable Status\n  location: class CustomObjectInputFilter\n/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:123: error: cannot find symbol\n                return Status.REJECTED;\n                       ^\n  symbol:   variable Status\n  location: class CustomObjectInputFilter\n/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:125: error: cannot find symbol\n            return Status.UNDECIDED;\n                   ^\n  symbol:   variable Status\n  location: class CustomObjectInputFilter\nNote: Some messages have been simplified; recompile with -Xdiags:verbose to get full output\n8 errors"
+  },
+  "harness_compile": {},
+  "checks": {
+    "reproducer": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "heldout1": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "heldout2": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "functional": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "probes": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    }
+  },
+  "claim_level": "L1",
+  "admissible": false,
+  "classes": {
+    "target": "/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/classes/target",
+    "harness": "/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/classes/harness",
+    "support": "/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes"
+  }
+}

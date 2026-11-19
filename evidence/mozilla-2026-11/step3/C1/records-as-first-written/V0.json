@@ -1,0 +1,285 @@
+{
+  "schema": "parapet.hardening-record/1",
+  "case": {
+    "id": "C1",
+    "title": "Preference tokens restored with Java object serialization"
+  },
+  "weakness": {
+    "cwe": "CWE-502",
+    "name": "Deserialization of Untrusted Data"
+  },
+  "patch": {
+    "id": "V0",
+    "kind": "vulnerable (unpatched baseline)",
+    "source_sha256": "26d815f0c645176fe3d994a77bf1208843257dabe844a727a3d7929ed45448b6",
+    "source_path": "parapet/cases/C1/src/example/prefs/PrefsCodec.java"
+  },
+  "mechanism": {
+    "route": "none",
+    "description": "unpatched vulnerable source"
+  },
+  "diff": "",
+  "checks": [
+    {
+      "name": "compile",
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/classes/target /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/src/example/prefs/PrefsCodec.java",
+      "passed": true,
+      "summary": "compiles"
+    },
+    {
+      "name": "reproducer",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/classes/harness harness.c1.Reproducer",
+      "passed": false,
+      "evaluated": true,
+      "summary": "canary fired (GadgetA.readObject)",
+      "result": {
+        "check": "reproducer",
+        "fixture": "reproducer.b64",
+        "fired": true,
+        "fired_by": "GadgetA.readObject",
+        "outcome": "rejected",
+        "exception": "java.lang.ClassCastException: class thirdparty.canary.GadgetA cannot be cast to class example.prefs.PrefsCodec$UserPrefs (thirdparty.canary.GadgetA and example.prefs.PrefsCodec$UserPrefs are in unnamed module of loader 'app')"
+      }
+    },
+    {
+      "name": "heldout1",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/classes/harness harness.c1.HeldOut1",
+      "passed": false,
+      "evaluated": true,
+      "summary": "canary fired (GadgetB.hashCode)",
+      "result": {
+        "check": "heldout1",
+        "fixture": "heldout1.b64",
+        "fired": true,
+        "fired_by": "GadgetB.hashCode",
+        "outcome": "rejected",
+        "exception": "java.lang.ClassCastException: class java.util.HashMap cannot be cast to class example.prefs.PrefsCodec$UserPrefs (java.util.HashMap is in module java.base of loader 'bootstrap'; example.prefs.PrefsCodec$UserPrefs is in unnamed module of loader 'app')"
+      }
+    },
+    {
+      "name": "heldout2",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/classes/harness harness.c1.HeldOut2",
+      "passed": false,
+      "evaluated": true,
+      "summary": "canary fired (GadgetC.readResolve)",
+      "result": {
+        "check": "heldout2",
+        "fixture": "heldout2.b64",
+        "fired": true,
+        "fired_by": "GadgetC.readResolve",
+        "outcome": "accepted",
+        "exception": null
+      }
+    },
+    {
+      "name": "functional",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/classes/harness harness.c1.FunctionalTests",
+      "passed": true,
+      "evaluated": true,
+      "summary": "11/11 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 11,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "roundtrip_typical",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_empty_collections",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_null_theme",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_unicode",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_500_recent_files",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "order_preserved",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "int_extremes",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "token_is_base64_text",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decoded_collections_are_read_only",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decode_rejects_truncated_token",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decode_rejects_non_token_text",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "probes",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/classes/target:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes:/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/V0/classes/harness harness.c1.Probes",
+      "passed": true,
+      "evaluated": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "probe_typical.b64",
+            "status": "accepted",
+            "digest": "3114ad04a5a61b2e",
+            "exception": null
+          },
+          {
+            "probe": "probe_empty.b64",
+            "status": "accepted",
+            "digest": "50ef533edd2673f8",
+            "exception": null
+          },
+          {
+            "probe": "probe_large.b64",
+            "status": "accepted",
+            "digest": "c5ded95ec6d61b17",
+            "exception": null
+          },
+          {
+            "probe": "probe_unicode.b64",
+            "status": "accepted",
+            "digest": "5b9f121b070c77f5",
+            "exception": null
+          },
+          {
+            "probe": "probe_legacy_linkedlist.b64",
+            "status": "accepted",
+            "digest": "3114ad04a5a61b2e",
+            "exception": null
+          },
+          {
+            "probe": "probe_legacy_hashmap.b64",
+            "status": "accepted",
+            "digest": "e988a74108279b23",
+            "exception": null
+          }
+        ]
+      }
+    }
+  ],
+  "claim_level": "L2",
+  "admissible": false,
+  "inputs_now_rejected": {
+    "evaluated": true,
+    "now_rejected": [],
+    "different_result": [],
+    "probes_total": 6
+  },
+  "cost": {
+    "vs_baseline": null,
+    "vs_matched_reference": null,
+    "noise_floor_pct": {
+      "latency_pct": 1.598056263702441,
+      "peak_memory_pct": 2.330756617474816
+    },
+    "raw_samples": {
+      "path": "measurement/raw_samples.jsonl",
+      "sha256": "05f759c3c0e5ad31ecd3f3afffa15374661b833fd486f0880f37ad52581ab975"
+    }
+  },
+  "budgets": [
+    {
+      "profile": "strict",
+      "path": "parapet/budgets/strict.parapet.budget.yaml",
+      "sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+      "caps": {
+        "latency_overhead_pct": 5.0,
+        "peak_memory_overhead_pct": 5.0
+      },
+      "fits": false,
+      "reasons": [
+        "not assessed"
+      ],
+      "recommended_patch": "R2",
+      "this_patch_recommended": false,
+      "claim_level": "L2"
+    },
+    {
+      "profile": "lenient",
+      "path": "parapet/budgets/lenient.parapet.budget.yaml",
+      "sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+      "caps": {
+        "latency_overhead_pct": 25.0,
+        "peak_memory_overhead_pct": 25.0
+      },
+      "fits": false,
+      "reasons": [
+        "not assessed"
+      ],
+      "recommended_patch": "R2",
+      "this_patch_recommended": false,
+      "claim_level": "L2"
+    }
+  ],
+  "generator": {
+    "name": "unpatched original"
+  },
+  "prompt": null,
+  "environment": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "6.6.114.1-microsoft-standard-WSL2",
+    "wsl": true,
+    "cpu": "Intel(R) Core(TM) i9-14900KF",
+    "logical_cpus": 32,
+    "ram_gib": 31.2,
+    "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 610.60",
+    "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "jdk_full": [
+      "openjdk version \"21.0.13.0.3\" 2026-10-24",
+      "OpenJDK Runtime Environment (build 21.0.13.0.3+1-1-26.04.1-Ubuntu)",
+      "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-26.04.1-Ubuntu, mixed mode, sharing)"
+    ],
+    "javac": "javac 21.0.13.0.3",
+    "python": "3.14.4",
+    "python_packages": {
+      "numpy": "2.5.5",
+      "openai": "2.54.0"
+    },
+    "loadavg": [
+      0.83642578125,
+      1.1953125,
+      0.76416015625
+    ],
+    "cwd_is_linux_fs": false
+  },
+  "reproduce": "python -m parapet run --case C1 --budget parapet/budgets/strict.parapet.budget.yaml --budget parapet/budgets/lenient.parapet.budget.yaml --no-generator",
+  "repo": {
+    "commit": "5eefe0c1d143f2d71d014aadf8b696f6fb1b1a01",
+    "branch": "mozilla/local-slice",
+    "dirty_outside_evidence": [
+      "M evidence/DEVIATIONS.md"
+    ]
+  }
+}

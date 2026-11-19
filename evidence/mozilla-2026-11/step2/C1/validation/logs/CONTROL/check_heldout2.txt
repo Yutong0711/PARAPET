@@ -1,0 +1,2 @@
+$ java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/CONTROL/classes/target:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/support-classes:/home/yzhao/parapet-work/runs/step2-C1-20261118T170907/patches/CONTROL/classes/harness harness.c1.HeldOut2
+PARAPET_RESULT {"check":"heldout2","fixture":"heldout2.b64","fired":true,"fired_by":"GadgetC.readResolve","outcome":"accepted","exception":null}

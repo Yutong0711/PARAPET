@@ -1,0 +1,377 @@
+{
+  "schema": "parapet.hardening-record/1",
+  "case": {
+    "id": "C2",
+    "title": "Tenant configuration documents parsed with a default DOM parser"
+  },
+  "weakness": {
+    "cwe": "CWE-611",
+    "name": "Improper Restriction of XML External Entity Reference"
+  },
+  "patch": {
+    "id": "G3",
+    "kind": "generated candidate",
+    "source_sha256": "cacf446cc6ded4204c583e6fab33a11514066576b231205cf8bd2f527098b680",
+    "source_path": "out/generation/extracted/G3/ConfigLoader.java"
+  },
+  "mechanism": {
+    "route": "same mechanism as R1 (narrowed behavior), by the pre-registered rule",
+    "description": "matched reference: R1 — reject any DOCTYPE declaration (disallow-doctype-decl) plus FEATURE_SECURE_PROCESSING",
+    "matched_reference": "R1"
+  },
+  "diff": "--- a/example/config/ConfigLoader.java\n+++ b/example/config/ConfigLoader.java\n@@ -31,6 +31,12 @@\n     public static Map<String, String> load(String xml) throws IOException {\n         try {\n             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();\n+            factory.setFeature(\"http://apache.org/xml/features/disallow-doctype-decl\", true);\n+            factory.setFeature(\"http://xml.org/sax/features/external-general-entities\", false);\n+            factory.setFeature(\"http://xml.org/sax/features/external-parameter-entities\", false);\n+            factory.setFeature(\"http://apache.org/xml/features/nonvalidating/load-external-dtd\", false);\n+            factory.setXIncludeAware(false);\n+            factory.setExpandEntityReferences(false);\n             DocumentBuilder builder = factory.newDocumentBuilder();\n             Document doc = builder.parse(new InputSource(new StringReader(xml)));\n             Element root = doc.getDocumentElement();\n",
+  "checks": [
+    {
+      "name": "compile",
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/classes/target /home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/src/example/config/ConfigLoader.java",
+      "passed": true,
+      "summary": "compiles"
+    },
+    {
+      "name": "reproducer",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/classes/target:/home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/classes/harness harness.c2.Reproducer",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "reproducer",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    },
+    {
+      "name": "heldout1",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/classes/target:/home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/classes/harness harness.c2.HeldOut1",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout1",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    },
+    {
+      "name": "heldout2",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/classes/target:/home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/classes/harness harness.c2.HeldOut2",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout2",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    },
+    {
+      "name": "functional",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/classes/target:/home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/classes/harness harness.c2.FunctionalTests",
+      "passed": true,
+      "evaluated": true,
+      "summary": "11/11 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 11,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "nested_elements",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "attributes",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "comments_ignored",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "cdata_section",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "predefined_and_char_refs",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "whitespace_trimmed",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "unicode_text",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "xml_declaration",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "document_order_preserved",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "workload_document",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "malformed_rejected_with_ioexception",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "probes",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/classes/target:/home/yzhao/parapet-work/runs/step3v2-C2-20261118T174928/patches/G3/classes/harness harness.c2.Probes",
+      "passed": true,
+      "evaluated": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "typical_no_doctype",
+            "status": "accepted",
+            "digest": "3149f0242a7d87c8",
+            "exception": null
+          },
+          {
+            "probe": "comments_cdata_charrefs",
+            "status": "accepted",
+            "digest": "c509f25f81f99611",
+            "exception": null
+          },
+          {
+            "probe": "doctype_without_subset",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          },
+          {
+            "probe": "internal_entity",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          },
+          {
+            "probe": "internal_default_attribute",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          },
+          {
+            "probe": "external_dtd_benign_local",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          }
+        ]
+      }
+    }
+  ],
+  "claim_level": "L4",
+  "admissible": true,
+  "inputs_now_rejected": {
+    "evaluated": true,
+    "now_rejected": [
+      {
+        "probe": "doctype_without_subset",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "internal_entity",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "internal_default_attribute",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      },
+      {
+        "probe": "external_dtd_benign_local",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    ],
+    "different_result": [],
+    "probes_total": 6
+  },
+  "cost": {
+    "vs_baseline": {
+      "vs": "baseline",
+      "latency": {
+        "ratio": 1.3592252241447167,
+        "ratio_lo": 1.3357915496183665,
+        "ratio_hi": 1.4108994405769626,
+        "overhead_pct": 35.92252241447167,
+        "overhead_pct_lo": 33.57915496183666,
+        "overhead_pct_hi": 41.08994405769626,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": false
+      },
+      "peak_memory": {
+        "ratio": 0.995657861269576,
+        "ratio_lo": 0.957858851247635,
+        "ratio_hi": 1.0203117619272555,
+        "overhead_pct": -0.43421387304239945,
+        "overhead_pct_lo": -4.214114875236497,
+        "overhead_pct_hi": 2.031176192725548,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": true
+      }
+    },
+    "vs_matched_reference": {
+      "vs": "R1",
+      "latency": {
+        "ratio": 1.2244254185525831,
+        "ratio_lo": 1.1771987762147058,
+        "ratio_hi": 1.2751687648020549,
+        "overhead_pct": 22.442541855258312,
+        "overhead_pct_lo": 17.71987762147058,
+        "overhead_pct_hi": 27.51687648020549,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": false
+      },
+      "peak_memory": {
+        "ratio": 0.958915854490735,
+        "ratio_lo": 0.9275455001123459,
+        "ratio_hi": 0.9927391938088888,
+        "overhead_pct": -4.108414550926498,
+        "overhead_pct_lo": -7.245449988765406,
+        "overhead_pct_hi": -0.7260806191111246,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": true
+      }
+    },
+    "noise_floor_pct": {
+      "latency_pct": 2.994209558491323,
+      "peak_memory_pct": 4.834919349258615
+    },
+    "raw_samples": {
+      "path": "measurement/raw_samples.jsonl",
+      "sha256": "cef73943453a11b46f1ec73dcef7ae2ea599fa881d57b755cd6098796a223384"
+    }
+  },
+  "budgets": [
+    {
+      "profile": "strict",
+      "path": "parapet/budgets/strict.parapet.budget.yaml",
+      "sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+      "caps": {
+        "latency_overhead_pct": 5.0,
+        "peak_memory_overhead_pct": 5.0
+      },
+      "fits": false,
+      "reasons": [
+        "latency overhead upper bound 41.09% > cap 5.0%"
+      ],
+      "recommended_patch": "R2",
+      "this_patch_recommended": false,
+      "claim_level": "L4"
+    },
+    {
+      "profile": "lenient",
+      "path": "parapet/budgets/lenient.parapet.budget.yaml",
+      "sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+      "caps": {
+        "latency_overhead_pct": 25.0,
+        "peak_memory_overhead_pct": 25.0
+      },
+      "fits": false,
+      "reasons": [
+        "latency overhead upper bound 41.09% > cap 25.0%"
+      ],
+      "recommended_patch": "R2",
+      "this_patch_recommended": false,
+      "claim_level": "L4"
+    }
+  ],
+  "generator": {
+    "name": "qwen2.5-coder:7b-instruct-q4_K_M",
+    "product_name": "parapet-local-qwen2.5-coder-7b-instruct",
+    "digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+    "serving": "Ollama 0.40.16 (OpenAI-compatible /v1/chat/completions)",
+    "seed": 103,
+    "wall_s": 4.058,
+    "prompt_tokens": 627,
+    "completion_tokens": 587,
+    "raw_output": "generation/raw/G3.txt",
+    "raw_sha256": "d73163d4d23adb2d23a8375a0a68df07d82c9f9a3f90bc1db7e09eb7cd1269e4",
+    "extraction": "fenced code block #1 (java) declaring class ConfigLoader"
+  },
+  "prompt": {
+    "template": "parapet/prompts/harden_v1.txt",
+    "template_sha256": "d5b3c33c4650e1a53437ad477bd4031896f35b4b33193efb946968f8ed90edbc",
+    "prompt_sha256": "48823d42342e244db8b00af2bff2c0b45a45f62f67066165c71ce0824710bed9",
+    "inputs": {
+      "source_file": "parapet/cases/C2/src/example/config/ConfigLoader.java",
+      "cwe_id": "CWE-611",
+      "cwe_name": "Improper Restriction of XML External Entity Reference"
+    }
+  },
+  "environment": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "6.6.114.1-microsoft-standard-WSL2",
+    "wsl": true,
+    "cpu": "Intel(R) Core(TM) i9-14900KF",
+    "logical_cpus": 32,
+    "ram_gib": 31.2,
+    "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 610.60",
+    "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "jdk_full": [
+      "openjdk version \"21.0.13.0.3\" 2026-10-24",
+      "OpenJDK Runtime Environment (build 21.0.13.0.3+1-1-26.04.1-Ubuntu)",
+      "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-26.04.1-Ubuntu, mixed mode, sharing)"
+    ],
+    "javac": "javac 21.0.13.0.3",
+    "python": "3.14.4",
+    "python_packages": {
+      "numpy": "2.5.5",
+      "openai": "2.54.0"
+    },
+    "loadavg": [
+      1.37744140625,
+      1.83642578125,
+      2.7216796875
+    ],
+    "cwd_is_linux_fs": false
+  },
+  "reproduce": "python -m parapet run --case C2 --budget parapet/budgets/strict.parapet.budget.yaml --budget parapet/budgets/lenient.parapet.budget.yaml --candidates-from <this run>/generation   # re-validate and re-measure the saved candidates\npython -m parapet run --case C2 --budget parapet/budgets/strict.parapet.budget.yaml --budget parapet/budgets/lenient.parapet.budget.yaml   # regenerate (sampling may differ)",
+  "repo": {
+    "commit": "a137f02c4678bde5889045623cbff42e007829a2",
+    "branch": "mozilla/local-slice",
+    "dirty_outside_evidence": []
+  }
+}

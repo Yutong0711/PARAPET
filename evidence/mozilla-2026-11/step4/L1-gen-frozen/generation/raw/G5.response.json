@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-454",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "This is a Java abstract class `BaseXMLBuilder` designed for building XML documents. It provides various methods to manipulate and construct an XML document using a fluent interface. Here's a breakdown of some key functionalities and methods:\n\n1. **Adding Content**:\n   - `cdata(String data)`: Adds CDATA content.\n   - `data(String data)`: Synonyms for `cdata`.\n   - `d(String data)`: Synonyms for `cdata`.\n   - `cdata(byte[] data)`: Adds Base64-encoded byte data as CDATA.\n   - `data(byte[] data)`: Synonyms for `cdata`.\n   - `d(byte[] data)`: Synonyms for `cdata`.\n\n2. **Adding Special XML Nodes**:\n   - `comment(String comment)`: Adds a comment.\n   - `cmnt(String comment)`: Synonym for `comment`.\n   - `c(String comment)`: Synonym for `comment`.\n   - `instruction(String target, String data)`: Adds an XML processing instruction.\n   - `inst(String target, String data)`: Synonym for `instruction`.\n   - `i(String target, String data)`: Synonym for `instruction`.\n\n3. **Manipulating the Document Structure**:\n   - `insertInstruction(String target, String data)`: Inserts an instruction before the current node.\n   - `reference(String name)`: Adds an entity reference.\n   - `ns(String prefix, String namespaceURI)`: Synonym for `namespace`.\n   - `ns(String namespaceURI)`: Synonym for `namespace`.\n   - `up(int steps)`: Returns the nth ancestor node.\n   - `up()`: Returns the parent node.\n   - `document()`: Returns the root document node.\n\n4. **Namespace Management**:\n   - `namespace(String prefix, String namespaceURI)`: Adds a namespace attribute.\n   - `namespace(String namespaceURI)`: Adds a default namespace attribute.\n\n5. **Serialization**:\n   - `toWriter(boolean wholeDocument, Writer writer, Properties outputProperties)`: Serializes the document to a writer.\n   - `toString()`: Serializes the document to a string without the XML declaration.\n\n6. **Utility Methods**:\n   - `upImpl(int steps)`: Internal method to navigate up the document tree.\n   - `assertElementContainsNoOrWhitespaceOnlyTextNodes(Node anXmlElement)`: Ensures an element does not contain non-whitespace text nodes.\n\nThis class is intended to be extended to provide specific implementations for different types of XML documents, such as SOAP, RSS, or custom XML structures. The fluent interface allows for chaining method calls, making it easy to construct complex XML documents in a readable and concise manner.",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1795054598,
+  "model": "qwen2.5-coder:7b-instruct-q4_K_M",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "fp_ollama",
+  "usage": {
+    "completion_tokens": 559,
+    "prompt_tokens": 4098,
+    "total_tokens": 4657,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 4097
+    }
+  }
+}

@@ -1,0 +1,12 @@
+# PARAPET service budget -- lenient profile.
+# Declared before any measurement (see the "prereg:" commit).
+version: 1
+profile: lenient
+workload: legitimate-path
+caps:
+  latency_overhead_pct: 25.0
+  peak_memory_overhead_pct: 25.0
+description: >-
+  Security hardening may add at most 25% latency and at most 25% peak memory
+  on the legitimate-path workload, judged on the upper end of the 95%
+  bootstrap interval.

@@ -1,0 +1,2 @@
+$ java -cp /home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/CONTROL/classes/target:/home/yzhao/parapet-work/runs/step2-C2-20261118T171144/patches/CONTROL/classes/harness harness.c2.HeldOut2
+PARAPET_RESULT {"check":"heldout2","fired":true,"fired_by":"result:config.name","outcome":"accepted","exception":null}

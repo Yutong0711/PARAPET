@@ -1,0 +1,58 @@
+# PARAPET case C2 -- pre-registered definition. Paths are relative to this directory.
+id: C2
+title: Tenant configuration documents parsed with a default DOM parser
+cwe:
+  id: CWE-611
+  name: Improper Restriction of XML External Entity Reference
+language: java
+java_release: 17
+
+# The ONLY file the prompt builder reads.
+target:
+  src_root: src
+  path: example/config/ConfigLoader.java
+
+harness:
+  sourcepath: harness
+  support_root: null
+  support_sources: []
+  fixtures: null          # payload files are written per check into a fresh temp directory
+
+checks:
+  reproducer: harness.c2.Reproducer   # internal-subset general entity, SYSTEM identifier
+  heldout1: harness.c2.HeldOut1       # entity declared in an external DTD subset named by DOCTYPE SYSTEM
+  heldout2: harness.c2.HeldOut2       # internal-subset general entity, PUBLIC identifier
+  functional: harness.c2.FunctionalTests
+  probes: harness.c2.Probes
+
+workload:
+  name: legitimate-path
+  main: harness.c2.Workload
+  description: load a ~7 KB tenant configuration document (no DOCTYPE)
+  ops_per_round: 600
+
+references:
+  R1:
+    path: reference/R1/example/config/ConfigLoader.java
+    route: narrowed behavior
+    mechanism: reject any DOCTYPE declaration (disallow-doctype-decl) plus FEATURE_SECURE_PROCESSING
+    guidance:
+      - "OWASP XML External Entity Prevention Cheat Sheet, Java, DocumentBuilderFactory (DOM): 'reject DOCTYPE declarations and leave XInclude disabled' (setFeature disallow-doctype-decl true; FEATURE_SECURE_PROCESSING true). https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html"
+  R2:
+    path: reference/R2/example/config/ConfigLoader.java
+    route: added work on the call path
+    mechanism: EntityResolver that refuses every external entity and external DTD subset; internal DTD subsets still processed; FEATURE_SECURE_PROCESSING
+    guidance:
+      - "OWASP XML External Entity Prevention Cheat Sheet, Java, 'Other providers and required DTDs': 'If internal DTDs are required, install an EntityResolver on the DOM builder or SAX reader that throws SAXException for external references.' and 'enable FEATURE_SECURE_PROCESSING where supported'. https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html"
+      - "SEI CERT Oracle Coding Standard for Java, IDS17-J. Prevent XML External Entity Attacks, 'Compliant Solution (EntityResolver)'. https://wiki.sei.cmu.edu/confluence/display/java/IDS17-J.+Prevent+XML+External+Entity+Attacks"
+
+control:
+  path: reference/CONTROL/example/config/ConfigLoader.java
+  description: regex denylist for the reproducer's shape (<!ENTITY name SYSTEM ...) only
+
+mechanism_match:
+  - ref: R1
+    any_of: ['disallow-doctype-decl"\s*,\s*true']
+  - ref: R2
+    any_of: ['setEntityResolver\s*\(']
+  - ref: R1

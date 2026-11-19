@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-539",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "This is a Java class that provides methods for building and manipulating XML documents using the Document Object Model (DOM). The class defines a builder pattern for constructing XML elements and attributes, and includes methods for adding text nodes, CDATA sections, comments, processing instructions, and entity references. It also includes methods for navigating the XML document, such as moving up the ancestor chain, and for serializing the document to a string or writer.\nThe class uses the `javax.xml.transform` package to serialize the XML document to a string or writer. The `TransformerFactory` and `Transformer` classes are used to apply output properties to the serializer. The class also uses the `javax.xml.namespace` package to handle XML namespace attributes.\nOverall, this class provides a convenient and flexible way to build and manipulate XML documents in Java.",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1795054590,
+  "model": "qwen2.5-coder:7b-instruct-q4_K_M",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "fp_ollama",
+  "usage": {
+    "completion_tokens": 164,
+    "prompt_tokens": 4098,
+    "total_tokens": 4262,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 4097
+    }
+  }
+}

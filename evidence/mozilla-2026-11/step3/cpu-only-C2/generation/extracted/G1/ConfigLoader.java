@@ -1,0 +1,72 @@
+package example.config;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.XMLReaderFactory;
+
+/**
+ * Loads a service configuration document into a flat key/value map.
+ *
+ * Tenants upload configuration documents through the admin console. Element
+ * paths become keys ("config.server.port"), attributes become "path@name",
+ * and the text of leaf elements is trimmed.
+ */
+public final class ConfigLoader {
+
+    private ConfigLoader() {
+    }
+
+    /** Parses a configuration document. */
+    public static Map<String, String> load(String xml) throws IOException {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            factory.setXIncludeAware(false);
+            factory.setExpandEntityReferences(false);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new InputSource(new StringReader(xml)));
+            Element root = doc.getDocumentElement();
+            Map<String, String> out = new LinkedHashMap<>();
+            collect(root, root.getTagName(), out);
+            return out;
+        } catch (ParserConfigurationException | SAXException e) {
+            throw new IOException("invalid configuration document: " + e.getMessage(), e);
+        }
+    }
+
+    private static void collect(Element element, String path, Map<String, String> out) {
+        NamedNodeMap attributes = element.getAttributes();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            Node attribute = attributes.item(i);
+            out.put(path + "@" + attribute.getNodeName(), attribute.getNodeValue());
+        }
+        boolean hasChildElements = false;
+        NodeList children = element.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                hasChildElements = true;
+                Element childElement = (Element) child;
+                collect(childElement, path + "." + childElement.getTagName(), out);
+            }
+        }
+        if (!hasChildElements) {
+            out.put(path, element.getTextContent().trim());
+        }
+    }
+}

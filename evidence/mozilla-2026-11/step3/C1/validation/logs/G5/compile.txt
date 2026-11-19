@@ -1,0 +1,39 @@
+$ javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/classes/target /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java
+Command 'javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/classes/target /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java' failed: /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:116: error: cannot find symbol
+    private static class CustomObjectInputFilter implements ObjectInputFilter {
+                                                            ^
+  symbol:   class ObjectInputFilter
+  location: class PrefsCodec
+/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:118: error: cannot find symbol
+        public Status checkInput(FilterInfo filterInfo) {
+                                 ^
+  symbol:   class FilterInfo
+  location: class CustomObjectInputFilter
+/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:118: error: cannot find symbol
+        public Status checkInput(FilterInfo filterInfo) {
+               ^
+  symbol:   class Status
+  location: class CustomObjectInputFilter
+/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:108: error: incompatible types: CustomObjectInputFilter cannot be converted to ObjectInputFilter
+            in.setObjectInputFilter(new CustomObjectInputFilter());
+                                    ^
+/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:117: error: method does not override or implement a method from a supertype
+        @Override
+        ^
+/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:120: error: cannot find symbol
+                return Status.UNDECIDED;
+                       ^
+  symbol:   variable Status
+  location: class CustomObjectInputFilter
+/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:123: error: cannot find symbol
+                return Status.REJECTED;
+                       ^
+  symbol:   variable Status
+  location: class CustomObjectInputFilter
+/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G5/src/example/prefs/PrefsCodec.java:125: error: cannot find symbol
+            return Status.UNDECIDED;
+                   ^
+  symbol:   variable Status
+  location: class CustomObjectInputFilter
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+8 errors

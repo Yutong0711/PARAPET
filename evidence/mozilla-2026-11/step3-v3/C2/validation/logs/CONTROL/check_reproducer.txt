@@ -1,0 +1,2 @@
+$ java -cp /home/yzhao/parapet-work/runs/step3v3-C2-20261118T190755/patches/CONTROL/classes/target:/home/yzhao/parapet-work/runs/step3v3-C2-20261118T190755/patches/CONTROL/classes/harness harness.c2.Reproducer
+PARAPET_RESULT {"check":"reproducer","fired":false,"fired_by":null,"outcome":"rejected","exception":"java.io.IOException: external entities are not allowed"}

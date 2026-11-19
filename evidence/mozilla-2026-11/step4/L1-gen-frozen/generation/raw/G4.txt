@@ -1,0 +1,33 @@
+This is a Java interface and abstract class `BaseXMLBuilder` which provides a fluent API for building XML documents. It allows you to add various types of nodes (elements, attributes, text, CDATA, etc.) to an XML document in a builder pattern manner. Here's a breakdown of some key features and methods:
+
+1. **Abstract Methods for Adding Content:**
+   - `cdata(String data)`: Adds a CDATA section with the given string data.
+   - `cdata(byte[] data)`: Adds a CDATA section with Base64-encoded byte data.
+   - `comment(String comment)`: Adds a comment node.
+   - `instruction(String target, String data)`: Adds an XML processing instruction.
+   - `reference(String name)`: Adds an entity reference.
+   - `namespace(String prefix, String namespaceURI)`: Adds a namespace declaration.
+
+2. **Synonyms for Abstract Methods:**
+   - The interface provides synonyms like `data`, `d`, `c`, `inst`, `i`, `insertInstruction`, `ref`, `r`, `ns`, and `c` for each abstract method to provide alternative spellings.
+
+3. **Methods for Navigating the Document:**
+   - `up(int steps)`: Moves up the document hierarchy by the specified number of levels.
+   - `up()`: A shorthand for moving up one level.
+   - `document()`: Returns the root document node.
+
+4. **Utility Methods:**
+   - `assertElementContainsNoOrWhitespaceOnlyTextNodes(Node anXmlElement)`: Ensures that an element does not contain non-whitespace text nodes.
+   - `toWriter(boolean wholeDocument, Writer writer, Properties outputProperties)`: Serializes the document or a specific element to a writer.
+   - `asString(Properties outputProperties)`: Serializes the document or a specific element to a string.
+   - `buildDocumentNamespaceContext()`: Creates a namespace context for the document.
+
+5. **Protected Methods:**
+   - `insertInstructionImpl(String target, String data)`: Implementations to insert a processing instruction.
+   - `referenceImpl(String name)`: Implementations to add an entity reference.
+   - `namespaceImpl(String prefix, String namespaceURI)`: Implementations to add a namespace declaration.
+
+6. **Protected Methods for Internal Use:**
+   - `upImpl(int steps)`: Internal method to navigate up the document hierarchy.
+
+This interface and class design allows for a flexible and intuitive way to construct and manipulate XML documents, making it easier to work with XML data programmatically in Java applications.

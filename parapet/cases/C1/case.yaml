@@ -1,0 +1,64 @@
+# PARAPET case C1 -- pre-registered definition. Paths are relative to this directory.
+id: C1
+title: Preference tokens restored with Java object serialization
+cwe:
+  id: CWE-502
+  name: Deserialization of Untrusted Data
+language: java
+java_release: 17
+
+# The ONLY file the prompt builder reads.
+target:
+  src_root: src
+  path: example/prefs/PrefsCodec.java
+
+harness:
+  sourcepath: harness
+  # Compiled once per run, independently of any patch. Simulates gadget
+  # classes from a third-party dependency on the application classpath.
+  support_root: support
+  support_sources: [thirdparty/canary/Canary.java, thirdparty/canary/GadgetA.java,
+                    thirdparty/canary/GadgetB.java, thirdparty/canary/GadgetC.java]
+  fixtures: fixtures      # built once from the ORIGINAL source by harness.c1.MakeFixtures
+
+checks:
+  reproducer: harness.c1.Reproducer   # GadgetA (readObject side effect) as the whole token
+  heldout1: harness.c1.HeldOut1       # GadgetB as a HashMap key (hashCode side effect on rehash)
+  heldout2: harness.c1.HeldOut2       # GadgetC (readResolve side effect) nested in a legitimate UserPrefs
+  functional: harness.c1.FunctionalTests
+  probes: harness.c1.Probes
+
+workload:
+  name: legitimate-path
+  main: harness.c1.Workload
+  description: session save/restore round trip (encode then decode) of typical preferences
+  ops_per_round: 4000
+
+references:
+  R1:
+    path: reference/R1/example/prefs/PrefsCodec.java
+    route: added work on the call path
+    mechanism: per-stream JEP 290 serialization filter (class allowlist plus graph and size limits)
+    guidance:
+      - "OWASP Deserialization Cheat Sheet, Java: 'Configure serialization filters with an application-specific class allowlist and resource limits before reading objects.' https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html"
+      - "Oracle, Secure Coding Guidelines for Java SE, Guideline 8-6 / SERIAL-6: Filter untrusted serial data. https://www.oracle.com/java/technologies/javase/seccodeguide.html"
+      - "Oracle, Java SE 21 Core Libraries, Serialization Filtering (allow-lists, pattern-based filters). https://docs.oracle.com/en/java/javase/21/core/serialization-filtering1.html"
+  R2:
+    path: reference/R2/example/prefs/PrefsCodec.java
+    route: substituted mechanism
+    mechanism: explicit data-only token format read field by field (no object deserialization)
+    guidance:
+      - "OWASP Deserialization Cheat Sheet, 'Using Alternative Data Formats': 'A great reduction of risk is achieved by avoiding native (de)serialization formats. By switching to a pure data format like JSON or XML ...' https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html"
+      - "Oracle, Secure Coding Guidelines for Java SE, Section 8: 'Deserialization of untrusted data is inherently dangerous and should be avoided.' https://www.oracle.com/java/technologies/javase/seccodeguide.html"
+
+control:
+  path: reference/CONTROL/example/prefs/PrefsCodec.java
+  description: denylists only the class named in the reported reproducer (GadgetA)
+
+# Deterministic rule that maps a candidate to the reference fix with the same
+# mechanism (for model-induced cost). First matching rule wins; regexes are
+# searched in the candidate source. The last rule is the default (R1).
+mechanism_match:
+  - ref: R2
+    none_of: ['new\s+ObjectInputStream', 'extends\s+ObjectInputStream', 'ObjectInputStream\s*\(']
+  - ref: R1

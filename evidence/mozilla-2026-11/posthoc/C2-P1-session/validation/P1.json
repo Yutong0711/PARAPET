@@ -1,0 +1,232 @@
+{
+  "patch_id": "P1",
+  "kind": "post-hoc hand-written arm, designed after seeing results",
+  "source_sha256": "b56bc0d98dacd765ca9e3a20d25a34dc991b70fc1120293f3fb7f6b63760f2dd",
+  "patched_files": [
+    "example/config/ConfigLoader.java"
+  ],
+  "compile": {
+    "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/src/example/config/ConfigLoader.java",
+    "ok": true,
+    "duration_s": 0.35,
+    "output": ""
+  },
+  "harness_compile": {
+    "reproducer": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/Reproducer.java'",
+      "ok": true,
+      "duration_s": 0.461,
+      "output": ""
+    },
+    "heldout1": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/HeldOut1.java'",
+      "ok": true,
+      "duration_s": 0.501,
+      "output": ""
+    },
+    "heldout2": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/HeldOut2.java'",
+      "ok": true,
+      "duration_s": 0.533,
+      "output": ""
+    },
+    "functional": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/FunctionalTests.java'",
+      "ok": true,
+      "duration_s": 0.484,
+      "output": ""
+    },
+    "probes": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/Probes.java'",
+      "ok": true,
+      "duration_s": 0.499,
+      "output": ""
+    },
+    "workload": {
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target -sourcepath '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness' '/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C2/harness/harness/c2/Workload.java'",
+      "ok": true,
+      "duration_s": 0.45,
+      "output": ""
+    }
+  },
+  "checks": {
+    "reproducer": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target:/home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness harness.c2.Reproducer",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.064,
+      "evaluated": true,
+      "passed": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "reproducer",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    },
+    "heldout1": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target:/home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness harness.c2.HeldOut1",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.065,
+      "evaluated": true,
+      "passed": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout1",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    },
+    "heldout2": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target:/home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness harness.c2.HeldOut2",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.067,
+      "evaluated": true,
+      "passed": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout2",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+      }
+    },
+    "functional": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target:/home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness harness.c2.FunctionalTests",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.082,
+      "evaluated": true,
+      "passed": true,
+      "summary": "11/11 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 11,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "nested_elements",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "attributes",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "comments_ignored",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "cdata_section",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "predefined_and_char_refs",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "whitespace_trimmed",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "unicode_text",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "xml_declaration",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "document_order_preserved",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "workload_document",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "malformed_rejected_with_ioexception",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    "probes": {
+      "command": "java -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target:/home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness harness.c2.Probes",
+      "exit_ok": true,
+      "timed_out": false,
+      "duration_s": 0.141,
+      "evaluated": true,
+      "passed": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "typical_no_doctype",
+            "status": "accepted",
+            "digest": "3149f0242a7d87c8",
+            "exception": null
+          },
+          {
+            "probe": "comments_cdata_charrefs",
+            "status": "accepted",
+            "digest": "c509f25f81f99611",
+            "exception": null
+          },
+          {
+            "probe": "doctype_without_subset",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          },
+          {
+            "probe": "internal_entity",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          },
+          {
+            "probe": "internal_default_attribute",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          },
+          {
+            "probe": "external_dtd_benign_local",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."
+          }
+        ]
+      }
+    }
+  },
+  "claim_level": "L4",
+  "admissible": true,
+  "classes": {
+    "target": "/home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/target",
+    "harness": "/home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/P1/classes/harness",
+    "support": null,
+    "jars": []
+  },
+  "workload_ready": true
+}

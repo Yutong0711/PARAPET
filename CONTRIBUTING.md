@@ -110,6 +110,7 @@ hosted CI runner from this checkout:
 | PerfOrch Go / Rust / C++ backends | need Go with `goimports`, a Cargo toolchain, and `g++` with OpenSSL | those toolchains on the runner; only their pure transformations are unit-tested |
 | PerfOrch profiling (`refine_test`) | needs the `cmdbench` package and a quiesced host | `cmdbench`, plus a dedicated machine — timing on a shared runner is not trustworthy |
 | PerfOrch LLM calls | need paid model APIs | provider credentials, which CI deliberately does not have |
+| PARAPET generation and workload measurement (`python -m parapet run`) | need a local model server (Ollama with the model pulled) and a quiet host; timing on a shared runner is not trustworthy | Ollama with `qwen2.5-coder:7b-instruct-q4_K_M` on loopback, a JDK, and a dedicated machine; see `parapet/README.md` |
 | Upstream vendored test suites (hmmlearn, PEFT, MIMIR) | need compiled C extensions, torch, and model downloads | the full upstream build and data for each |
 
 If you add coverage for any of these, update this table and the corresponding

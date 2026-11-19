@@ -1,0 +1,21 @@
+{
+  "tag": "qwen2.5-coder:7b-instruct-q4_K_M",
+  "manifest_digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+  "size_bytes": 4683087561,
+  "details": {
+    "parent_model": "",
+    "format": "gguf",
+    "family": "qwen2",
+    "families": [
+      "qwen2"
+    ],
+    "parameter_size": "7.6B",
+    "quantization_level": "Q4_K_M"
+  },
+  "parameter_count": 7615616512,
+  "architecture": "qwen2",
+  "context_length_trained": 32768,
+  "license_head": "\n                                 Apache License\n                           Version 2.0, January 2004\n                        http://www.apache.org/licenses/\n\n   TERMS AND CONDITIONS FOR USE, REPRODUC",
+  "server_version": "0.40.16",
+  "serving": "Ollama 0.40.16 (OpenAI-compatible /v1/chat/completions)"
+}

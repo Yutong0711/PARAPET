@@ -1,0 +1,185 @@
+{
+  "schema": "parapet.hardening-record/1",
+  "case": {
+    "id": "C1",
+    "title": "Preference tokens restored with Java object serialization"
+  },
+  "weakness": {
+    "cwe": "CWE-502",
+    "name": "Deserialization of Untrusted Data"
+  },
+  "patch": {
+    "id": "G4",
+    "kind": "generated candidate",
+    "source_sha256": "4b8231873f6fce9f56521afbc24bdcab4d97c8e7c09da850fc7c868034e5afe0",
+    "source_path": "generation/extracted/G4/PrefsCodec.java"
+  },
+  "mechanism": {
+    "route": "same mechanism as R1 (added work on the call path), by the pre-registered rule",
+    "description": "matched reference: R1 — per-stream JEP 290 serialization filter (class allowlist plus graph and size limits)",
+    "matched_reference": "R1"
+  },
+  "diff": "--- a/example/prefs/PrefsCodec.java\n+++ b/example/prefs/PrefsCodec.java\n@@ -7,7 +7,6 @@\n import java.io.ObjectOutputStream;\n import java.io.Serializable;\n import java.util.ArrayList;\n-import java.util.Base64;\n import java.util.Collections;\n import java.util.LinkedHashMap;\n import java.util.List;\n@@ -105,6 +104,7 @@\n     public static UserPrefs decode(String token) throws IOException {\n         byte[] data = Base64.getDecoder().decode(token);\n         try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(data))) {\n+            // Custom deserialization filter\n             return (UserPrefs) in.readObject();\n         } catch (ClassNotFoundException e) {\n             throw new IOException(\"unknown class in preferences token\", e);\n",
+  "checks": [
+    {
+      "name": "compile",
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G4/classes/target /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G4/src/example/prefs/PrefsCodec.java",
+      "passed": false,
+      "summary": "does not compile"
+    },
+    {
+      "name": "reproducer",
+      "command": null,
+      "passed": false,
+      "evaluated": false,
+      "summary": "not run: patch does not compile",
+      "result": null
+    },
+    {
+      "name": "heldout1",
+      "command": null,
+      "passed": false,
+      "evaluated": false,
+      "summary": "not run: patch does not compile",
+      "result": null
+    },
+    {
+      "name": "heldout2",
+      "command": null,
+      "passed": false,
+      "evaluated": false,
+      "summary": "not run: patch does not compile",
+      "result": null
+    },
+    {
+      "name": "functional",
+      "command": null,
+      "passed": false,
+      "evaluated": false,
+      "summary": "not run: patch does not compile",
+      "result": null
+    },
+    {
+      "name": "probes",
+      "command": null,
+      "passed": false,
+      "evaluated": false,
+      "summary": "not run: patch does not compile",
+      "result": null
+    }
+  ],
+  "claim_level": "L1",
+  "admissible": false,
+  "inputs_now_rejected": {
+    "evaluated": false,
+    "now_rejected": [],
+    "different_result": [],
+    "note": "probes not evaluated for this patch"
+  },
+  "cost": {
+    "vs_baseline": null,
+    "vs_matched_reference": null,
+    "noise_floor_pct": {
+      "latency_pct": 1.598056263702441,
+      "peak_memory_pct": 2.330756617474816
+    },
+    "raw_samples": null
+  },
+  "budgets": [
+    {
+      "profile": "strict",
+      "path": "parapet/budgets/strict.parapet.budget.yaml",
+      "sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+      "caps": {
+        "latency_overhead_pct": 5.0,
+        "peak_memory_overhead_pct": 5.0
+      },
+      "fits": false,
+      "reasons": [
+        "not assessed"
+      ],
+      "recommended_patch": "R2",
+      "this_patch_recommended": false,
+      "claim_level": "L1"
+    },
+    {
+      "profile": "lenient",
+      "path": "parapet/budgets/lenient.parapet.budget.yaml",
+      "sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+      "caps": {
+        "latency_overhead_pct": 25.0,
+        "peak_memory_overhead_pct": 25.0
+      },
+      "fits": false,
+      "reasons": [
+        "not assessed"
+      ],
+      "recommended_patch": "R2",
+      "this_patch_recommended": false,
+      "claim_level": "L1"
+    }
+  ],
+  "generator": {
+    "name": "qwen2.5-coder:7b-instruct-q4_K_M",
+    "product_name": "parapet-local-qwen2.5-coder-7b-instruct",
+    "digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+    "serving": "Ollama 0.40.16 (OpenAI-compatible /v1/chat/completions)",
+    "seed": 104,
+    "wall_s": 6.248,
+    "prompt_tokens": 845,
+    "completion_tokens": 849,
+    "raw_output": "generation/raw/G4.txt",
+    "raw_sha256": "4e6ba5bed9b40c30dedfe9bf6f03ab4fcf8fc9ab72053796820cdd425d4ec7e7",
+    "extraction": "fenced code block #1 (java) declaring class PrefsCodec"
+  },
+  "prompt": {
+    "template": "parapet/prompts/harden_v1.txt",
+    "template_sha256": "d5b3c33c4650e1a53437ad477bd4031896f35b4b33193efb946968f8ed90edbc",
+    "prompt_sha256": "ca4de091367f148432505594779160045f56343829121931948f4c2bf83c07ea",
+    "inputs": {
+      "source_file": "parapet/cases/C1/src/example/prefs/PrefsCodec.java",
+      "cwe_id": "CWE-502",
+      "cwe_name": "Deserialization of Untrusted Data"
+    }
+  },
+  "environment": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "6.6.114.1-microsoft-standard-WSL2",
+    "wsl": true,
+    "cpu": "Intel(R) Core(TM) i9-14900KF",
+    "logical_cpus": 32,
+    "ram_gib": 31.2,
+    "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 610.60",
+    "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "jdk_full": [
+      "openjdk version \"21.0.13.0.3\" 2026-10-24",
+      "OpenJDK Runtime Environment (build 21.0.13.0.3+1-1-26.04.1-Ubuntu)",
+      "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-26.04.1-Ubuntu, mixed mode, sharing)"
+    ],
+    "javac": "javac 21.0.13.0.3",
+    "python": "3.14.4",
+    "python_packages": {
+      "numpy": "2.5.5",
+      "openai": "2.54.0"
+    },
+    "loadavg": [
+      0.83642578125,
+      1.1953125,
+      0.76416015625
+    ],
+    "cwd_is_linux_fs": false
+  },
+  "reproduce": "python -m parapet run --case C1 --budget parapet/budgets/strict.parapet.budget.yaml --budget parapet/budgets/lenient.parapet.budget.yaml --candidates-from <this run>/generation   # re-validate and re-measure the saved candidates\npython -m parapet run --case C1 --budget parapet/budgets/strict.parapet.budget.yaml --budget parapet/budgets/lenient.parapet.budget.yaml   # regenerate (sampling may differ)",
+  "repo": {
+    "commit": "5eefe0c1d143f2d71d014aadf8b696f6fb1b1a01",
+    "branch": "mozilla/local-slice",
+    "dirty_outside_evidence": [
+      "M evidence/DEVIATIONS.md"
+    ]
+  },
+  "rendered": {
+    "by": "python -m parapet rerecord",
+    "at": "2026-11-18T17:28:12-0800",
+    "reason": "D4: first-written candidate records omitted the mechanism route (record-assembly bug); nothing re-run"
+  }
+}

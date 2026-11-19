@@ -1,0 +1,40 @@
+This is a Java abstract class `BaseXMLBuilder` designed for building XML documents. It provides various methods to manipulate and construct an XML document using a fluent interface. Here's a breakdown of some key functionalities and methods:
+
+1. **Adding Content**:
+   - `cdata(String data)`: Adds CDATA content.
+   - `data(String data)`: Synonyms for `cdata`.
+   - `d(String data)`: Synonyms for `cdata`.
+   - `cdata(byte[] data)`: Adds Base64-encoded byte data as CDATA.
+   - `data(byte[] data)`: Synonyms for `cdata`.
+   - `d(byte[] data)`: Synonyms for `cdata`.
+
+2. **Adding Special XML Nodes**:
+   - `comment(String comment)`: Adds a comment.
+   - `cmnt(String comment)`: Synonym for `comment`.
+   - `c(String comment)`: Synonym for `comment`.
+   - `instruction(String target, String data)`: Adds an XML processing instruction.
+   - `inst(String target, String data)`: Synonym for `instruction`.
+   - `i(String target, String data)`: Synonym for `instruction`.
+
+3. **Manipulating the Document Structure**:
+   - `insertInstruction(String target, String data)`: Inserts an instruction before the current node.
+   - `reference(String name)`: Adds an entity reference.
+   - `ns(String prefix, String namespaceURI)`: Synonym for `namespace`.
+   - `ns(String namespaceURI)`: Synonym for `namespace`.
+   - `up(int steps)`: Returns the nth ancestor node.
+   - `up()`: Returns the parent node.
+   - `document()`: Returns the root document node.
+
+4. **Namespace Management**:
+   - `namespace(String prefix, String namespaceURI)`: Adds a namespace attribute.
+   - `namespace(String namespaceURI)`: Adds a default namespace attribute.
+
+5. **Serialization**:
+   - `toWriter(boolean wholeDocument, Writer writer, Properties outputProperties)`: Serializes the document to a writer.
+   - `toString()`: Serializes the document to a string without the XML declaration.
+
+6. **Utility Methods**:
+   - `upImpl(int steps)`: Internal method to navigate up the document tree.
+   - `assertElementContainsNoOrWhitespaceOnlyTextNodes(Node anXmlElement)`: Ensures an element does not contain non-whitespace text nodes.
+
+This class is intended to be extended to provide specific implementations for different types of XML documents, such as SOAP, RSS, or custom XML structures. The fluent interface allows for chaining method calls, making it easy to construct complex XML documents in a readable and concise manner.

@@ -1,0 +1,50 @@
+{
+  "settings": {
+    "version": 1,
+    "default_generator": {
+      "product_name": "parapet-local-qwen2.5-coder-7b-instruct-longctx",
+      "model": "qwen2.5-coder:7b-instruct-q4_K_M",
+      "model_card": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct",
+      "serving": "ollama",
+      "base_url": "http://127.0.0.1:11436/v1",
+      "api_key": "ollama",
+      "server_env": {
+        "OLLAMA_CONTEXT_LENGTH": "32768",
+        "OLLAMA_HOST": "127.0.0.1:11436",
+        "OLLAMA_NO_CLOUD": "1"
+      }
+    },
+    "k": 5,
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "seeds": [
+      101,
+      102,
+      103,
+      104,
+      105
+    ],
+    "max_tokens": 16384,
+    "request_timeout_s": 1200,
+    "max_retries": 1,
+    "client_max_retries": 0,
+    "prompt_template": "parapet/prompts/harden_v1.txt",
+    "extraction_rule": "parapet/extract.py (first closed fenced block declaring the target class)",
+    "transport_note": "same as generation.yaml",
+    "hosted_controls": {}
+  },
+  "settings_path": "parapet/settings/generation-longctx.yaml",
+  "settings_sha256": "baa69a5480570a284be378ca5d884460e563c358834e2132342c63265416be64",
+  "generator": {
+    "product_name": "parapet-local-qwen2.5-coder-7b-instruct-longctx",
+    "model": "qwen2.5-coder:7b-instruct-q4_K_M",
+    "model_card": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct",
+    "serving": "ollama",
+    "base_url": "http://127.0.0.1:11436/v1",
+    "server_env": {
+      "OLLAMA_CONTEXT_LENGTH": "32768",
+      "OLLAMA_HOST": "127.0.0.1:11436",
+      "OLLAMA_NO_CLOUD": "1"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "chatcmpl-585",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "To mitigate the CWE-502 vulnerability, which involves deserializing untrusted data, we need to ensure that only trusted data is deserialized. One way to achieve this is by using a whitelist of allowed classes for deserialization. We can implement this by creating a custom `ObjectInputStream` that only allows deserialization of specific classes.\n\nHere's the updated file with the deserialization vulnerability removed:\n\n```java\npackage example.prefs;\n\nimport java.io.ByteArrayInputStream;\nimport java.io.ByteArrayOutputStream;\nimport java.io.IOException;\nimport java.io.ObjectInputStream;\nimport java.io.ObjectOutputStream;\nimport java.io.Serializable;\nimport java.util.ArrayList;\nimport java.util.Base64;\nimport java.util.Collections;\nimport java.util.LinkedHashMap;\nimport java.util.List;\nimport java.util.Map;\nimport java.util.Objects;\n\n/**\n * Saves and restores a user's editor preferences as a compact text token.\n *\n * The token is stored in a browser cookie and sent back with later requests,\n * where {@link #decode(String)} turns it back into preferences.\n */\npublic final class PrefsCodec {\n\n    private PrefsCodec() {\n    }\n\n    /** A user's editor preferences. */\n    public static final class UserPrefs implements Serializable {\n        private static final long serialVersionUID = 1L;\n\n        private final String user;\n        private final String theme;\n        private final int fontSize;\n        private final List<String> recentFiles;\n        private final Map<String, String> shortcuts;\n\n        public UserPrefs(String user, String theme, int fontSize,\n                         List<String> recentFiles, Map<String, String> shortcuts) {\n            this.user = user;\n            this.theme = theme;\n            this.fontSize = fontSize;\n            this.recentFiles = new ArrayList<>(recentFiles);\n            this.shortcuts = new LinkedHashMap<>(shortcuts);\n        }\n\n        public String getUser() {\n            return user;\n        }\n\n        public String getTheme() {\n            return theme;\n        }\n\n        public int getFontSize() {\n            return fontSize;\n        }\n\n        public List<String> getRecentFiles() {\n            return Collections.unmodifiableList(recentFiles);\n        }\n\n        public Map<String, String> getShortcuts() {\n            return Collections.unmodifiableMap(shortcuts);\n        }\n\n        @Override\n        public boolean equals(Object o) {\n            if (this == o) {\n                return true;\n            }\n            if (!(o instanceof UserPrefs)) {\n                return false;\n            }\n            UserPrefs other = (UserPrefs) o;\n            return fontSize == other.fontSize\n                    && Objects.equals(user, other.user)\n                    && Objects.equals(theme, other.theme)\n                    && Objects.equals(recentFiles, other.recentFiles)\n                    && Objects.equals(shortcuts, other.shortcuts);\n        }\n\n        @Override\n        public int hashCode() {\n            return Objects.hash(user, theme, fontSize, recentFiles, shortcuts);\n        }\n\n        @Override\n        public String toString() {\n            return \"UserPrefs{user=\" + user + \", theme=\" + theme + \", fontSize=\" + fontSize\n                    + \", recentFiles=\" + recentFiles + \", shortcuts=\" + shortcuts + \"}\";\n        }\n    }\n\n    /** Turns preferences into a Base64 token. */\n    public static String encode(UserPrefs prefs) throws IOException {\n        ByteArrayOutputStream bytes = new ByteArrayOutputStream();\n        try (ObjectOutputStream out = new ObjectOutputStream(bytes)) {\n            out.writeObject(prefs);\n        }\n        return Base64.getEncoder().encodeToString(bytes.toByteArray());\n    }\n\n    /** Restores preferences from a token produced by {@link #encode(UserPrefs)}. */\n    public static UserPrefs decode(String token) throws IOException {\n        byte[] data = Base64.getDecoder().decode(token);\n        try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(data)) {\n            @Override\n            protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {\n                if (\"example.prefs.PrefsCodec$UserPrefs\".equals(desc.getName())) {\n                    return super.resolveClass(desc);\n                } else {\n                    throw new InvalidClassException(\"Unauthorized deserialization attempt\", desc.getName());\n                }\n            }\n        }) {\n            return (UserPrefs) in.readObject();\n        }\n    }\n}\n```\n\nIn this updated version, we've added a custom `ObjectInputStream` that overrides the `resolveClass` method to restrict deserialization to the `UserPrefs` class. If an attempt is made to deserialize any other class, an `InvalidClassException` is thrown, thus preventing unauthorized deserialization.",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1795050990,
+  "model": "qwen2.5-coder:7b-instruct-q4_K_M",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "fp_ollama",
+  "usage": {
+    "completion_tokens": 902,
+    "prompt_tokens": 845,
+    "total_tokens": 1747,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 844
+    }
+  }
+}

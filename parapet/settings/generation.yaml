@@ -1,0 +1,32 @@
+# PARAPET generation settings -- pre-registered.
+version: 1
+default_generator:
+  product_name: parapet-local-qwen2.5-coder-7b-instruct
+  model: qwen2.5-coder:7b-instruct-q4_K_M       # Ollama library tag (Q4_K_M GGUF)
+  model_card: https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct
+  serving: ollama
+  base_url: http://127.0.0.1:11434/v1           # loopback only
+  api_key: ollama                               # placeholder; the local server ignores it
+  server_env: {OLLAMA_CONTEXT_LENGTH: "8192", OLLAMA_HOST: "127.0.0.1:11434"}
+k: 5
+temperature: 0.7
+top_p: 0.95
+seeds: [101, 102, 103, 104, 105]                # one per candidate
+max_tokens: 4096
+request_timeout_s: 600
+max_retries: 1                                  # generate_text retries only on timeout; 1 = no retry
+client_max_retries: 0                           # OpenAI SDK transport retries disabled
+prompt_template: parapet/prompts/harden_v1.txt
+extraction_rule: parapet/extract.py (first closed fenced block declaring the target class)
+transport_note: >-
+  Requests go through PerfOrch's llm_generator.generate_text, which forwards
+  model, messages, temperature and top_p. PARAPET's recording client (placed
+  in llm_generator's client cache) adds seed and max_tokens to the same
+  request and records the response's usage block; it changes nothing else.
+hosted_controls:          # refused unless --allow-hosted-control; never part of the default path
+  openai:
+    base_url: https://api.openai.com/v1
+    key_env: OPENAI_API_KEY
+  anthropic:
+    base_url: https://api.anthropic.com/v1/
+    key_env: ANTHROPIC_API_KEY

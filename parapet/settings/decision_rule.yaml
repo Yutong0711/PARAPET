@@ -1,0 +1,17 @@
+# PARAPET decision rule -- pre-registered.
+version: 1
+fits_budget: >-
+  A patch fits a budget only if it is admissible (claim level L4), its arm has
+  a valid cost estimate (at least min_valid_forks valid forks), the upper end
+  of the 95% bootstrap interval of its latency overhead against the unpatched
+  baseline is at or below the budget's latency cap, AND the upper end of the
+  95% interval of its peak-memory overhead is at or below the budget's
+  peak-memory cap. The budget's workload name must equal the measured workload.
+recommend: >-
+  Among admissible patches that fit, recommend the one with the lowest upper
+  bound on latency overhead; ties broken by the lower peak-memory upper bound,
+  then by patch id. If none fits, recommend nothing and report that no
+  admissible patch fits the budget.
+candidate_set:
+  step2: hand-written reference fixes R1 and R2 only
+  step3: every admissible patch (R1, R2, and admissible generated candidates)

@@ -1,0 +1,49 @@
+{
+  "label": "T2 post-hoc session (designed after seeing results); P1 is not a reference fix; no decision",
+  "argv": [
+    "evidence/mozilla-2026-11/analysis/posthoc_c2_p1.py"
+  ],
+  "repo": {
+    "commit": "8c8ad50572f6188171600b7899de488b9725ecfc",
+    "branch": "mozilla/local-slice",
+    "dirty_outside_evidence": []
+  },
+  "environment": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "6.6.114.1-microsoft-standard-WSL2",
+    "wsl": true,
+    "cpu": "Intel(R) Core(TM) i9-14900KF",
+    "logical_cpus": 32,
+    "ram_gib": 31.2,
+    "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 610.60",
+    "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "jdk_full": [
+      "openjdk version \"21.0.13.0.3\" 2026-10-24",
+      "OpenJDK Runtime Environment (build 21.0.13.0.3+1-1-26.04.1-Ubuntu)",
+      "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-26.04.1-Ubuntu, mixed mode, sharing)"
+    ],
+    "javac": "javac 21.0.13.0.3",
+    "python": "3.14.4",
+    "python_packages": {
+      "numpy": "2.5.5",
+      "openai": "2.54.0"
+    },
+    "loadavg": [
+      2.537109375,
+      2.2021484375,
+      1.4384765625
+    ],
+    "cwd_is_linux_fs": false
+  },
+  "work_dir": "/home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352",
+  "measurement_settings": {
+    "path": "/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/settings/measurement.yaml",
+    "sha256": "4b3e8fbacd0a76f825e326f4603a93a809e4336822462cc41bfad26262b5882d"
+  },
+  "claim_levels": {
+    "V0": "L2",
+    "R1": "L4",
+    "G2": "L4",
+    "P1": "L4"
+  }
+}

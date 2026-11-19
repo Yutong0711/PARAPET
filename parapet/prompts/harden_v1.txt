@@ -1,0 +1,12 @@
+You are hardening a Java source file.
+
+Weakness class: {cwe_id} ({cwe_name})
+
+The file below contains a weakness of this class. Rewrite the file so that the weakness is removed and the file's legitimate behavior is preserved. Keep the package declaration, the class names, and the public method signatures unchanged. Use only the Java standard library (Java 17).
+
+Reply with the complete rewritten file in a single ```java code block.
+
+File: {file_path}
+```java
+{source}
+```

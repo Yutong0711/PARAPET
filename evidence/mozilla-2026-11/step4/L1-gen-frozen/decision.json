@@ -1,0 +1,70 @@
+[
+  {
+    "profile": "strict",
+    "budget_path": "parapet/budgets/strict.parapet.budget.yaml",
+    "budget_sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+    "caps": {
+      "latency_overhead_pct": 5.0,
+      "peak_memory_overhead_pct": 5.0
+    },
+    "workload": "legitimate-path",
+    "assessed": [
+      {
+        "patch_id": "R1",
+        "fits": false,
+        "latency_overhead_pct_hi": 42.79003620205704,
+        "peak_memory_overhead_pct_hi": 10.012576575114608,
+        "reasons": [
+          "latency overhead upper bound 42.79% > cap 5.0%",
+          "peak-memory overhead upper bound 10.01% > cap 5.0%"
+        ]
+      },
+      {
+        "patch_id": "R2",
+        "fits": false,
+        "latency_overhead_pct_hi": 13.103634780607965,
+        "peak_memory_overhead_pct_hi": 9.935793237971403,
+        "reasons": [
+          "latency overhead upper bound 13.10% > cap 5.0%",
+          "peak-memory overhead upper bound 9.94% > cap 5.0%"
+        ]
+      }
+    ],
+    "fitting": [],
+    "recommended": null,
+    "statement": "no admissible patch fits the strict budget; recommend none"
+  },
+  {
+    "profile": "lenient",
+    "budget_path": "parapet/budgets/lenient.parapet.budget.yaml",
+    "budget_sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+    "caps": {
+      "latency_overhead_pct": 25.0,
+      "peak_memory_overhead_pct": 25.0
+    },
+    "workload": "legitimate-path",
+    "assessed": [
+      {
+        "patch_id": "R1",
+        "fits": false,
+        "latency_overhead_pct_hi": 42.79003620205704,
+        "peak_memory_overhead_pct_hi": 10.012576575114608,
+        "reasons": [
+          "latency overhead upper bound 42.79% > cap 25.0%"
+        ]
+      },
+      {
+        "patch_id": "R2",
+        "fits": true,
+        "latency_overhead_pct_hi": 13.103634780607965,
+        "peak_memory_overhead_pct_hi": 9.935793237971403,
+        "reasons": []
+      }
+    ],
+    "fitting": [
+      "R2"
+    ],
+    "recommended": "R2",
+    "statement": "recommend R2"
+  }
+]

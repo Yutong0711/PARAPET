@@ -1,0 +1,3 @@
+$ java -cp /home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/R1/classes/target:/home/yzhao/parapet-work/runs/posthoc-C2-P1-20261118T191352/patches/R1/classes/harness harness.c2.Reproducer
+PARAPET_RESULT {"check":"reproducer","fired":false,"fired_by":null,"outcome":"rejected","exception":"java.io.IOException: invalid configuration document: DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true."}
+[Fatal Error] :2:10: DOCTYPE is disallowed when the feature "http://apache.org/xml/features/disallow-doctype-decl" set to true.

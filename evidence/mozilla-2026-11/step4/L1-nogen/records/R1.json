@@ -1,0 +1,432 @@
+{
+  "schema": "parapet.hardening-record/1",
+  "case": {
+    "id": "L1",
+    "title": "java-xmlbuilder 1.1+ (pinned 5d5caa5) parses documents with external entities enabled"
+  },
+  "weakness": {
+    "cwe": "CWE-611",
+    "name": "Improper Restriction of XML External Entity Reference"
+  },
+  "patch": {
+    "id": "R1",
+    "kind": "upstream fix (commit e6fddca, three files)",
+    "source_sha256": "a778674502e61f4266b4b4047d7fbd523a5997803db4d8b6405f017052344b47",
+    "source_path": "parapet/cases/L1/reference/R1/com/jamesmurty/utils/BaseXMLBuilder.java, parapet/cases/L1/reference/R1/com/jamesmurty/utils/XMLBuilder.java, parapet/cases/L1/reference/R1/com/jamesmurty/utils/XMLBuilder2.java"
+  },
+  "mechanism": {
+    "route": "narrowed behavior",
+    "description": "upstream fix -- explicitly disable external-general-entities and external-parameter-entities on every DocumentBuilderFactory (parse and create), with new opt-in overloads",
+    "guidance": [
+      "Upstream commit e6fddca201790abab4f2c274341c0bb8835c3e73 (java-xmlbuilder v1.2), referenced by CVE-2014-125087. https://github.com/jmurty/java-xmlbuilder/commit/e6fddca201790abab4f2c274341c0bb8835c3e73"
+    ]
+  },
+  "diff": "--- a/com/jamesmurty/utils/BaseXMLBuilder.java\n+++ b/com/jamesmurty/utils/BaseXMLBuilder.java\n@@ -77,6 +77,13 @@\n     private static boolean isNamespaceAware = true;\n \n     /**\n+     * If true, the builder will raise an {@link XMLBuilderRuntimeException}\n+     * if external general and parameter entities cannot be explicitly enabled\n+     * or disabled.\n+     */\n+    public static boolean failIfExternalEntityParsingCannotBeConfigured = true;\n+\n+    /**\n      * Construct a new builder object that wraps the given XML document.\n      * This constructor is for internal use only.\n      *\n@@ -113,6 +120,78 @@\n     }\n \n     /**\n+     * Explicitly enable or disable the 'external-general-entities' and\n+     * 'external-parameter-entities' features of the underlying\n+     * DocumentBuilderFactory.\n+     *\n+     * TODO This is a naive approach that simply tries to apply all known\n+     * feature name/URL values in turn until one succeeds, or none do.\n+     *\n+     * @param factory\n+     * factory which will have external general and parameter entities enabled\n+     * or disabled.\n+     * @param enableExternalEntities\n+     * if true external entities will be explicitly enabled, otherwise they\n+     * will be explicitly disabled.\n+     */\n+    protected static void enableOrDisableExternalEntityParsing(\n+        DocumentBuilderFactory factory, boolean enableExternalEntities)\n+    {\n+        // Feature list drawn from:\n+        // https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Processing\n+\n+        /* Enable or disable external general entities */\n+        String[] externalGeneralEntitiesFeatures = {\n+            // General\n+            \"http://xml.org/sax/features/external-general-entities\",\n+            // Xerces 1\n+            \"http://xerces.apache.org/xerces-j/features.html#external-general-entities\",\n+            // Xerces 2\n+            \"http://xerces.apache.org/xerces2-j/features.html#external-general-entities\",\n+        };\n+        boolean success = false;\n+        for (String feature: externalGeneralEntitiesFeatures) {\n+            try {\n+                factory.setFeature(feature, enableExternalEntities);\n+                success = true;\n+                break;\n+            } catch (ParserConfigurationException e) {\n+            }\n+        }\n+        if (!success && failIfExternalEntityParsingCannotBeConfigured) {\n+            throw new XMLBuilderRuntimeException(\n+                new ParserConfigurationException(\n+                    \"Failed to set 'external-general-entities' feature to \"\n+                    + enableExternalEntities));\n+        }\n+\n+        /* Enable or disable external parameter entities */\n+        String[] externalParameterEntitiesFeatures = {\n+            // General\n+            \"http://xml.org/sax/features/external-parameter-entities\",\n+            // Xerces 1\n+            \"http://xerces.apache.org/xerces-j/features.html#external-parameter-entities\",\n+            // Xerces 2\n+            \"http://xerces.apache.org/xerces2-j/features.html#external-parameter-entities\",\n+        };\n+        success = false;\n+        for (String feature: externalParameterEntitiesFeatures) {\n+            try {\n+                factory.setFeature(feature, enableExternalEntities);\n+                success = true;\n+                break;\n+            } catch (ParserConfigurationException e) {\n+            }\n+        }\n+        if (!success && failIfExternalEntityParsingCannotBeConfigured) {\n+            throw new XMLBuilderRuntimeException(\n+                new ParserConfigurationException(\n+                    \"Failed to set 'external-parameter-entities' feature to \"\n+                    + enableExternalEntities));\n+        }\n+    }\n+\n+    /**\n      * Construct an XML Document with a default namespace with the given\n      * root element.\n      *\n@@ -126,11 +205,13 @@\n      * @throws FactoryConfigurationError\n      * @throws ParserConfigurationException\n      */\n-    protected static Document createDocumentImpl(String name, String namespaceURI)\n+    protected static Document createDocumentImpl(\n+        String name, String namespaceURI, boolean enableExternalEntities)\n         throws ParserConfigurationException, FactoryConfigurationError\n     {\n         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();\n         factory.setNamespaceAware(isNamespaceAware);\n+        enableOrDisableExternalEntityParsing(factory, enableExternalEntities);\n         DocumentBuilder builder = factory.newDocumentBuilder();\n         Document document = builder.newDocument();\n         Element rootElement = null;\n@@ -157,11 +238,13 @@\n      * @throws IOException\n      * @throws SAXException\n      */\n-    protected static Document parseDocumentImpl(InputSource inputSource)\n+    protected static Document parseDocumentImpl(\n+        InputSource inputSource, boolean enableExternalEntities)\n         throws ParserConfigurationException, SAXException, IOException\n     {\n         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();\n         factory.setNamespaceAware(isNamespaceAware);\n+        enableOrDisableExternalEntityParsing(factory, enableExternalEntities);\n         DocumentBuilder builder = factory.newDocumentBuilder();\n         Document document = builder.parse(inputSource);\n         return document;\n--- a/com/jamesmurty/utils/XMLBuilder.java\n+++ b/com/jamesmurty/utils/XMLBuilder.java\n@@ -99,16 +99,20 @@\n      * the name of the document's root element.\n      * @param namespaceURI\n      * default namespace URI for document, ignored if null or empty.\n-     * @return\n-     * a builder node that can be used to add more nodes to the XML document.\n-     *\n-     * @throws FactoryConfigurationError\n-     * @throws ParserConfigurationException\n-     */\n-    public static XMLBuilder create(String name, String namespaceURI)\n+     * @param enableExternalEntities\n+     * enable external entities; beware of XML External Entity (XXE) injection.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     *\n+     * @throws FactoryConfigurationError\n+     * @throws ParserConfigurationException\n+     */\n+    public static XMLBuilder create(String name, String namespaceURI,\n+        boolean enableExternalEntities)\n         throws ParserConfigurationException, FactoryConfigurationError\n     {\n-        return new XMLBuilder(createDocumentImpl(name, namespaceURI));\n+        return new XMLBuilder(\n+            createDocumentImpl(name, namespaceURI, enableExternalEntities));\n     }\n \n     /**\n@@ -118,6 +122,49 @@\n      *\n      * @param name\n      * the name of the document's root element.\n+     * @param enableExternalEntities\n+     * enable external entities; beware of XML External Entity (XXE) injection.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     *\n+     * @throws FactoryConfigurationError\n+     * @throws ParserConfigurationException\n+     */\n+    public static XMLBuilder create(String name, boolean enableExternalEntities)\n+        throws ParserConfigurationException, FactoryConfigurationError\n+    {\n+        return create(name, null, enableExternalEntities);\n+    }\n+\n+    /**\n+     * Construct a builder for new XML document with a default namespace.\n+     * The document will be created with the given root element, and the builder\n+     * returned by this method will serve as the starting-point for any further\n+     * document additions.\n+     *\n+     * @param name\n+     * the name of the document's root element.\n+     * @param namespaceURI\n+     * default namespace URI for document, ignored if null or empty.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     *\n+     * @throws FactoryConfigurationError\n+     * @throws ParserConfigurationException\n+     */\n+    public static XMLBuilder create(String name, String namespaceURI)\n+        throws ParserConfigurationException, FactoryConfigurationError\n+    {\n+        return create(name, namespaceURI, false);\n+    }\n+\n+    /**\n+     * Construct a builder for new XML document. The document will be created\n+     * with the given root element, and the builder returned by this method\n+     * will serve as the starting-point for any further document additions.\n+     *\n+     * @param name\n+     * the name of the document's root element.\n      * @return\n      * a builder node that can be used to add more nodes to the XML document.\n      *\n@@ -137,6 +184,8 @@\n      *\n      * @param inputSource\n      * an XML document input source that will be parsed into a DOM.\n+     * @param enableExternalEntities\n+     * enable external entities; beware of XML External Entity (XXE) injection.\n      * @return\n      * a builder node that can be used to add more nodes to the XML document.\n      * @throws ParserConfigurationException\n@@ -146,10 +195,12 @@\n      * @throws IOException\n      * @throws SAXException\n      */\n-    public static XMLBuilder parse(InputSource inputSource)\n+    public static XMLBuilder parse(\n+        InputSource inputSource, boolean enableExternalEntities)\n         throws ParserConfigurationException, SAXException, IOException\n     {\n-        return new XMLBuilder(parseDocumentImpl(inputSource));\n+        return new XMLBuilder(\n+            parseDocumentImpl(inputSource, enableExternalEntities));\n     }\n \n     /**\n@@ -159,6 +210,8 @@\n      *\n      * @param xmlString\n      * an XML document string that will be parsed into a DOM.\n+     * @param enableExternalEntities\n+     * enable external entities; beware of XML External Entity (XXE) injection.\n      * @return\n      * a builder node that can be used to add more nodes to the XML document.\n      *\n@@ -168,10 +221,13 @@\n      * @throws IOException\n      * @throws SAXException\n      */\n-    public static XMLBuilder parse(String xmlString)\n+    public static XMLBuilder parse(\n+        String xmlString, boolean enableExternalEntities)\n         throws ParserConfigurationException, SAXException, IOException\n     {\n-        return XMLBuilder.parse(new InputSource(new StringReader(xmlString)));\n+        return XMLBuilder.parse(\n+            new InputSource(new StringReader(xmlString)),\n+            enableExternalEntities);\n     }\n \n     /**\n@@ -181,6 +237,8 @@\n      *\n      * @param xmlFile\n      * an XML document file that will be parsed into a DOM.\n+     * @param enableExternalEntities\n+     * enable external entities; beware of XML External Entity (XXE) injection.\n      * @return\n      * a builder node that can be used to add more nodes to the XML document.\n      *\n@@ -190,10 +248,77 @@\n      * @throws IOException\n      * @throws SAXException\n      */\n+    public static XMLBuilder parse(File xmlFile, boolean enableExternalEntities)\n+        throws ParserConfigurationException, SAXException, IOException\n+    {\n+        return XMLBuilder.parse(\n+            new InputSource(new FileReader(xmlFile)), enableExternalEntities);\n+    }\n+\n+    /**\n+     * Construct a builder from an existing XML document. The provided XML\n+     * document will be parsed and an XMLBuilder object referencing the\n+     * document's root element will be returned.\n+     *\n+     * @param inputSource\n+     * an XML document input source that will be parsed into a DOM.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     * @throws ParserConfigurationException\n+     *\n+     * @throws FactoryConfigurationError\n+     * @throws ParserConfigurationException\n+     * @throws IOException\n+     * @throws SAXException\n+     */\n+    public static XMLBuilder parse(InputSource inputSource)\n+        throws ParserConfigurationException, SAXException, IOException\n+    {\n+        return XMLBuilder.parse(inputSource, false);\n+    }\n+\n+    /**\n+     * Construct a builder from an existing XML document string.\n+     * The provided XML document will be parsed and an XMLBuilder\n+     * object referencing the document's root element will be returned.\n+     *\n+     * @param xmlString\n+     * an XML document string that will be parsed into a DOM.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     *\n+     * @throws ParserConfigurationException\n+     * @throws FactoryConfigurationError\n+     * @throws ParserConfigurationException\n+     * @throws IOException\n+     * @throws SAXException\n+     */\n+    public static XMLBuilder parse(String xmlString)\n+        throws ParserConfigurationException, SAXException, IOException\n+    {\n+        return XMLBuilder.parse(xmlString, false);\n+    }\n+\n+    /**\n+     * Construct a builder from an existing XML document file.\n+     * The provided XML document will be parsed and an XMLBuilder\n+     * object referencing the document's root element will be returned.\n+     *\n+     * @param xmlFile\n+     * an XML document file that will be parsed into a DOM.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     *\n+     * @throws ParserConfigurationException\n+     * @throws FactoryConfigurationError\n+     * @throws ParserConfigurationException\n+     * @throws IOException\n+     * @throws SAXException\n+     */\n     public static XMLBuilder parse(File xmlFile)\n         throws ParserConfigurationException, SAXException, IOException\n     {\n-        return XMLBuilder.parse(new InputSource(new FileReader(xmlFile)));\n+        return XMLBuilder.parse(xmlFile, false);\n     }\n \n     @Override\n--- a/com/jamesmurty/utils/XMLBuilder2.java\n+++ b/com/jamesmurty/utils/XMLBuilder2.java\n@@ -118,15 +118,19 @@\n      * the name of the document's root element.\n      * @param namespaceURI\n      * default namespace URI for document, ignored if null or empty.\n+     * @param enableExternalEntities\n+     * enable external entities; beware of XML External Entity (XXE) injection.\n      * @return\n      * a builder node that can be used to add more nodes to the XML document.\n      * @throws XMLBuilderRuntimeException\n      * to wrap {@link ParserConfigurationException}\n      */\n-    public static XMLBuilder2 create(String name, String namespaceURI)\n-    {\n-        try {\n-            return new XMLBuilder2(createDocumentImpl(name, namespaceURI));\n+    public static XMLBuilder2 create(\n+        String name, String namespaceURI, boolean enableExternalEntities)\n+    {\n+        try {\n+            return new XMLBuilder2(\n+                createDocumentImpl(name, namespaceURI, enableExternalEntities));\n         } catch (ParserConfigurationException e) {\n             throw wrapExceptionAsRuntimeException(e);\n         }\n@@ -139,14 +143,53 @@\n      *\n      * @param name\n      * the name of the document's root element.\n+     * @param enableExternalEntities\n+     * enable external entities; beware of XML External Entity (XXE) injection.\n      * @return\n      * a builder node that can be used to add more nodes to the XML document.\n      * @throws XMLBuilderRuntimeException\n      * to wrap {@link ParserConfigurationException}\n      */\n+    public static XMLBuilder2 create(String name, boolean enableExternalEntities)\n+    {\n+        return XMLBuilder2.create(name, null, enableExternalEntities);\n+    }\n+\n+    /**\n+     * Construct a builder for new XML document with a default namespace.\n+     * The document will be created with the given root element, and the builder\n+     * returned by this method will serve as the starting-point for any further\n+     * document additions.\n+     *\n+     * @param name\n+     * the name of the document's root element.\n+     * @param namespaceURI\n+     * default namespace URI for document, ignored if null or empty.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     * @throws XMLBuilderRuntimeException\n+     * to wrap {@link ParserConfigurationException}\n+     */\n+    public static XMLBuilder2 create(String name, String namespaceURI)\n+    {\n+        return XMLBuilder2.create(name, namespaceURI, false);\n+    }\n+\n+    /**\n+     * Construct a builder for new XML document. The document will be created\n+     * with the given root element, and the builder returned by this method\n+     * will serve as the starting-point for any further document additions.\n+     *\n+     * @param name\n+     * the name of the document's root element.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     * @throws XMLBuilderRuntimeException\n+     * to wrap {@link ParserConfigurationException}\n+     */\n     public static XMLBuilder2 create(String name)\n     {\n-        return create(name, null);\n+        return XMLBuilder2.create(name, null, false);\n     }\n \n     /**\n@@ -156,16 +199,20 @@\n      *\n      * @param inputSource\n      * an XML document input source that will be parsed into a DOM.\n+     * @param enableExternalEntities\n+     * enable external entities; beware of XML External Entity (XXE) injection.\n      * @return\n      * a builder node that can be used to add more nodes to the XML document.\n      * @throws XMLBuilderRuntimeException\n      * to wrap {@link ParserConfigurationException}, {@link SAXException},\n      * {@link IOException}\n      */\n-    public static XMLBuilder2 parse(InputSource inputSource)\n-    {\n-        try {\n-            return new XMLBuilder2(parseDocumentImpl(inputSource));\n+    public static XMLBuilder2 parse(\n+        InputSource inputSource, boolean enableExternalEntities)\n+    {\n+        try {\n+            return new XMLBuilder2(\n+                parseDocumentImpl(inputSource, enableExternalEntities));\n         } catch (ParserConfigurationException e) {\n             throw wrapExceptionAsRuntimeException(e);\n         } catch (SAXException e) {\n@@ -182,12 +229,17 @@\n      *\n      * @param xmlString\n      * an XML document string that will be parsed into a DOM.\n-     * @return\n-     * a builder node that can be used to add more nodes to the XML document.\n-     */\n-    public static XMLBuilder2 parse(String xmlString)\n-    {\n-        return XMLBuilder2.parse(new InputSource(new StringReader(xmlString)));\n+     * @param enableExternalEntities\n+     * enable external entities; beware of XML External Entity (XXE) injection.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     */\n+    public static XMLBuilder2 parse(\n+        String xmlString, boolean enableExternalEntities)\n+    {\n+        return XMLBuilder2.parse(\n+            new InputSource(new StringReader(xmlString)),\n+            enableExternalEntities);\n     }\n \n     /**\n@@ -197,19 +249,74 @@\n      *\n      * @param xmlFile\n      * an XML document file that will be parsed into a DOM.\n+     * @param enableExternalEntities\n+     * enable external entities; beware of XML External Entity (XXE) injection.\n      * @return\n      * a builder node that can be used to add more nodes to the XML document.\n      * @throws XMLBuilderRuntimeException\n      * to wrap {@link ParserConfigurationException}, {@link SAXException},\n      * {@link IOException}, {@link FileNotFoundException}\n      */\n+    public static XMLBuilder2 parse(File xmlFile, boolean enableExternalEntities)\n+    {\n+        try {\n+            return XMLBuilder2.parse(\n+                new InputSource(new FileReader(xmlFile)),\n+                enableExternalEntities);\n+        } catch (FileNotFoundException e) {\n+            throw wrapExceptionAsRuntimeException(e);\n+        }\n+    }\n+\n+    /**\n+     * Construct a builder from an existing XML document. The provided XML\n+     * document will be parsed and an XMLBuilder2 object referencing the\n+     * document's root element will be returned.\n+     *\n+     * @param inputSource\n+     * an XML document input source that will be parsed into a DOM.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     * @throws XMLBuilderRuntimeException\n+     * to wrap {@link ParserConfigurationException}, {@link SAXException},\n+     * {@link IOException}\n+     */\n+    public static XMLBuilder2 parse(InputSource inputSource)\n+    {\n+        return XMLBuilder2.parse(inputSource, false);\n+    }\n+\n+    /**\n+     * Construct a builder from an existing XML document string.\n+     * The provided XML document will be parsed and an XMLBuilder2\n+     * object referencing the document's root element will be returned.\n+     *\n+     * @param xmlString\n+     * an XML document string that will be parsed into a DOM.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     */\n+    public static XMLBuilder2 parse(String xmlString)\n+    {\n+        return XMLBuilder2.parse(xmlString, false);\n+    }\n+\n+    /**\n+     * Construct a builder from an existing XML document file.\n+     * The provided XML document will be parsed and an XMLBuilder2\n+     * object referencing the document's root element will be returned.\n+     *\n+     * @param xmlFile\n+     * an XML document file that will be parsed into a DOM.\n+     * @return\n+     * a builder node that can be used to add more nodes to the XML document.\n+     * @throws XMLBuilderRuntimeException\n+     * to wrap {@link ParserConfigurationException}, {@link SAXException},\n+     * {@link IOException}, {@link FileNotFoundException}\n+     */\n     public static XMLBuilder2 parse(File xmlFile)\n     {\n-        try {\n-            return XMLBuilder2.parse(new InputSource(new FileReader(xmlFile)));\n-        } catch (FileNotFoundException e) {\n-            throw wrapExceptionAsRuntimeException(e);\n-        }\n+        return XMLBuilder2.parse(xmlFile, false);\n     }\n \n     /**\n",
+  "checks": [
+    {
+      "name": "compile",
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/classes/target -cp /home/yzhao/parapet-work/jars/base64-2.3.8.jar /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/src/com/jamesmurty/utils/BaseXMLBuilder.java /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/src/com/jamesmurty/utils/NamespaceContextImpl.java /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/src/com/jamesmurty/utils/XMLBuilder.java /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/src/com/jamesmurty/utils/XMLBuilder2.java /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/src/com/jamesmurty/utils/XMLBuilderRuntimeException.java",
+      "passed": true,
+      "summary": "compiles"
+    },
+    {
+      "name": "reproducer",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/classes/target:/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.Reproducer",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input accepted",
+      "result": {
+        "check": "reproducer",
+        "api": "XMLBuilder2.parse(String)",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "accepted",
+        "exception": null
+      }
+    },
+    {
+      "name": "heldout1",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/classes/target:/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.HeldOut1",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input accepted",
+      "result": {
+        "check": "heldout1",
+        "api": "XMLBuilder.parse(InputSource)",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "accepted",
+        "exception": null
+      }
+    },
+    {
+      "name": "heldout2",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/classes/target:/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.HeldOut2",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input accepted",
+      "result": {
+        "check": "heldout2",
+        "api": "XMLBuilder.parse(String)",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "accepted",
+        "exception": null
+      }
+    },
+    {
+      "name": "functional",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/classes/target:/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.FunctionalTests",
+      "passed": true,
+      "evaluated": true,
+      "summary": "34/34 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 34,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "testSimpleXpath(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testXmlDocumentCreation(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testAddElementsInLoop(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testCDataNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementAsString(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testModerateDocumentSizeAsString(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testSetStandaloneToYes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testNamespaces(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTextNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndXPath(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testStripWhitespaceNodesFromDocument(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementBefore(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testProcessingInstructionNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTraversalDuringBuild(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testImport(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndAmendDocWithWhitespaceNodes(com.jamesmurty.utils.TestXMLBuilder)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testNoCheckedExceptions(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testExceptionWrappedInXMLBuilderRuntimeException(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testSimpleXpath(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testXmlDocumentCreation(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testAddElementsInLoop(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testCDataNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementAsString(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testModerateDocumentSizeAsString(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testSetStandaloneToYes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testNamespaces(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTextNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndXPath(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testStripWhitespaceNodesFromDocument(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testElementBefore(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testProcessingInstructionNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testTraversalDuringBuild(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testImport(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "testParseAndAmendDocWithWhitespaceNodes(com.jamesmurty.utils.TestXMLBuilder2)",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "probes",
+      "command": "java -cp /home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/classes/target:/home/yzhao/parapet-work/runs/step4-L1-20261118T181230/patches/R1/classes/harness:/home/yzhao/parapet-work/jars/base64-2.3.8.jar:/home/yzhao/parapet-work/jars/junit-4.11.jar:/home/yzhao/parapet-work/jars/hamcrest-core-1.3.jar harness.l1.Probes",
+      "passed": true,
+      "evaluated": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "typical_no_doctype",
+            "status": "accepted",
+            "digest": "ed7c43499571a945",
+            "exception": null
+          },
+          {
+            "probe": "comments_cdata_charrefs",
+            "status": "accepted",
+            "digest": "74e13feb2c350f66",
+            "exception": null
+          },
+          {
+            "probe": "doctype_without_subset",
+            "status": "accepted",
+            "digest": "cac327dbb29eec15",
+            "exception": null
+          },
+          {
+            "probe": "internal_entity",
+            "status": "accepted",
+            "digest": "83c097cdd97752c4",
+            "exception": null
+          },
+          {
+            "probe": "internal_default_attribute",
+            "status": "accepted",
+            "digest": "bf82844d3400e469",
+            "exception": null
+          },
+          {
+            "probe": "external_dtd_benign_local",
+            "status": "accepted",
+            "digest": "cac327dbb29eec15",
+            "exception": null
+          }
+        ]
+      }
+    }
+  ],
+  "claim_level": "L4",
+  "admissible": true,
+  "inputs_now_rejected": {
+    "evaluated": true,
+    "now_rejected": [],
+    "different_result": [],
+    "probes_total": 6
+  },
+  "cost": {
+    "vs_baseline": {
+      "vs": "baseline",
+      "latency": {
+        "ratio": 1.387763415063378,
+        "ratio_lo": 1.3334091395727865,
+        "ratio_hi": 1.459222150178899,
+        "overhead_pct": 38.7763415063378,
+        "overhead_pct_lo": 33.34091395727865,
+        "overhead_pct_hi": 45.92221501788989,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": false
+      },
+      "peak_memory": {
+        "ratio": 1.0507089737233515,
+        "ratio_lo": 1.0053061536112384,
+        "ratio_hi": 1.1063497975538052,
+        "overhead_pct": 5.070897372335148,
+        "overhead_pct_lo": 0.5306153611238429,
+        "overhead_pct_hi": 10.634979755380524,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": true
+      }
+    },
+    "vs_matched_reference": null,
+    "noise_floor_pct": {
+      "latency_pct": 5.769272360110589,
+      "peak_memory_pct": 5.860019175455422
+    },
+    "raw_samples": {
+      "path": "measurement/raw_samples.jsonl",
+      "sha256": "3c730c9367cb7982f43fafb443aaa63dabecd3b6be5a4b40662aee11e05a8d34"
+    }
+  },
+  "budgets": [
+    {
+      "profile": "strict",
+      "path": "parapet/budgets/strict.parapet.budget.yaml",
+      "sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+      "caps": {
+        "latency_overhead_pct": 5.0,
+        "peak_memory_overhead_pct": 5.0
+      },
+      "fits": false,
+      "reasons": [
+        "latency overhead upper bound 45.92% > cap 5.0%",
+        "peak-memory overhead upper bound 10.63% > cap 5.0%"
+      ],
+      "recommended_patch": null,
+      "this_patch_recommended": false,
+      "claim_level": "L4"
+    },
+    {
+      "profile": "lenient",
+      "path": "parapet/budgets/lenient.parapet.budget.yaml",
+      "sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+      "caps": {
+        "latency_overhead_pct": 25.0,
+        "peak_memory_overhead_pct": 25.0
+      },
+      "fits": false,
+      "reasons": [
+        "latency overhead upper bound 45.92% > cap 25.0%"
+      ],
+      "recommended_patch": "R2",
+      "this_patch_recommended": false,
+      "claim_level": "L4"
+    }
+  ],
+  "generator": {
+    "name": "hand-written reference"
+  },
+  "prompt": null,
+  "environment": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "6.6.114.1-microsoft-standard-WSL2",
+    "wsl": true,
+    "cpu": "Intel(R) Core(TM) i9-14900KF",
+    "logical_cpus": 32,
+    "ram_gib": 31.2,
+    "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 610.60",
+    "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "jdk_full": [
+      "openjdk version \"21.0.13.0.3\" 2026-10-24",
+      "OpenJDK Runtime Environment (build 21.0.13.0.3+1-1-26.04.1-Ubuntu)",
+      "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-26.04.1-Ubuntu, mixed mode, sharing)"
+    ],
+    "javac": "javac 21.0.13.0.3",
+    "python": "3.14.4",
+    "python_packages": {
+      "numpy": "2.5.5",
+      "openai": "2.54.0"
+    },
+    "loadavg": [
+      0.81396484375,
+      0.65869140625,
+      1.29052734375
+    ],
+    "cwd_is_linux_fs": false
+  },
+  "reproduce": "python -m parapet run --case L1 --budget parapet/budgets/strict.parapet.budget.yaml --budget parapet/budgets/lenient.parapet.budget.yaml --no-generator",
+  "repo": {
+    "commit": "083b7b8a66debb9ab80f556cb44419bf918a4ef6",
+    "branch": "mozilla/local-slice",
+    "dirty_outside_evidence": []
+  }
+}

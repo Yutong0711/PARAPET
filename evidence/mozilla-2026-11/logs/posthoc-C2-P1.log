@@ -1,0 +1,15 @@
+V0 L2 {'reproducer': False, 'heldout1': False, 'heldout2': False, 'functional': True, 'probes': True}
+R1 L4 {'reproducer': True, 'heldout1': True, 'heldout2': True, 'functional': True, 'probes': True}
+G2 L4 {'reproducer': True, 'heldout1': True, 'heldout2': True, 'functional': True, 'probes': True}
+P1 L4 {'reproducer': True, 'heldout1': True, 'heldout2': True, 'functional': True, 'probes': True}
+noise floor {'latency_pct': 2.860248865521431, 'peak_memory_pct': 3.21181981346077}
+baseline-AA latency +1.34% [+0.08, +2.86]
+R1 latency +9.98% [+8.85, +11.90]
+G2 latency +34.80% [+33.19, +37.23]
+P1 latency -6.60% [-7.67, -5.42]
+P1_vs_R1 latency -15.08% [-16.45, -14.23]
+P1_vs_G2 latency -30.72% [-31.84, -29.96]
+G2_vs_R1 latency +22.57% [+20.60, +24.50]
+copied to /mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/evidence/mozilla-2026-11/posthoc/C2-P1-session
+T2 exit 0
+Wed Nov 18 19:16:40 PST 2026

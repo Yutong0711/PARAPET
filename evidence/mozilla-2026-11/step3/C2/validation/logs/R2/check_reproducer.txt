@@ -1,0 +1,2 @@
+$ java -cp /home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3-C2-20261118T172012/patches/R2/classes/harness harness.c2.Reproducer
+PARAPET_RESULT {"check":"reproducer","fired":false,"fired_by":null,"outcome":"rejected","exception":"java.io.IOException: invalid configuration document: external entity or DTD reference refused: file:///tmp/parapet-c2-16293897890338114321/secret.txt"}

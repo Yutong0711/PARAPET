@@ -1,0 +1,46 @@
+{
+  "patch_id": "G4",
+  "kind": "generated candidate",
+  "source_sha256": "4b8231873f6fce9f56521afbc24bdcab4d97c8e7c09da850fc7c868034e5afe0",
+  "compile": {
+    "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G4/classes/target /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G4/src/example/prefs/PrefsCodec.java",
+    "ok": false,
+    "duration_s": 0.364,
+    "output": "Command 'javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G4/classes/target /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G4/src/example/prefs/PrefsCodec.java' failed: /home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G4/src/example/prefs/PrefsCodec.java:100: error: cannot find symbol\n        return Base64.getEncoder().encodeToString(bytes.toByteArray());\n               ^\n  symbol:   variable Base64\n  location: class PrefsCodec\n/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G4/src/example/prefs/PrefsCodec.java:105: error: cannot find symbol\n        byte[] data = Base64.getDecoder().decode(token);\n                      ^\n  symbol:   variable Base64\n  location: class PrefsCodec\n2 errors"
+  },
+  "harness_compile": {},
+  "checks": {
+    "reproducer": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "heldout1": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "heldout2": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "functional": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    },
+    "probes": {
+      "evaluated": false,
+      "passed": false,
+      "summary": "not run: patch does not compile"
+    }
+  },
+  "claim_level": "L1",
+  "admissible": false,
+  "classes": {
+    "target": "/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G4/classes/target",
+    "harness": "/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/patches/G4/classes/harness",
+    "support": "/home/yzhao/parapet-work/runs/step3-C1-20261118T171545/support-classes"
+  }
+}

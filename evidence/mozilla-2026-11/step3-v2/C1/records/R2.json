@@ -1,0 +1,338 @@
+{
+  "schema": "parapet.hardening-record/1",
+  "case": {
+    "id": "C1",
+    "title": "Preference tokens restored with Java object serialization"
+  },
+  "weakness": {
+    "cwe": "CWE-502",
+    "name": "Deserialization of Untrusted Data"
+  },
+  "patch": {
+    "id": "R2",
+    "kind": "reference fix (hand-written)",
+    "source_sha256": "3e62b47b2d6339c333d27c84ecbed1bc37dd53a6ed9ff7fb4fdbce1fafc800a1",
+    "source_path": "parapet/cases/C1/reference/R2/example/prefs/PrefsCodec.java"
+  },
+  "mechanism": {
+    "route": "substituted mechanism",
+    "description": "explicit data-only token format read field by field (no object deserialization)",
+    "guidance": [
+      "OWASP Deserialization Cheat Sheet, 'Using Alternative Data Formats': 'A great reduction of risk is achieved by avoiding native (de)serialization formats. By switching to a pure data format like JSON or XML ...' https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+      "Oracle, Secure Coding Guidelines for Java SE, Section 8: 'Deserialization of untrusted data is inherently dangerous and should be avoided.' https://www.oracle.com/java/technologies/javase/seccodeguide.html"
+    ]
+  },
+  "diff": "--- a/example/prefs/PrefsCodec.java\n+++ b/example/prefs/PrefsCodec.java\n@@ -2,10 +2,12 @@\n \n import java.io.ByteArrayInputStream;\n import java.io.ByteArrayOutputStream;\n+import java.io.DataInputStream;\n+import java.io.DataOutputStream;\n+import java.io.EOFException;\n import java.io.IOException;\n-import java.io.ObjectInputStream;\n-import java.io.ObjectOutputStream;\n import java.io.Serializable;\n+import java.nio.charset.StandardCharsets;\n import java.util.ArrayList;\n import java.util.Base64;\n import java.util.Collections;\n@@ -21,6 +23,18 @@\n  * where {@link #decode(String)} turns it back into preferences.\n  */\n public final class PrefsCodec {\n+\n+    /*\n+     * Tokens use an explicit data-only format instead of Java object\n+     * serialization: decode() reads strings and integers field by field and\n+     * never instantiates a class named by the input. Format (big-endian):\n+     * magic, version, user, theme, fontSize, recentFiles, shortcuts, where a\n+     * string is a length (-1 for null) followed by UTF-8 bytes and a list or\n+     * map is a count followed by its strings.\n+     */\n+    private static final int MAGIC = 0x50524546; // \"PREF\"\n+    private static final int VERSION = 1;\n+    private static final int MAX_ENTRIES = 100_000;\n \n     private PrefsCodec() {\n     }\n@@ -95,8 +109,21 @@\n     /** Turns preferences into a Base64 token. */\n     public static String encode(UserPrefs prefs) throws IOException {\n         ByteArrayOutputStream bytes = new ByteArrayOutputStream();\n-        try (ObjectOutputStream out = new ObjectOutputStream(bytes)) {\n-            out.writeObject(prefs);\n+        try (DataOutputStream out = new DataOutputStream(bytes)) {\n+            out.writeInt(MAGIC);\n+            out.writeByte(VERSION);\n+            writeString(out, prefs.user);\n+            writeString(out, prefs.theme);\n+            out.writeInt(prefs.fontSize);\n+            out.writeInt(prefs.recentFiles.size());\n+            for (String file : prefs.recentFiles) {\n+                writeString(out, file);\n+            }\n+            out.writeInt(prefs.shortcuts.size());\n+            for (Map.Entry<String, String> e : prefs.shortcuts.entrySet()) {\n+                writeString(out, e.getKey());\n+                writeString(out, e.getValue());\n+            }\n         }\n         return Base64.getEncoder().encodeToString(bytes.toByteArray());\n     }\n@@ -104,10 +131,62 @@\n     /** Restores preferences from a token produced by {@link #encode(UserPrefs)}. */\n     public static UserPrefs decode(String token) throws IOException {\n         byte[] data = Base64.getDecoder().decode(token);\n-        try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(data))) {\n-            return (UserPrefs) in.readObject();\n-        } catch (ClassNotFoundException e) {\n-            throw new IOException(\"unknown class in preferences token\", e);\n+        DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));\n+        try {\n+            if (in.readInt() != MAGIC || in.readUnsignedByte() != VERSION) {\n+                throw new IOException(\"not a preferences token\");\n+            }\n+            String user = readString(in);\n+            String theme = readString(in);\n+            int fontSize = in.readInt();\n+            int fileCount = readCount(in);\n+            List<String> recentFiles = new ArrayList<>(Math.min(fileCount, 1024));\n+            for (int i = 0; i < fileCount; i++) {\n+                recentFiles.add(readString(in));\n+            }\n+            int shortcutCount = readCount(in);\n+            Map<String, String> shortcuts = new LinkedHashMap<>();\n+            for (int i = 0; i < shortcutCount; i++) {\n+                String key = readString(in);\n+                shortcuts.put(key, readString(in));\n+            }\n+            if (in.read() != -1) {\n+                throw new IOException(\"trailing data in preferences token\");\n+            }\n+            return new UserPrefs(user, theme, fontSize, recentFiles, shortcuts);\n+        } catch (EOFException e) {\n+            throw new IOException(\"truncated preferences token\", e);\n         }\n     }\n+\n+    private static void writeString(DataOutputStream out, String s) throws IOException {\n+        if (s == null) {\n+            out.writeInt(-1);\n+            return;\n+        }\n+        byte[] utf8 = s.getBytes(StandardCharsets.UTF_8);\n+        out.writeInt(utf8.length);\n+        out.write(utf8);\n+    }\n+\n+    private static String readString(DataInputStream in) throws IOException {\n+        int length = in.readInt();\n+        if (length == -1) {\n+            return null;\n+        }\n+        if (length < 0 || length > in.available()) {\n+            throw new IOException(\"invalid string length in preferences token\");\n+        }\n+        byte[] utf8 = new byte[length];\n+        in.readFully(utf8);\n+        return new String(utf8, StandardCharsets.UTF_8);\n+    }\n+\n+    private static int readCount(DataInputStream in) throws IOException {\n+        int count = in.readInt();\n+        if (count < 0 || count > MAX_ENTRIES) {\n+            throw new IOException(\"invalid entry count in preferences token\");\n+        }\n+        return count;\n+    }\n }\n",
+  "checks": [
+    {
+      "name": "compile",
+      "command": "javac --release 17 -encoding UTF-8 -d /home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/classes/target /home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/src/example/prefs/PrefsCodec.java",
+      "passed": true,
+      "summary": "compiles"
+    },
+    {
+      "name": "reproducer",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/support-classes:/home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/classes/harness harness.c1.Reproducer",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "reproducer",
+        "fixture": "reproducer.b64",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: not a preferences token"
+      }
+    },
+    {
+      "name": "heldout1",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/support-classes:/home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/classes/harness harness.c1.HeldOut1",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout1",
+        "fixture": "heldout1.b64",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: not a preferences token"
+      }
+    },
+    {
+      "name": "heldout2",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/support-classes:/home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/classes/harness harness.c1.HeldOut2",
+      "passed": true,
+      "evaluated": true,
+      "summary": "canary did not fire; input rejected",
+      "result": {
+        "check": "heldout2",
+        "fixture": "heldout2.b64",
+        "fired": false,
+        "fired_by": null,
+        "outcome": "rejected",
+        "exception": "java.io.IOException: not a preferences token"
+      }
+    },
+    {
+      "name": "functional",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/support-classes:/home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/classes/harness harness.c1.FunctionalTests",
+      "passed": true,
+      "evaluated": true,
+      "summary": "11/11 functional tests pass",
+      "result": {
+        "check": "functional",
+        "passed": 11,
+        "failed": 0,
+        "tests": [
+          {
+            "name": "roundtrip_typical",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_empty_collections",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_null_theme",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_unicode",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "roundtrip_500_recent_files",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "order_preserved",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "int_extremes",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "token_is_base64_text",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decoded_collections_are_read_only",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decode_rejects_truncated_token",
+            "ok": true,
+            "detail": null
+          },
+          {
+            "name": "decode_rejects_non_token_text",
+            "ok": true,
+            "detail": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "probes",
+      "command": "java '-Dparapet.fixtures=/mnt/d/2027-Funding/2027 Mozilla Foundation Human-Scale AI Incubator/Mozilla-1117/PARAPET-v1.0/parapet/cases/C1/fixtures' -cp /home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/classes/target:/home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/support-classes:/home/yzhao/parapet-work/runs/step3v2-C1-20261118T174700/patches/R2/classes/harness harness.c1.Probes",
+      "passed": true,
+      "evaluated": true,
+      "summary": "probes evaluated (informational)",
+      "result": {
+        "check": "probes",
+        "probes": [
+          {
+            "probe": "probe_typical.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          },
+          {
+            "probe": "probe_empty.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          },
+          {
+            "probe": "probe_large.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          },
+          {
+            "probe": "probe_unicode.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          },
+          {
+            "probe": "probe_legacy_linkedlist.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          },
+          {
+            "probe": "probe_legacy_hashmap.b64",
+            "status": "rejected",
+            "digest": null,
+            "exception": "java.io.IOException: not a preferences token"
+          }
+        ]
+      }
+    }
+  ],
+  "claim_level": "L4",
+  "admissible": true,
+  "inputs_now_rejected": {
+    "evaluated": true,
+    "now_rejected": [
+      {
+        "probe": "probe_typical.b64",
+        "exception": "java.io.IOException: not a preferences token"
+      },
+      {
+        "probe": "probe_empty.b64",
+        "exception": "java.io.IOException: not a preferences token"
+      },
+      {
+        "probe": "probe_large.b64",
+        "exception": "java.io.IOException: not a preferences token"
+      },
+      {
+        "probe": "probe_unicode.b64",
+        "exception": "java.io.IOException: not a preferences token"
+      },
+      {
+        "probe": "probe_legacy_linkedlist.b64",
+        "exception": "java.io.IOException: not a preferences token"
+      },
+      {
+        "probe": "probe_legacy_hashmap.b64",
+        "exception": "java.io.IOException: not a preferences token"
+      }
+    ],
+    "different_result": [],
+    "probes_total": 6
+  },
+  "cost": {
+    "vs_baseline": {
+      "vs": "baseline",
+      "latency": {
+        "ratio": 0.3690571278614998,
+        "ratio_lo": 0.36400280456058814,
+        "ratio_hi": 0.3760584076446068,
+        "overhead_pct": -63.09428721385002,
+        "overhead_pct_lo": -63.59971954394119,
+        "overhead_pct_hi": -62.39415923553933,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": false
+      },
+      "peak_memory": {
+        "ratio": 0.7364460144371064,
+        "ratio_lo": 0.7203330369185055,
+        "ratio_hi": 0.7482783826414804,
+        "overhead_pct": -26.355398556289355,
+        "overhead_pct_lo": -27.96669630814945,
+        "overhead_pct_hi": -25.17216173585196,
+        "n_arm": 20,
+        "n_base": 20,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "seed": 20261119,
+        "indistinguishable_from_noise": false
+      }
+    },
+    "vs_matched_reference": null,
+    "noise_floor_pct": {
+      "latency_pct": 3.0298654147413284,
+      "peak_memory_pct": 2.081260999311352
+    },
+    "raw_samples": {
+      "path": "measurement/raw_samples.jsonl",
+      "sha256": "983498a69b4661465f9088f50abcf8030fb7d994b7c7f6f9a64ba29decd7e9c9"
+    }
+  },
+  "budgets": [
+    {
+      "profile": "strict",
+      "path": "parapet/budgets/strict.parapet.budget.yaml",
+      "sha256": "208491b8306db37da0dd43bb23a217137ac4b711106bf9284bf13f5ae99a4dc3",
+      "caps": {
+        "latency_overhead_pct": 5.0,
+        "peak_memory_overhead_pct": 5.0
+      },
+      "fits": true,
+      "reasons": [],
+      "recommended_patch": "R2",
+      "this_patch_recommended": true,
+      "claim_level": "L5"
+    },
+    {
+      "profile": "lenient",
+      "path": "parapet/budgets/lenient.parapet.budget.yaml",
+      "sha256": "fdada931cc9381c870237d02f790ccc9535a4b127d9c131c4c3894262085ff28",
+      "caps": {
+        "latency_overhead_pct": 25.0,
+        "peak_memory_overhead_pct": 25.0
+      },
+      "fits": true,
+      "reasons": [],
+      "recommended_patch": "R2",
+      "this_patch_recommended": true,
+      "claim_level": "L5"
+    }
+  ],
+  "generator": {
+    "name": "hand-written reference"
+  },
+  "prompt": null,
+  "environment": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "6.6.114.1-microsoft-standard-WSL2",
+    "wsl": true,
+    "cpu": "Intel(R) Core(TM) i9-14900KF",
+    "logical_cpus": 32,
+    "ram_gib": 31.2,
+    "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 610.60",
+    "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "jdk_full": [
+      "openjdk version \"21.0.13.0.3\" 2026-10-24",
+      "OpenJDK Runtime Environment (build 21.0.13.0.3+1-1-26.04.1-Ubuntu)",
+      "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-26.04.1-Ubuntu, mixed mode, sharing)"
+    ],
+    "javac": "javac 21.0.13.0.3",
+    "python": "3.14.4",
+    "python_packages": {
+      "numpy": "2.5.5",
+      "openai": "2.54.0"
+    },
+    "loadavg": [
+      1.4921875,
+      2.20361328125,
+      2.98291015625
+    ],
+    "cwd_is_linux_fs": false
+  },
+  "reproduce": "python -m parapet run --case C1 --budget parapet/budgets/strict.parapet.budget.yaml --budget parapet/budgets/lenient.parapet.budget.yaml --no-generator",
+  "repo": {
+    "commit": "a137f02c4678bde5889045623cbff42e007829a2",
+    "branch": "mozilla/local-slice",
+    "dirty_outside_evidence": []
+  }
+}

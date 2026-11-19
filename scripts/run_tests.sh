@@ -8,8 +8,8 @@
 #
 # Usage:
 #   ./scripts/run_tests.sh              # run everything available on this machine
-#   ./scripts/run_tests.sh functional   # component functional + Python smoke tests
-#   ./scripts/run_tests.sh jvm          # Java end-to-end smoke tests (needs a JDK)
+#   ./scripts/run_tests.sh functional   # component + parapet functional, Python smoke tests
+#   ./scripts/run_tests.sh jvm          # Java end-to-end tests: PerfOrch smoke + parapet harness (needs a JDK)
 #   ./scripts/run_tests.sh sanity       # repository + website structural checks
 #
 # Set PYTHON to choose an interpreter (default: python3).
@@ -45,12 +45,12 @@ fi
 case "$SUITE" in
   all|functional)
     run "Component functional and Python runtime smoke tests" \
-      "$PYTHON" -m pytest tests/perforch tests/more_than_just_functional -m "not jvm"
+      "$PYTHON" -m pytest tests/perforch tests/more_than_just_functional tests/parapet -m "not jvm"
     ;;&
   all|jvm)
     if command -v javac >/dev/null 2>&1; then
       run "Java/JVM end-to-end smoke tests" \
-        "$PYTHON" -m pytest tests/perforch -m jvm
+        "$PYTHON" -m pytest tests/perforch tests/parapet -m jvm
     else
       echo
       echo "=== Java/JVM end-to-end smoke tests ==="
