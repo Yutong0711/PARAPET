@@ -59,6 +59,7 @@ evidence directory with the run outputs).
 | 2026-11-18 16:52:36 | `https://www.oracle.com/java/technologies/javase/seccodeguide.html` | verify citation for C1 R1/R2 |
 | 2026-11-18 16:52:57 | `https://wiki.sei.cmu.edu/confluence/display/java/IDS17-J.+Prevent+XML+External+Entity+Attacks` | verify citation for C2 R2 |
 | 2026-11-18 16:52:58 | `https://wiki.sei.cmu.edu/confluence/display/java/SER12-J.+Prevent+deserialization+of+untrusted+data` | checked, not cited |
+| 2026-11-18 17:14:33 | `https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct/raw/main/README.md` | model card: parameter count, license |
 
 Model-call endpoints are logged separately, per run, in each run's
 `generation/endpoint_log.jsonl`.
