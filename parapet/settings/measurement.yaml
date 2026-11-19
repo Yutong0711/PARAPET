@@ -1,0 +1,24 @@
+# PARAPET measurement protocol -- pre-registered. Applies to every case.
+version: 1
+forks_per_arm: 20          # forked JVMs per arm (protocol minimum is 10)
+min_valid_forks: 10        # an arm with fewer valid forks has no cost estimate and fits no budget
+warmup_rounds: 10          # run and discarded inside each JVM
+measured_rounds: 20        # timed inside each JVM; ops per round come from the case's workload
+jvm_flags: ["-XX:+UseSerialGC", "-Xms64m", "-Xmx512m", "-XX:-UsePerfData"]
+cpu_affinity: "2-5"        # taskset -c; same for every fork and every arm
+fork_timeout_s: 120
+schedule_seed: 20261118    # fork i runs every arm once, in an order shuffled with Random(seed * 1000 + i)
+latency_sample: mean nanoseconds per operation over the measured rounds of one fork
+memory_sample: peak resident set size of the forked JVM (ru_maxrss from wait4, KiB)
+statistic: ratio of medians across forks (arm / unpatched baseline)
+bootstrap:
+  resamples: 10000
+  confidence: 0.95
+  method: percentile; forks resampled with replacement, independently within each arm
+  seed: 20261119
+noise_floor: >-
+  The A/A arm is a second, separately compiled copy of the unpatched baseline.
+  Noise floor (percent) = max(|lo - 1|, |hi - 1|) * 100 of the A/A ratio's 95%
+  interval, computed separately for latency and peak memory. A cost difference
+  whose point estimate is smaller in magnitude than the noise floor is reported
+  as indistinguishable.
